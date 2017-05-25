@@ -1,13 +1,16 @@
 // @flow
 import React from "react"
-import firebase from 'firebase'
+import firebase from "firebase"
 import { HashRouter as Router, Route } from "react-router-dom"
+import { connect } from "react-redux"
 import Toolbar from "react-md/lib/Toolbars"
 import Paper from "react-md/lib/Papers"
 import Button from "react-md/lib/Buttons/Button"
 import TextField from "react-md/lib/TextFields"
 import FontIcon from "react-md/lib/FontIcons"
 import { app as fbApp } from "../../libs/db"
+import { userSelector } from "../../redux/getters"
+import { updateUser } from "../../redux/actions"
 import "./App.scss"
 
 const actions = [
@@ -16,10 +19,18 @@ const actions = [
 
 const nav = <Button key="nav" icon>menu</Button>
 
-class App extends React.Component {
+const mapStateToProps = state => ({
+  user: userSelector(state)
+})
 
-  componentWillMount(){
-    firebase.auth(fbApp).onAuthStateChanged( user => console.log(user) )
+const mapDispatchToProps = {
+  updateUser
+}
+
+@connect(mapStateToProps, mapDispatchToProps)
+class App extends React.Component {
+  componentWillMount() {
+    firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
   }
 
   render = () => (
@@ -46,9 +57,9 @@ class App extends React.Component {
           inputClassName="md-text-field--toolbar"
         />
       </Toolbar>
+      { this.props.user ? this.props.user.email : 'null'}
       <Router>
-        <div>
-        </div>
+        <div />
       </Router>
     </app>
   )
