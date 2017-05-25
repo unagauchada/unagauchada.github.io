@@ -10,6 +10,7 @@ import FontIcon from "react-md/lib/FontIcons"
 import { app as fbApp } from "../../libs/db"
 import { userSelector } from "../../redux/getters"
 import { updateUser } from "../../redux/actions"
+import Signup from '../Signup'
 import "./App.scss"
 
 const actions = [
@@ -45,7 +46,7 @@ class App extends React.Component {
         actions={actions}
         nav={nav}
       >
-        <caption>Explorar</caption>
+        <section>Explorar</section>
         <TextField
           id="iconLeftPhone"
           block
@@ -56,9 +57,11 @@ class App extends React.Component {
           inputClassName="md-text-field--toolbar"
         />
       </Toolbar>
-      { this.props.user ? this.props.user.email : 'null'}
+      {this.props.user ? this.props.user.email : "null"}
       <Router>
-        <div />
+        <div>
+          <Route path='/signup' component={Signup} />
+        </div>
       </Router>
     </app>
   )
