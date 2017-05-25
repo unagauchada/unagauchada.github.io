@@ -1,4 +1,3 @@
-import {combineReducers} from 'redux'
 import * as mutations from './mutationsTypes'
 
 const defaultState = {
