@@ -1,0 +1,15 @@
+list{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    .md-card{
+        margin: 10px 15px;
+        width: 300px;
+
+        .md-card-text{
+            font-weight: 100;
+            font-size: 20px;
+        }
+    }
+}
