@@ -19,3 +19,14 @@ publications{
         right: 32px;
     }
 }
+
+.googleDialog {
+    .md-dialog {
+        width: 570px;
+        border-radius: 4px;
+
+        .md-dialog-content{
+            padding: 5px;
+        }
+    }
+}
