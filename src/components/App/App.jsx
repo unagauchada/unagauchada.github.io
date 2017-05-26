@@ -10,13 +10,29 @@ import FontIcon from "react-md/lib/FontIcons"
 import { app as fbApp } from "../../libs/db"
 import { userSelector } from "../../redux/getters"
 import { updateUser } from "../../redux/actions"
-import Signup from '../Signup'
-import Login from '../Login'
+import Signup from "../Signup"
+import Login from "../Login"
 import "./App.scss"
 
-const actions = [
-  <Button className="login-btn" key="login" raised primary label="Login" />
-]
+const actions = user =>
+  user === null
+    ? [
+        <Button
+          className="login-btn"
+          key="login"
+          raised
+          primary
+          label="Login"
+        />
+      ]
+    : [  
+        <Button
+          className="login-btn"
+          key="login"
+          raised
+          primary
+          label="Logout"
+        /> ] 
 
 const nav = <Button key="nav" icon>menu</Button>
 
@@ -34,7 +50,9 @@ class App extends React.Component {
     firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
   }
 
-  render = () => (
+  render = () =>{ 
+  console.log(this.props.user)
+  return (
     <app>
       <Toolbar
         zDepth={1}
@@ -44,7 +62,7 @@ class App extends React.Component {
             Una<span>Gauchada</span>
           </h2>
         }
-        actions={actions}
+        actions={actions(this.props.user)}
         nav={nav}
       >
         <section>Explorar</section>
@@ -60,12 +78,12 @@ class App extends React.Component {
       </Toolbar>
       <Router>
         <div>
-          <Route path='/signup' component={Signup} />
-          <Route path='/signin' component={Login} />
+          <Route path="/signup" component={Signup} />
+          <Route path="/signin" component={Login} />
         </div>
       </Router>
     </app>
-  )
+  )}
 }
 
 export default App
