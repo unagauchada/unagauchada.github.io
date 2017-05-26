@@ -11,6 +11,7 @@ import { app as fbApp } from "../../libs/db"
 import { userSelector } from "../../redux/getters"
 import { updateUser } from "../../redux/actions"
 import Signup from '../Signup'
+import Login from '../Login'
 import "./App.scss"
 
 const actions = [
@@ -57,10 +58,10 @@ class App extends React.Component {
           inputClassName="md-text-field--toolbar"
         />
       </Toolbar>
-      {this.props.user ? this.props.user.email : "null"}
       <Router>
         <div>
           <Route path='/signup' component={Signup} />
+          <Route path='/signin' component={Login} />
         </div>
       </Router>
     </app>
