@@ -3,7 +3,7 @@
 signup{
     width: 400px;
     display: block;
-    margin: 120px auto 0;
+    margin: 80px auto 0;
     header{
         padding: 25px 50px 15px;
         font-size: xx-large;
@@ -14,11 +14,13 @@ signup{
     
     section {
         padding: 15px 50px;
+        background: #fff;
     }
 
     footer {
         padding: 15px 50px 25px;
         text-align: right;
+        background: #fff;
     }
 
 }
