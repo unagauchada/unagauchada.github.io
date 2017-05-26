@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 import firebase from "firebase"
-import { HashRouter as Router, Route } from "react-router-dom"
+import { HashRouter as Router, Route, Link } from "react-router-dom"
 import { connect } from "react-redux"
 import Toolbar from "react-md/lib/Toolbars"
 import Button from "react-md/lib/Buttons/Button"
@@ -12,27 +12,8 @@ import { userSelector } from "../../redux/getters"
 import { updateUser } from "../../redux/actions"
 import Signup from "../Signup"
 import Login from "../Login"
+import actionCreator from '../ToolbarActions'
 import "./App.scss"
-
-const actions = user =>
-  user === null
-    ? [
-        <Button
-          className="login-btn"
-          key="login"
-          raised
-          primary
-          label="Login"
-        />
-      ]
-    : [  
-        <Button
-          className="login-btn"
-          key="login"
-          raised
-          primary
-          label="Logout"
-        /> ] 
 
 const nav = <Button key="nav" icon>menu</Button>
 
@@ -53,7 +34,8 @@ class App extends React.Component {
   render = () =>{ 
   console.log(this.props.user)
   return (
-    <app>
+    <Router>
+      <app>
       <Toolbar
         zDepth={1}
         colored
@@ -62,7 +44,7 @@ class App extends React.Component {
             Una<span>Gauchada</span>
           </h2>
         }
-        actions={actions(this.props.user)}
+        actions={actionCreator(this.props.user)}
         nav={nav}
       >
         <section>Explorar</section>
@@ -76,13 +58,11 @@ class App extends React.Component {
           inputClassName="md-text-field--toolbar"
         />
       </Toolbar>
-      <Router>
-        <div>
+
           <Route path="/signup" component={Signup} />
           <Route path="/signin" component={Login} />
-        </div>
+        </app>
       </Router>
-    </app>
   )}
 }
 
