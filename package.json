@@ -3,8 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "firebase": "^4.0.0",
+    "flow-bin": "^0.46.0",
+    "lodash": "^4.17.4",
     "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react-dom": "^15.5.4",
+    "react-md": "^1.0.15",
+    "react-redux": "^5.0.5",
+    "react-router": "^4.1.1",
+    "react-router-dom": "^4.1.1",
+    "redux": "^3.6.0",
+    "redux-actions": "^2.0.3",
+    "redux-thunk": "^2.2.0",
+    "reselect": "^3.0.1",
+    "webfontloader": "^1.6.27"
   },
   "devDependencies": {
     "custom-react-scripts": "0.0.23"
@@ -13,6 +25,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "flow": "flow"
   }
 }

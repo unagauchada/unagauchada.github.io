@@ -1,0 +1,48 @@
+@import './variables.scss';
+@include react-md-everything;
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background-color: $md-grey-50;
+}
+
+app {
+    header.md-toolbar {
+        //background-color: $md-white-base;
+        section {
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            padding-left: 24px;
+            margin: 0;
+            margin-left: 24px;
+            line-height: 32px;
+            color: #fff;
+            font-weight: 500;
+            font-family: 'Product Sans';
+            font-size: 20px;
+            display: flex;
+            align-self: center;
+        }
+        .toolbar-text {
+            background-color: rgba(255, 255, 255, .15);
+            margin-right: 36px;
+            margin-left: 48px;
+            padding: 11px 12px;
+            border-radius: 3px;
+            max-width: 720px;
+            .md-text-field-icon-container {
+                align-items: center;
+            }
+        }
+        .md-title {
+            font-family: 'Product Sans';
+            font-weight: 600;
+            span {
+                font-weight: 300;
+            }
+        }
+        .login-btn {
+            background-color: $md-orange-900;
+        }
+    }
+}
