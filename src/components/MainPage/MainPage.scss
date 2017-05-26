@@ -1,0 +1,22 @@
+.mainPage {
+    padding-top: 16px;
+    display: flex;
+    flex-direction: row;
+
+    & > aside {
+        min-width: 210px;
+        display: flex;
+        flex-grow: 0;
+        
+        & > .md-list {
+           background-color: transparent;
+           width: 100%; 
+        }
+    }
+
+    & > content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+}
