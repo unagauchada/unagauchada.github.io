@@ -27,18 +27,36 @@ class Login extends React.Component {
       .catch(error => this.setState({ error }))
   }
 
+  getUserError = () => {
+    if(!this.state.error){
+      return null;
+    }
+
+    switch (this.state.error.code) {
+      case 'auth/user-not-found':
+        return 'No existe el Usuario'
+      case 'auth/user-disabled':
+        return 'El usuario no esta habilitado'
+      case 'auth/invalid-email':
+        return 'Email inválido'
+      default:
+        return null;
+    }
+  }
+
   render = () => (
     <login>
       <Paper zDepth={2}>
         <header>Ingresar al sistema</header>
         <section>
-          { this.state.error ? <error>{this.state.error.message}</error> : null}
           <TextField
             id="email"
             label="Email"
             fullWidth={true}
             value={this.state.email}
             onChange={this.handleChange("email")}
+            error={ (this.state.error) && ( ['auth/user-not-found', 'auth/user-disabled', 'auth/invalid-email'].indexOf(this.state.error.code) > -1) }
+            errorText={this.getUserError()}
           />
           <TextField
             id="password"
@@ -47,8 +65,9 @@ class Login extends React.Component {
             fullWidth={true}
             value={this.state.password}
             onChange={this.handleChange("password")}
+            error={(this.state.error) && (this.state.error.code ==='auth/wrong-password')}
+            errorText={"Contraseña incorrecta"}
           />
-          {" "}
         </section>
         <footer>
           <Button raised label="Aceptar" primary onClick={this.loginUser} />
