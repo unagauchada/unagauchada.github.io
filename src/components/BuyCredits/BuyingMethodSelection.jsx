@@ -1,20 +1,85 @@
 import React, { PureComponent } from 'react';
 import CardReactFormContainer from 'card-react';
+import Card from 'react-md/lib/Cards/Card';
+import CardTitle from 'react-md/lib/Cards/CardTitle';
+import CardActions from "react-md/lib/Cards/CardActions"
+import Media from 'react-md/lib/Media';
+import Button from "react-md/lib/Buttons"
+import firebase from "firebase"
+import rootRef, { app } from "../../libs/db"
+
 import "./card.scss"
+import "./BuyCredits.scss"
+
+const database = firebase.database();
+const user = firebase.auth().currentUser;
 
 export default class BuyingMethodSelector extends PureComponent {
   constructor(props) {
     super(props);
 
-    this._handleChange = this._handleChange.bind(this);
   }
 
-  _handleChange(stackedValue) {
-    this.setState({ stackedValue });
+  getUserDisplayName = () => {
+    var displayName;
+
+    if (user != null) {
+        displayName = `${user.name} ${user.lastname[0].toUpperCase()}`;
+    }
+
+    return displayName      
   }
 
-  render = () => (
-        <div>
+  getUserId = () => {
+    var uid;
+
+    if (user != null) {
+        uid = user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
+                        // this value to authenticate with your backend server, if
+                        // you have one. Use User.getToken() instead.
+    }
+
+    return uid
+  }
+
+  writeNewCredits(price, value) {
+    var userId = this.getUserId()
+    
+    // A credits entry.
+    var CreditsData = {
+        price: price,
+        value: value,
+        type : "Buy"    };
+
+    // Get a key for a new credits.
+    var newCreditsKey = database.ref().child('credits/' + userId).push().key;
+
+    // Write the new credits' data.
+    var updates = {};
+    updates['credits/' + userId + '/' + newCreditsKey] = CreditsData;
+
+    return database.ref().update(updates);
+    }
+
+
+  purchaseCredits = (purchase) => {
+    this.writeNewCredits(purchase.cost, purchase.creditsAmount)
+    this.props.nextStep(this.props.purchase)
+  }
+
+  render = () => {
+      let displayName = this.getUserDisplayName()
+      console.log(user)
+
+      return(
+        <Card id="purchase-card">
+            <Media>
+                <img role="presentation" src="https://unsplash.it/40/40?random&time=${new Date().getTime()}" />
+            </Media>            
+            <CardTitle
+                title={this.props.purchase.creditsAmount.toString().concat(" Creditos")}
+                subtitle={"$".concat(this.props.purchase.cost.toString())}  
+            />
             <CardReactFormContainer
                 
                 // the id of the container element where you want to render the card element.
@@ -33,12 +98,12 @@ export default class BuyingMethodSelector extends PureComponent {
                 }
                 
                 // initial values to render in the card element
-                initialValues= {
+                initialValues={
                     {
-                    number: '•••• •••• •••• ••••', // optional — default •••• •••• •••• ••••
+/*                    number: '•••• •••• •••• ••••', // optional — default •••• •••• •••• ••••
                     cvc: '•••', // optional — default •••
                     expiry: '••/••', // optional — default ••/••
-                    name: 'FULL NAME' // optional — default FULL NAME
+*/                  name: {displayName} // optional — default FULL NAME
                     }
                 }
                 
@@ -62,10 +127,23 @@ export default class BuyingMethodSelector extends PureComponent {
                     <input placeholder="CVC" type="text" name="CCcvc" />
                 </form>
                 
-                </CardReactFormContainer>
+            </CardReactFormContainer>
     
-            // the container in which the card component will be rendered - can be anywhere in the DOM
             <div id="card-wrapper"></div>
-        </div>
-    )
+            <CardActions>
+                <Button 
+                    raised
+                    label="Cancelar" 
+                    secondary
+                    className="md-btn--dialog"
+                />
+                <Button 
+                    raised 
+                    label={"Pagar ".concat("$".concat(this.props.purchase.cost.toString()))} 
+                    primary 
+                    className="md-btn--dialog md-cell--right"
+                    onClick={ () => this.props.nextStep(this.props.purchase) } />
+            </CardActions>
+        </Card>
+    )}
 }

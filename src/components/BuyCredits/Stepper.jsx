@@ -1,30 +1,51 @@
 import React, { PureComponent } from 'react';
-import Button from "react-md/lib/Buttons"
+import BuyingMethodSelection from './BuyingMethodSelection';
+import BuyingAmountSelection from './BuyingAmountSelection';
 import ProgressSteps from "react-progress-steps"
+import PurchaseFinished from "./PurchaseFinished"
+
+const step = ( title, content ) => ({title, content})
 
 export default class Stepper extends PureComponent {
+
 
   constructor(props) {
     super(props);
 
-    this.state = { index: 0 }
+    this.state = { index: 0, purchase: null }
   }
 
-  nextStep = () => {
-      let index = this.state.index
-      if (this.state.index < this.props.steps.length){
+  nextStep = ( purchase ) => {
+    let index = this.state.index
+    console.log(purchase)
+    if(purchase){
+        this.setState({ purchase })
+    }
+    if (index < this.steps.length){
         index = index + 1
         this.setState({index})
-      }else{
-
-      }
+        console.log("next step")
+    }
   }
 
+  steps = [
+    step(
+        "Seleccionar creditos a comprar",
+        (purchase) => <BuyingAmountSelection nextStep={this.nextStep}/>
+    ),
+    step(
+        "Informacion de facturacion",
+        (purchase) => <BuyingMethodSelection nextStep={this.nextStep} purchase={purchase}/>
+    ),
+    step(
+        "Pedido completado",
+        (purchase) => <PurchaseFinished purchase={purchase}/>
+    )
+  ]
+
   render = () => (
-    <div>
-        <ProgressSteps steps={ this.props.steps.length } current={ this.state.index +1 } />
-        { this.props.steps[this.state.index].content }
-        <Button raised label="Aceptar" primary onClick={this.nextStep} />
+    <div className="card-container">
+        { this.steps[this.state.index].content(this.state.purchase) }
     </div>
   )
 }

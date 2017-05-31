@@ -1,59 +1,70 @@
 // @flow
 
 import React from "react"
-import Paper from 'react-md/lib/Papers';
-import Button from "react-md/lib/Buttons"
+import Card from 'react-md/lib/Cards/Card';
+import CardTitle from 'react-md/lib/Cards/CardTitle';
+import Media from 'react-md/lib/Media';
 import "./BuyCredits.scss"
-import Divider from 'react-md/lib/Dividers';
+import firebase from "firebase"
+import { app } from "../../libs/db.js"
 
-const Amount = ({ amount }) => {
-    console.log(amount.description)
+import rootRef from "../../libs/db"
+
+var cost = 0
+
+const database = firebase.database();
+
+const Amount = ({ purchase, nextStep }) => {
     return(
-    <div className="paper-container md-block-centered">
-        <Paper
-            zDepth={1}
-            raiseOnHover= {true}
-        >
-            <h1>{amount.value}</h1>
-            <p>{amount.description}</p>
-            <Divider/>
-            <h2 className= "md-block-centered">{amount.cost}</h2>
-        </Paper>        
-    </div>
-)}
+      <div onClick={() => nextStep(purchase)}>
+        <Card raise className="md-block-centered">
+          <Media>
+            <img role="presentation" allowFullScreen src="https://unsplash.it/40/40?random&time=${new Date().getTime()}" />
+          </Media>
+          <CardTitle 
+            title={purchase.creditsAmount.toString().concat(" Creditos")} 
+            subtitle={"$".concat(purchase.cost.toString())} />
+        </Card>
+      </div>
+    )}
 
-const amount = (value, cost, description) => ({
-  value,
-  cost,
-  description
+
+const getCost = () => {
+  database.ref('/transferences/Buy').on(
+    "value",
+    snap  =>{
+      setCost(snap.val().price)
+    })
+}
+
+const setCost = ( price ) => (
+  cost = price
+)
+
+const purchase = (creditsAmount, cost) => ({
+  creditsAmount,
+  cost
 })
 
-const amounts = [
-  amount(
-    5,
-    "$50",
-    "rata"
-  ),
-  amount(
-    10,
-    "$90",
-    "no tan rata"
-  ),
-  amount(
-    20,
-    "$170",
-    "bien ahi"
-  ),
-  amount(
-    50,
-    "$425",
-    "¿¿cuanta ayuda necesitas??"
-  )
-]
+const getAmounts = () => {
+  let purchaseValues = [1, 5, 10, 25, 50, 100]
+  getCost()
+  console.log(cost)
+  return purchaseValues.map(value => purchase(value, (cost * value)))
+  }
 
-const makeList = amounts =>
-  amounts.map(amount => <Amount key= {amount.value} amount={amount} />)
 
-const BuyingAmountSelection = () => <list> {makeList(amounts)}</list>
+const makeList = (amounts, nextStep) =>
+    amounts.map(purchase => <Amount key= {purchase.creditsAmount} purchase={purchase} nextStep={nextStep}/>)
+
+
+const BuyingAmountSelection = ({nextStep}) => (
+  <Card>
+    <CardTitle 
+      title="Selecciona un paquete de creditos"
+    />
+    <list> {makeList(getAmounts(), nextStep)}</list>
+  </Card>
+)
 
 export default BuyingAmountSelection
