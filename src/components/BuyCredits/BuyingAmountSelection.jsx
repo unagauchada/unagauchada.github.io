@@ -1,6 +1,6 @@
 // @flow
 
-import React from "react"
+import React, {PureComponent} from "react"
 import Card from 'react-md/lib/Cards/Card';
 import CardTitle from 'react-md/lib/Cards/CardTitle';
 import Media from 'react-md/lib/Media';
@@ -9,10 +9,6 @@ import firebase from "firebase"
 import { app } from "../../libs/db.js"
 
 import rootRef from "../../libs/db"
-
-var cost = 0
-
-const database = firebase.database();
 
 const Amount = ({ purchase, nextStep }) => {
     return(
@@ -23,48 +19,51 @@ const Amount = ({ purchase, nextStep }) => {
           </Media>
           <CardTitle 
             title={purchase.creditsAmount.toString().concat(" Creditos")} 
-            subtitle={"$".concat(purchase.cost.toString())} />
+            subtitle={"$".concat(purchase.cost.toString())}/>
         </Card>
       </div>
     )}
 
-
-const getCost = () => {
-  database.ref('/transferences/Buy').on(
-    "value",
-    snap  =>{
-      setCost(snap.val().price)
-    })
-}
-
-const setCost = ( price ) => (
-  cost = price
-)
-
 const purchase = (creditsAmount, cost) => ({
-  creditsAmount,
-  cost
-})
+    creditsAmount,
+    cost
+  })
 
-const getAmounts = () => {
-  let purchaseValues = [1, 5, 10, 25, 50, 100]
-  getCost()
-  console.log(cost)
-  return purchaseValues.map(value => purchase(value, (cost * value)))
+export default class BuyingAmountSelection extends PureComponent {
+
+  constructor(props){
+    super(props)
+
+    this.state={
+      purchaseValues: [1, 5, 10], 
+      cost: null
+    }
   }
 
+  componentDidMount = () => {
+    this.getCost()
+  }
 
-const makeList = (amounts, nextStep) =>
-    amounts.map(purchase => <Amount key= {purchase.creditsAmount} purchase={purchase} nextStep={nextStep}/>)
+  getCost = () => {
+    rootRef.child('/transferences/Buy').on(
+      "value",
+      snap  =>{
+        this.setState({cost: snap.val().price})
+      })
+  }
+
+  getAmounts = () => this.state.purchaseValues.map(value => purchase(value, (this.state.cost * value)))
+  
+  makeList = () =>
+    this.getAmounts().map(purchase => <Amount key= {purchase.creditsAmount} purchase={purchase} nextStep={this.props.nextStep}/>)
 
 
-const BuyingAmountSelection = ({nextStep}) => (
+  render = () => (
   <Card>
     <CardTitle 
       title="Selecciona un paquete de creditos"
     />
-    <list> {makeList(getAmounts(), nextStep)}</list>
+    <list> {this.makeList()}</list>
   </Card>
 )
-
-export default BuyingAmountSelection
+}

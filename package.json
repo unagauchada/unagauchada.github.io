@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "card-react": "^1.2.6",
     "firebase": "^4.0.0",
     "flow-bin": "^0.46.0",
     "lodash": "^4.17.4",

@@ -27,6 +27,14 @@ class Publish extends React.Component {
     rootRef
       .child("publications")
       .push({ title, category, state, text, user },() => this.clean())
+    rootRef
+      .child("users/" + this.getUserId().toString() + "/credits")
+      .once(
+        "value",
+        snap => 
+            rootRef
+                .child("users/" + this.getUserId().toString() + "/credits")
+                .set(snap.val() - 1))    
   }
 
   cancel = () => this.clean()

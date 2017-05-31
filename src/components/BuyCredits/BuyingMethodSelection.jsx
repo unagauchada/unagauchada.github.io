@@ -11,30 +11,23 @@ import rootRef, { app } from "../../libs/db"
 import "./card.scss"
 import "./BuyCredits.scss"
 
-const database = firebase.database();
-const user = firebase.auth().currentUser;
+import { connect } from "react-redux"
+import { userSelector } from "../../redux/getters"
 
+@connect(state => ({
+  user: userSelector(state)
+}))
 export default class BuyingMethodSelector extends PureComponent {
   constructor(props) {
     super(props);
 
   }
 
-  getUserDisplayName = () => {
-    var displayName;
-
-    if (user != null) {
-        displayName = `${user.name} ${user.lastname[0].toUpperCase()}`;
-    }
-
-    return displayName      
-  }
-
   getUserId = () => {
     var uid;
 
-    if (user != null) {
-        uid = user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
+    if (this.props.user != null) {
+        uid = this.props.user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
                         // this value to authenticate with your backend server, if
                         // you have one. Use User.getToken() instead.
     }
@@ -42,34 +35,39 @@ export default class BuyingMethodSelector extends PureComponent {
     return uid
   }
 
-  writeNewCredits(price, value) {
-    var userId = this.getUserId()
-    
+  writeNewCredits =() => {
     // A credits entry.
-    var CreditsData = {
-        price: price,
-        value: value,
-        type : "Buy"    };
+    let CreditsData = {
+        price: this.props.purchase.cost,
+        type : "Buy",    
+        value: this.props.purchase.creditsAmount
+    };
 
-    // Get a key for a new credits.
-    var newCreditsKey = database.ref().child('credits/' + userId).push().key;
+    rootRef
+      .child("credits/" + this.getUserId().toString())
+      .push(CreditsData)
 
-    // Write the new credits' data.
-    var updates = {};
-    updates['credits/' + userId + '/' + newCreditsKey] = CreditsData;
-
-    return database.ref().update(updates);
     }
 
+  updateCredits = () => {
+    rootRef
+      .child("users/" + this.getUserId().toString() + "/credits")
+      .once(
+        "value",
+        snap => 
+            rootRef
+                .child("users/" + this.getUserId().toString() + "/credits")
+                .set(snap.val() + this.props.purchase.creditsAmount))    
+  }
 
-  purchaseCredits = (purchase) => {
-    this.writeNewCredits(purchase.cost, purchase.creditsAmount)
+  purchaseCredits = () => {
+    console.log("purchaseCredits")
+    this.writeNewCredits()
+    this.updateCredits(this.props.purchase.creditsAmount)
     this.props.nextStep(this.props.purchase)
   }
 
   render = () => {
-      let displayName = this.getUserDisplayName()
-      console.log(user)
 
       return(
         <Card id="purchase-card">
@@ -98,14 +96,14 @@ export default class BuyingMethodSelector extends PureComponent {
                 }
                 
                 // initial values to render in the card element
-                initialValues={
+                /*initialValues={
                     {
-/*                    number: '•••• •••• •••• ••••', // optional — default •••• •••• •••• ••••
+                    number: '•••• •••• •••• ••••', // optional — default •••• •••• •••• ••••
                     cvc: '•••', // optional — default •••
                     expiry: '••/••', // optional — default ••/••
-*/                  name: {displayName} // optional — default FULL NAME
+                    name: {displayName} // optional — default FULL NAME
                     }
-                }
+                }*/
                 
                 // the class name attribute to add to the input field and the corresponding part of the card element,
                 // when the input is valid/invalid.
@@ -142,7 +140,7 @@ export default class BuyingMethodSelector extends PureComponent {
                     label={"Pagar ".concat("$".concat(this.props.purchase.cost.toString()))} 
                     primary 
                     className="md-btn--dialog md-cell--right"
-                    onClick={ () => this.props.nextStep(this.props.purchase) } />
+                    onClick={ () => this.purchaseCredits() } />
             </CardActions>
         </Card>
     )}

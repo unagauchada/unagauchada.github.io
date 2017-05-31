@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import BuyingMethodSelection from './BuyingMethodSelection';
 import BuyingAmountSelection from './BuyingAmountSelection';
-import ProgressSteps from "react-progress-steps"
 import PurchaseFinished from "./PurchaseFinished"
 
 const step = ( title, content ) => ({title, content})
