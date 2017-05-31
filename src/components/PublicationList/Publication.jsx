@@ -1,4 +1,5 @@
 import React from "react"
+import firebase from "firebase"
 import Card from "react-md/lib/Cards/Card"
 import CardTitle from "react-md/lib/Cards/CardTitle"
 import CardActions from "react-md/lib/Cards/CardActions"
@@ -56,20 +57,24 @@ class Publication extends React.Component {
             role="presentation"
           />
         }
-        title={this.props.publication.title}
-        subtitle={this.state.user.name}
+        title={this.state.user.name}
+        subtitle={this.state.state.name}
       />
-      <CardText>
-        <p>{this.props.publication.text}</p>
-      </CardText>
       <Media>
         <img
           src={`https://unsplash.it/350/150/?random&time=${new Date().getTime()}`}
           role="presentation"
         />
+        <MediaOverlay>
+                <CardTitle title={this.props.publication.title} />
+              </MediaOverlay>
       </Media>
       <CardActions>
-        <Button flat label="View" />
+          { firebase.auth().currentUser?
+            <a href={"#/favor/"+this.props.publication.id} >
+              <Button flat label="Ver"   />
+            </a> 
+           : "" }      
       </CardActions>
     </Card>
   )

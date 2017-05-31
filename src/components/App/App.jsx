@@ -13,6 +13,7 @@ import { updateUser } from "../../redux/actions"
 import Signup from "../Signup"
 import Login from "../Login"
 import Home from "../Home"
+import FavorView from "../FavorView"
 import actionCreator from "../ToolbarActions"
 import "./App.scss"
 
@@ -62,6 +63,7 @@ class App extends React.Component {
           <Route exact path="/" component={Home} />
           <Route path="/signup" component={Signup} />
           <Route path="/signin" component={Login} />
+          <Route path="/favor/:favorID"  component={FavorView} />
         </app>
       </Router>
     )
