@@ -1,0 +1,25 @@
+@import '../App/variables.scss';
+
+favorForm{
+    width: 90%;
+    display: block;
+    margin: 120px auto 0;
+    header{
+        padding: 85px 50px 15px;
+        font-size: xx-large;
+        font-weight: 200;
+        background: $md-primary-color;
+        color: #fff;
+    }
+    
+    section {
+        padding: 15px 50px;
+    }
+
+    footer {
+        padding: 15px 50px 25px;
+        text-align: right;
+    }
+
+    $md-media-aspect-ratios: '16:9';
+}
