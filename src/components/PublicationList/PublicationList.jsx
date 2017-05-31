@@ -35,7 +35,7 @@ class PublicationList extends React.Component {
 
   render = () => (
     <publications>
-      {this.state.publications.map(
+      {this.state.publications.sort((function(a, b){return b.submissions - a.submissions})).map(
         publication =>
           publication &&
           <Publication key={publication.id} publication={publication} />
