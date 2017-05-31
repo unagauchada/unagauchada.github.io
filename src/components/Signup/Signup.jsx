@@ -53,6 +53,23 @@ class Singup extends React.Component {
 
   createUser = () => {
     let { name, lastname, city, birthdate, phone } = this.state
+
+    if (name.trim() === "") {
+      return this.setState({ error: { code: "validate/name" } })
+    }
+
+    if (lastname.trim() === "") {
+      return this.setState({ error: { code: "validate/lastname" } })
+    }
+
+    if (!city || city === -1) {
+      return this.setState({ error: { code: "validate/city" } })
+    }
+
+    if (phone.trim().length < 5 || phone.trim().length > 20) {
+      return this.setState({ error: { code: "validate/phone" } })
+    }
+
     firebase
       .auth(app)
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
@@ -62,9 +79,20 @@ class Singup extends React.Component {
         })
         return user
       })
-      .then(user => rootRef.child('users').child(user.uid).set({ name, lastname, city, birthdate, phone  }))
+      .then(user =>{
+        rootRef.child('credits').child(user.uid).push({ date: new Date(), type: 'Initial', price: 0, value: 1 })
+        rootRef
+          .child("users")
+          .child(user.uid)
+          .set({ name, lastname, city, birthdate, phone, credits: 1 })
+        return user;
+      })
+      .then( user => user.sendEmailVerification() )
       .then(() => this.setState({ done: true }))
-      .catch(error => this.setState({ error }))
+      .catch(error => {
+        console.log(error)
+        this.setState({ error })
+    })
   }
 
   componentDidMount() {
@@ -82,20 +110,42 @@ class Singup extends React.Component {
       err => console.error(err)
     )
   }
+
+  getUserError = () => {
+    if(!this.state.error){
+      return null;
+    }
+
+    switch (this.state.error.code) {
+      case 'auth/email-already-in-use':
+        return 'Cuenta de email ya registrada'
+      case 'auth/invalid-email':
+        return 'Email inválido'
+      default:
+        return null;
+    }
+  }
+
   render = () => (
     <signup>
       {this.state.done && <Redirect to="/" />}
       <Paper zDepth={2}>
         <header>Registrarse al sistema</header>
         <section className="md-grid">
-          {this.state.error &&
-            <div className="error">{this.state.error.message}</div>}
           <div className="md-cell md-cell--12">
             <TextField
               id="email"
               label="Email"
               fullWidth={true}
               value={this.state.email}
+              error={
+                this.state.error &&
+                  [
+                    "auth/email-already-in-use",
+                    "auth/invalid-email"
+                  ].indexOf(this.state.error.code) > -1
+              }
+              errorText={this.getUserError()}
               onChange={this.handleChange("email")}
             />
           </div>
@@ -106,6 +156,11 @@ class Singup extends React.Component {
               type="password"
               fullWidth={true}
               value={this.state.password}
+              error={
+                this.state.error &&
+                  this.state.error.code === "auth/weak-password"
+              }
+              errorText={"La contraseña debe tener al menos 6 caracteres"}
               onChange={this.handleChange("password")}
             />
           </div>
@@ -115,6 +170,10 @@ class Singup extends React.Component {
               label="Nombre"
               fullWidth={true}
               value={this.state.name}
+              error={
+                this.state.error && this.state.error.code === "validate/name"
+              }
+              errorText={"Nombre incorrecto"}
               onChange={this.handleChange("name")}
             />
           </div>
@@ -124,6 +183,11 @@ class Singup extends React.Component {
               label="Apellido"
               fullWidth={true}
               value={this.state.lastname}
+              error={
+                this.state.error &&
+                  this.state.error.code === "validate/lastname"
+              }
+              errorText={"Apellido incorrecto"}
               onChange={this.handleChange("lastname")}
             />
           </div>
@@ -136,6 +200,10 @@ class Singup extends React.Component {
               itemLabel="name"
               itemValue="id"
               value={this.state.city}
+              error={
+                this.state.error && this.state.error.code === "validate/city"
+              }
+              errorText={"Seleccione una ciudad válida"}
               onChange={this.handleChange("city")}
             />
           </div>
@@ -145,6 +213,10 @@ class Singup extends React.Component {
               label="Teléfono"
               fullWidth={true}
               value={this.state.phone}
+              error={
+                this.state.error && this.state.error.code === "validate/phone"
+              }
+              errorText={"Teléfono inválido"}
               onChange={this.handleChange("phone")}
             />
           </div>
@@ -154,6 +226,7 @@ class Singup extends React.Component {
               label="Cumpleaños"
               fullWidth={true}
               value={this.state.birthdate}
+              maxDate={new Date()}
               onChange={this.handleChange("birthdate")}
             />
           </div>
