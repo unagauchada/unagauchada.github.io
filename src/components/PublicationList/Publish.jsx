@@ -4,7 +4,6 @@ import Avatar from "react-md/lib/Avatars"
 import FontIcon from "react-md/lib/FontIcons"
 import Button from "react-md/lib/Buttons/Button"
 import TextField from "react-md/lib/TextFields"
-import DatePicker from "react-md/lib/Pickers/DatePickerContainer"
 
 import { userSelector } from "../../redux/getters"
 import rootRef from "../../libs/db"

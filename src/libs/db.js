@@ -23,3 +23,4 @@ const rootRef = firebase.database().ref()
 
 export default rootRef
 export const app = firebase.app()
+export const storage = firebase.storage();

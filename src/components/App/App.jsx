@@ -13,7 +13,7 @@ import { updateUser } from "../../redux/actions"
 import Signup from "../Signup"
 import Login from "../Login"
 import Home from "../Home"
-import FavorView from "../FavorView"
+import FavorView from "../Publication"
 import actionCreator from "../ToolbarActions"
 import "./App.scss"
 
@@ -33,9 +33,7 @@ class App extends React.Component {
     firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
   }
 
-  render = () => {
-    console.log(this.props.user)
-    return (
+  render = () => (
       <Router>
         <app>
           <Toolbar
@@ -63,11 +61,10 @@ class App extends React.Component {
           <Route exact path="/" component={Home} />
           <Route path="/signup" component={Signup} />
           <Route path="/signin" component={Login} />
-          <Route path="/favor/:favorID"  component={FavorView} />
+          <Route path="/favor/:favorID"  component={this.props.user ? FavorView : Login } />
         </app>
       </Router>
     )
-  }
 }
 
 export default App

@@ -1,0 +1,52 @@
+.publication-view .comments comment {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    position: relative;
+    justify-content: flex-start;
+
+    & > .md-menu-container{
+        position: absolute;
+        right: 0;
+        top: 0;
+        
+        .md-btn--icon{
+            padding: 5px;
+            margin: 0;
+            width: 24px;
+            height: 24px;
+            i{
+                font-size: 12px;
+                vertical-align: middle;
+            }
+        }
+    }
+
+    
+    & >.user {
+        display: flex;
+        margin-right: 16px;
+        flex: 0 auto;
+        /* width: auto; */
+    }
+    &>section {
+
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        word-break:break-word;
+        word-wrap: break-word;
+
+        & > h3 {
+                font-weight: 600;
+                font-size: 14px;
+                margin: 0;
+                padding: 0;
+        }
+
+        & > comment {
+            padding-top: 10px;
+        }
+    }
+}
