@@ -1,13 +1,14 @@
 @import '../App/variables.scss';
 
 
-list{
+#plans-list{
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row;
     margin: auto;
     width: 96%;
-    
+    text-align: center;
+
     .md-card{
         margin: 10px 15px;
         width: 300px;
@@ -15,7 +16,10 @@ list{
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        cursor: pointer;
+
+        .md-card-title{
+             text-align: center;
+        }
 
         .md-card-text{
             font-weight: 100;
@@ -26,17 +30,21 @@ list{
 
 .card-container{
     padding-top: 50px;
-}
-
-#card-wrapper{
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
-
-.md-card{
-    .md-card-title{
-        background: $md-primary-color;
-    }
     width: 80%;
     margin: auto;
+}
+
+#purchaseCard{
+    #card-wrapper{
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+    &.md-card{
+        .md-card-title{
+             background: $md-primary-color;
+        }
+        width: 80%;
+        margin: auto;
+    }
 }

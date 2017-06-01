@@ -8,6 +8,7 @@
     "flow-bin": "^0.46.0",
     "lodash": "^4.17.4",
     "react": "^15.5.4",
+    "react-addons-css-transition-group": "^15.5.2",
     "react-dom": "^15.5.4",
     "react-md": "^1.0.15",
     "react-redux": "^5.0.5",

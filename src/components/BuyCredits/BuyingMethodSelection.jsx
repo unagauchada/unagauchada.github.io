@@ -2,8 +2,8 @@ import React, { PureComponent } from 'react';
 import CardReactFormContainer from 'card-react';
 import Card from 'react-md/lib/Cards/Card';
 import CardTitle from 'react-md/lib/Cards/CardTitle';
-import CardActions from "react-md/lib/Cards/CardActions"
 import Media from 'react-md/lib/Media';
+import CardActions from "react-md/lib/Cards/CardActions"
 import Button from "react-md/lib/Buttons"
 import firebase from "firebase"
 import rootRef, { app } from "../../libs/db"
@@ -64,20 +64,18 @@ export default class BuyingMethodSelector extends PureComponent {
     console.log("purchaseCredits")
     this.writeNewCredits()
     this.updateCredits(this.props.purchase.creditsAmount)
-    this.props.nextStep(this.props.purchase)
+    this.props.nextStep()
   }
 
   render = () => {
 
       return(
         <Card id="purchase-card">
-            <Media>
-                <img role="presentation" src="https://unsplash.it/40/40?random&time=${new Date().getTime()}" />
-            </Media>            
             <CardTitle
                 title={this.props.purchase.creditsAmount.toString().concat(" Creditos")}
                 subtitle={"$".concat(this.props.purchase.cost.toString())}  
             />
+            <div id="card-wrapper"></div>
             <CardReactFormContainer
                 
                 // the id of the container element where you want to render the card element.
@@ -127,7 +125,6 @@ export default class BuyingMethodSelector extends PureComponent {
                 
             </CardReactFormContainer>
     
-            <div id="card-wrapper"></div>
             <CardActions>
                 <Button 
                     raised

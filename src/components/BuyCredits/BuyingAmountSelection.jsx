@@ -3,24 +3,37 @@
 import React, {PureComponent} from "react"
 import Card from 'react-md/lib/Cards/Card';
 import CardTitle from 'react-md/lib/Cards/CardTitle';
+import CardText from 'react-md/lib/Cards/CardText';
 import Media from 'react-md/lib/Media';
+import Divider from 'react-md/lib/Dividers';
 import "./BuyCredits.scss"
 import firebase from "firebase"
 import { app } from "../../libs/db.js"
+import FontIcon from 'react-md/lib/FontIcons';
+import CardActions from "react-md/lib/Cards/CardActions"
+import Button from "react-md/lib/Buttons"
 
 import rootRef from "../../libs/db"
 
 const Amount = ({ purchase, nextStep }) => {
     return(
-      <div onClick={() => nextStep(purchase)}>
-        <Card raise className="md-block-centered">
-          <Media>
-            <img role="presentation" allowFullScreen src="https://unsplash.it/40/40?random&time=${new Date().getTime()}" />
-          </Media>
-          <CardTitle 
-            title={purchase.creditsAmount.toString().concat(" Creditos")} 
-            subtitle={"$".concat(purchase.cost.toString())}/>
-        </Card>
+      <div>
+        <Card raised className="md-block-centered">
+          <CardTitle
+            title={purchase.creditsAmount.toString().concat(" Creditos")}/> 
+          <Divider/>
+          <CardText>
+            <h2 className="md-display-3 display-override">{"$" + (purchase.cost.toString())}</h2>            
+          </CardText>
+          <CardActions>
+              <Button 
+                  raised 
+                  label="comprar" 
+                  primary 
+                  className="md-btn--dialog md-cell--right"
+                  onClick={ () => nextStep(purchase) } />
+          </CardActions>
+       </Card>
       </div>
     )}
 
@@ -63,7 +76,7 @@ export default class BuyingAmountSelection extends PureComponent {
     <CardTitle 
       title="Selecciona un paquete de creditos"
     />
-    <list> {this.makeList()}</list>
+    <list id="plans-list"> {this.makeList()}</list>
   </Card>
 )
 }

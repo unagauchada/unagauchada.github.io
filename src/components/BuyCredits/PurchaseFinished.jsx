@@ -16,9 +16,6 @@ export default class BuyingMethodSelector extends PureComponent {
   render = () => 
       (
         <Card id="purchase-card">
-            <Media>
-                <img role="presentation" src="https://unsplash.it/40/40?random&time=${new Date().getTime()}" />
-            </Media>
             <CardTitle
                 title="Recibo"
                 subtitle="Compra de creditos exitosa"  
