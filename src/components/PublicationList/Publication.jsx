@@ -78,7 +78,7 @@ class Publication extends React.Component {
           {this.props.publication.text}
         </CardText>,
         <CardActions key="actions">
-          <a href={"#/favor/" + this.props.publication.id}>
+          <a href={"#/publication/" + this.props.publication.id}>
             <Button flat secondary label="Ver" />
           </a>
         </CardActions>
