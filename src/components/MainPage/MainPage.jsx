@@ -22,7 +22,7 @@ const SideBar = () => (
       <Link to="/">
         <ListItem leftIcon={<ProfileIcon />} primaryText="Mi Perfil" />
       </Link>
-      <Link to="/">
+      <Link to="/buy">
         <ListItem leftIcon={<CreditIcon />} primaryText="Comprar Créditos" />
       </Link>
     </List>
