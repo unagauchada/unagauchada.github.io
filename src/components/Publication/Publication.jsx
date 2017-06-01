@@ -99,7 +99,7 @@ class Publication extends PureComponent {
   getPostulados = () =>
     this.state.publication.submissions === 1
       ? this.state.publication.submissions + " Postulado"
-      : this.state.publication.submissions + " Postulados"
+      : (this.state.publication.submissions || 0) + " Postulados"
 
   render = () => {
     return (
@@ -124,7 +124,7 @@ class Publication extends PureComponent {
             >
               <div className="md-card-title--title-block md-cell--right">
                 <FontIcon>access_time</FontIcon> {" "}
-                {(this.state.publication.end || new Date())
+                {(new Date(this.state.publication.end || new Date()))
                   .toLocaleDateString("es-AR", {
                     weekday: "long",
                     year: "numeric",
@@ -139,12 +139,13 @@ class Publication extends PureComponent {
                 <a href="#/"><FontIcon>place</FontIcon> {this.state.state} </a>
               }
             />
+            { this.state.publication.imageURL && this.state.publication.imageURL !== "" &&
             <Media>
               <img
-                src={`https://unsplash.it/600/400?random&time=${new Date().getTime()}`}
+                src={this.state.publication.imageURL}
                 role="presentation"
               />
-            </Media>
+            </Media>}
             <CardText>
               {this.state.publication.text.split("\n").map(function(item, key) {
                 return (

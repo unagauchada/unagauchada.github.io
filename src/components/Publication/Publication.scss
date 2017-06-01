@@ -10,6 +10,9 @@
             }
         }
     }
+    img{
+        object-fit: cover;
+    }
     .comments {
         ul {
             user-select: initial;
