@@ -93,18 +93,17 @@ class PublicationList extends React.Component {
   }
 
   getButton = () => {
-    let shadowed = (this.state.credits >= publicationCost)
-    if (this.props.user && this.state.shadowed){ 
+    let shadowed = (this.state.credits < publicationCost)
+    if (this.props.user && shadowed){ 
       return(
       <add>
         <Button
           className="add-publication"
           floating
-          primary
-          disabled
+          secundary
           onClick={this.toastFailure}
           >
-          create
+          money_off
         </Button>
       </add>)
     }else if(this.props.user){

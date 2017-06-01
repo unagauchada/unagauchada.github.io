@@ -1,13 +1,14 @@
-import React, { PureComponent } from 'react';
-import CardReactFormContainer from 'card-react';
-import Card from 'react-md/lib/Cards/Card';
-import CardTitle from 'react-md/lib/Cards/CardTitle';
-import Media from 'react-md/lib/Media';
+import React, { PureComponent } from 'react'
+import CardReactFormContainer from 'card-react'
+import Card from 'react-md/lib/Cards/Card'
+import CardTitle from 'react-md/lib/Cards/CardTitle'
+import Media from 'react-md/lib/Media'
 import CardActions from "react-md/lib/Cards/CardActions"
+import TextField from 'react-md/lib/TextFields'
 import Button from "react-md/lib/Buttons"
 import firebase from "firebase"
 import rootRef, { app } from "../../libs/db"
-import Snackbar from 'react-md/lib/Snackbars';
+import Snackbar from 'react-md/lib/Snackbars'
 
 import "./card.scss"
 import "./BuyCredits.scss"
@@ -24,9 +25,9 @@ export default class BuyingMethodSelector extends PureComponent {
 
     this.state = {
         name: "",
-        number: 0,
-        date: 0,
-        cvc: 0,
+        number: "",
+        date: "",
+        cvc: "",
         toasts: [],
         autohide: true,
     }
@@ -56,7 +57,7 @@ export default class BuyingMethodSelector extends PureComponent {
   }
 
   toastError = () => {
-    this._addToast('Transaccion fallida, intente de nuevo');
+    this.addToast('Transaccion fallida, intente de nuevo');
   }
 
   getUserId = () => {
@@ -97,8 +98,30 @@ export default class BuyingMethodSelector extends PureComponent {
   }
 
   purchaseCredits = () => {
-    console.log("purchaseCredits")
-    if(this.state.cvc != 1234){
+
+      if(this.state.name === ""){
+           this.addToast('El nombre no es válido')
+           return
+      }
+
+      if(this.state.number.length < 16){
+           this.addToast('El número no es válido')
+           return
+      }
+
+      if(this.state.date.length < 9){
+           this.addToast('La fecha es incorrecta');
+           return
+      }
+
+      if(this.state.cvc.length < 3){
+           this.addToast('El cvc es incorrecto');
+           return
+      }
+
+
+    
+    if(this.state.cvc != 123){
         this.writeNewCredits()
         this.updateCredits(this.props.purchase.creditsAmount)
         this.props.nextStep()
@@ -107,20 +130,23 @@ export default class BuyingMethodSelector extends PureComponent {
     }
   }
 
-  setName = (name) =>{
+  setName = (event) =>{
+      let name = event.target.value
       this.setState({name})
   }
 
-  setNumber = (number) =>{
+  setNumber = (event) =>{
+      let number = event.target.value
       this.setState({number})
   }
 
-  setDate = (date) =>{
+  setDate = (event) =>{
+      let date = event.target.value
       this.setState({date})
   }
 
-  setCvc = (cvc) =>{
-        console.log(cvc)
+  setCvc = (event) =>{
+      let cvc = event.target.value
       this.setState({cvc})
   }
 
@@ -174,10 +200,10 @@ export default class BuyingMethodSelector extends PureComponent {
                 >
                 
                 <form>
-                    <input placeholder="Full name" type="text" name="CCname" onchange={this.setName}/>
-                    <input placeholder="Card number" type="text" name="CCnumber" onchange={this.setNumber}/>
-                    <input placeholder="MM/YY" type="text" name="CCexpiry" onchange={this.setDate}/>
-                    <input placeholder="CVC" type="text" name="CCcvc" onchange={this.setCvc}/>
+                    <input placeholder="Full name" type="text" name="CCname" onChange={this.setName}/>
+                    <input placeholder="Card number" type="text" name="CCnumber" onChange={this.setNumber}/>
+                    <input placeholder="MM/YY" type="text" name="CCexpiry" onChange={this.setDate}/>
+                    <input placeholder="CVC" type="text" name="CCcvc" onChange={this.setCvc}/>
                 </form>
                 
             </CardReactFormContainer>

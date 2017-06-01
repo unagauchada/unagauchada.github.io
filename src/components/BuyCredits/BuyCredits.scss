@@ -3,7 +3,8 @@
 
 #plans-list{
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    justify-content: center;
     flex-direction: row;
     margin: auto;
     width: 96%;
