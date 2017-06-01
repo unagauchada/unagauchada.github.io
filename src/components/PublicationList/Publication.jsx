@@ -5,7 +5,7 @@ import CardTitle from "react-md/lib/Cards/CardTitle"
 import CardActions from "react-md/lib/Cards/CardActions"
 import Media, { MediaOverlay } from "react-md/lib/Media"
 import Button from "react-md/lib/Buttons"
-
+import CompanyLogo  from "../../assets/logo.png"
 import rootRef from "../../libs/db"
 import UserAvatar from "../UserAvatar"
 
@@ -56,7 +56,7 @@ class Publication extends React.Component {
       />
       <Media>
         <img
-          src={`https://unsplash.it/350/150/?random&time=${new Date().getTime()}`}
+          src={this.props.publication.imageURL && this.props.publication.imageURL != "" ? this.props.publication.imageURL: CompanyLogo}
           role="presentation"
         />
         <MediaOverlay>
@@ -66,7 +66,7 @@ class Publication extends React.Component {
       <CardActions>
         {firebase.auth().currentUser
           ? <a href={"#/favor/" + this.props.publication.id}>
-              <Button flat label="Ver" />
+              <Button flat secondary label="Ver" />
             </a>
           : ""}
       </CardActions>
