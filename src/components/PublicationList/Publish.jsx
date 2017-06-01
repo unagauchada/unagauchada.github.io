@@ -1,4 +1,5 @@
 import React from "react"
+import _ from "lodash"
 import { connect } from "react-redux"
 import FontIcon from "react-md/lib/FontIcons"
 import Button from "react-md/lib/Buttons/Button"
@@ -10,28 +11,6 @@ import rootRef, { storageRef } from "../../libs/db"
 import UserAvatar from "../UserAvatar"
 import ImageUpload from "./ImageUpload"
 import firebase from "firebase"
-
-const stateItems = [
-  {
-    name: "La Plata",
-    value: 1
-  },
-  {
-    name: "otro",
-    value: 2
-  }
-]
-
-const categoryItems = [
-  {
-    name: "Entretenimiento",
-    value: 1
-  },
-  {
-    name: "Otros",
-    value: 2
-  }
-]
 
 const duration = 15
 const thisDate = new Date()
@@ -48,17 +27,37 @@ class Publish extends React.Component {
       submissions: 0,
       text: "",
       end: thisDate.setDate(thisDate.getDate() + duration),
-      image: { url: "", file: null }
+      image: { url: "", file: null },
+      categories: [{ name: "loading", value: "1" }],
+      states: [{ name: "loading", value: "1" }]
     }
+  }
+
+  componentDidMount = () => {
+    rootRef.child("states").on("value", snap =>
+      this.setState({
+        states: _.map(snap.val(), (state, value) => ({ ...state, value })).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        )
+      })
+    )
+    rootRef.child("categories").on("value", snap =>
+      this.setState({
+        categories: _.map(snap.val(), (category, value) => ({
+          ...category,
+          value
+        })).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        )
+      })
+    )
   }
 
   getUserId = () => {
     var uid
 
     if (this.props.user != null) {
-      uid = this.props.user.uid // The user's ID, unique to the Firebase project. Do NOT use
-      // this value to authenticate with your backend server, if
-      // you have one. Use User.getToken() instead.
+      uid = this.props.user.uid
     }
 
     return uid
@@ -75,9 +74,6 @@ class Publish extends React.Component {
         () => this.clean()
       ).key
 
-    console.log(this.state.image.file)
-    console.log(key)
-    //image uploading to Firebase
     let uploadTask = storageRef
       .child("publications/".concat(key))
       .put(this.state.image.file)
@@ -163,7 +159,7 @@ class Publish extends React.Component {
             itemLabel="name"
             itemValue="value"
             value={this.state.state}
-            menuItems={stateItems}
+            menuItems={this.state.states}
             onChange={this._handleStateChange}
             required
             errorText="Debes seleccionar un lugar para el favor"
@@ -177,7 +173,7 @@ class Publish extends React.Component {
             itemLabel="name"
             itemValue="value"
             value={this.state.category}
-            menuItems={categoryItems}
+            menuItems={this.state.categories}
             onChange={this._handleCategoryChange}
             required
             errorText="Debes seleccionar una categoria para el favor"
