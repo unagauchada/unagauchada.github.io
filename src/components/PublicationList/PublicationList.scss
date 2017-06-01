@@ -14,6 +14,10 @@ publications{
             font-weight: 100;
             font-size: 20px;
         }
+
+        img{
+            object-fit: cover;
+        }
     }
 
     .add-publication{
