@@ -2,10 +2,11 @@ import React from "react"
 import firebase from "firebase"
 import Card from "react-md/lib/Cards/Card"
 import CardTitle from "react-md/lib/Cards/CardTitle"
+import CardText from 'react-md/lib/Cards/CardText';
 import CardActions from "react-md/lib/Cards/CardActions"
 import Media, { MediaOverlay } from "react-md/lib/Media"
 import Button from "react-md/lib/Buttons"
-
+import CompanyLogo  from "../../assets/logo.png"
 import rootRef from "../../libs/db"
 import UserAvatar from "../UserAvatar"
 
@@ -48,7 +49,7 @@ class Publication extends React.Component {
       .on("value", snap => this.setState({ user: snap.val() }))
 
   render = () => (
-    <Card style={{ maxWidth: 400 }} className="md-block-centered">
+    <Card style={{ maxWidth: 400 }} className="md-block-centered md-cell--top " expanderTooltipLabel="Expandir descripcion!">
       <CardTitle
         avatar={<UserAvatar url={this.state.user.photoURL} />}
         title={this.state.user.name}
@@ -56,20 +57,24 @@ class Publication extends React.Component {
       />
       <Media>
         <img
-          src={`https://unsplash.it/350/150/?random&time=${new Date().getTime()}`}
+          src={this.props.publication.imgURL && this.props.publication.imgURL != "" ? this.props.publication.imgURL: CompanyLogo}
           role="presentation"
         />
         <MediaOverlay>
           <CardTitle title={this.props.publication.title} />
         </MediaOverlay>
       </Media>
-      <CardActions>
-        {firebase.auth().currentUser
-          ? <a href={"#/favor/" + this.props.publication.id}>
-              <Button flat label="Ver" />
-            </a>
-          : ""}
-      </CardActions>
+      {firebase.auth().currentUser?      
+        <CardActions expander>
+          <a href={"#/favor/" + this.props.publication.id}>
+            <Button flat label="Ver" />
+          </a>
+        </CardActions>
+         
+        : ""}
+        <CardText expandable>
+          {this.props.publication.text}
+        </CardText>
     </Card>
   )
 }
