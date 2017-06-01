@@ -5,6 +5,7 @@ import FontIcon from "react-md/lib/FontIcons"
 import Button from "react-md/lib/Buttons/Button"
 import TextField from "react-md/lib/TextFields"
 import SelectField from 'react-md/lib/SelectFields';
+import Snackbar from 'react-md/lib/Snackbars';
 
 import { userSelector } from "../../redux/getters"
 import rootRef, { storageRef } from "../../libs/db"
@@ -37,15 +38,45 @@ class Publish extends React.Component {
 
 
     this.state = {
+      toasts: [],
+      autohide: true,
       title: "",
-      category: 1,
-      state: 1,
+      category: 0,
+      state: 0,
       submissions: 0,
       text: "",
       end: thisDate.setDate(thisDate.getDate() + duration),
       image: {url: "", file: null}
     }
   }
+
+  componentWillUpdate =(nextProps, nextState)=> {
+    const { toasts } = nextState;
+    const [toast] = toasts;
+    if (this.state.toasts === toasts || !toast) {
+      return;
+    }
+
+    const autohide = toast.action !== 'Retry';
+    this.setState({ autohide });
+  }
+
+  addToast = (text, action)=> {
+    const toasts = this.state.toasts.slice();
+    toasts.push({ text, action });
+
+    this.setState({ toasts });
+  }
+
+  removeToast=() =>{
+    const [, ...toasts] = this.state.toasts;
+    this.setState({ toasts });
+  }
+
+  toastError=(error)=> {
+    this.addToast('Campo '+ error +' incompleto');
+  }
+
 
   getUserId = () => {
     var uid;
@@ -60,6 +91,22 @@ class Publish extends React.Component {
   }
 
   submit = () => {
+    if(this.state.title == ""){ 
+      this.toastError('titulo')
+      return
+    }
+    if(this.state.text == ""){ 
+      this.toastError('descripcion')
+      return
+    }
+    if(this.state.category == 0){ 
+      this.toastError('categoria')
+      return
+    }
+    if(this.state.state == 0){ 
+      this.toastError('lugar')
+      return
+    }
 
     let { title, category, state, submissions, text, end } = this.state
     let imageURL = ""
@@ -109,7 +156,7 @@ class Publish extends React.Component {
   }
 
   _handleStateChange = (value, index, event) => { // eslint-disable-line no-unused-vars
-    this.setState({ state: value });
+    this.setState({ state: value, error: false });
   };
 
   _handleCategoryChange = (value, index, event) => { // eslint-disable-line no-unused-vars
@@ -135,18 +182,22 @@ class Publish extends React.Component {
         id="floatingTitle"
         label="Title"
         customSize="title"
+        required
         size={10}
         className="md-cell md-cell--10 md-cell--middle"
         value={this.state.title}
+        errorText={"debe ingresar un titulo"}
         onChange={this.handleChange('title')}
       />
       <TextField
         block
         paddedBlock
         id="body"
+        required
         placeholder="Descripción"
         rows={4}
         value={this.state.text}
+        errorText={"debe ingresar una descripcion"}
         onChange={this.handleChange('text')}
       />
 
@@ -184,7 +235,8 @@ class Publish extends React.Component {
         <Button flat label="Cancelar" onClick={this.cancel} />
         <Button raised primary label="Publicar!" onClick={this.submit} />
       </section>
-    </section>
+      <Snackbar {...this.state} onDismiss={this.removeToast} />
+   </section>
   )}
 }
 
