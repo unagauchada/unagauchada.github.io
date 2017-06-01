@@ -6,6 +6,9 @@ publications{
     .md-card{
         margin: 10px 15px;
         width: 300px;
+        .md-avatar{
+            margin-right: 16px;
+        }
 
         .md-card-text{
             font-weight: 100;
