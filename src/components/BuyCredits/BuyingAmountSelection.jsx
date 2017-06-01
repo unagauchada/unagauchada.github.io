@@ -31,7 +31,7 @@ const Amount = ({ purchase, nextStep }) => (
                     label="comprar" 
                     primary 
                     className="md-btn--dialog md-cell--right"
-                    onClick={ () => nextStep(purchase) } />)
+                    onClick={ () => nextStep(purchase) } />
             </CardActions>
         </Card>
         </div>
