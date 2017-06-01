@@ -146,7 +146,6 @@ class Publish extends React.Component {
         id="body"
         placeholder="Descripción"
         rows={4}
-        maxLength={240}
         value={this.state.text}
         onChange={this.handleChange('text')}
       />

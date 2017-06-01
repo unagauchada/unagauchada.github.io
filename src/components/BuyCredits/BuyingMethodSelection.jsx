@@ -131,6 +131,7 @@ export default class BuyingMethodSelector extends PureComponent {
                     label="Cancelar" 
                     secondary
                     className="md-btn--dialog"
+                    onClick={ () => this.cancel() } />                    
                 />
                 <Button 
                     raised 

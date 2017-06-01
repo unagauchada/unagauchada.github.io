@@ -15,27 +15,27 @@ import Button from "react-md/lib/Buttons"
 
 import rootRef from "../../libs/db"
 
-const Amount = ({ purchase, nextStep }) => {
-    return(
-      <div>
-        <Card raised className="md-block-centered">
-          <CardTitle
-            title={purchase.creditsAmount.toString().concat(" Creditos")}/> 
-          <Divider/>
-          <CardText>
-            <h2 className="md-display-3 display-override">{"$" + (purchase.cost.toString())}</h2>            
-          </CardText>
-          <CardActions>
-              <Button 
-                  raised 
-                  label="comprar" 
-                  primary 
-                  className="md-btn--dialog md-cell--right"
-                  onClick={ () => nextStep(purchase) } />
-          </CardActions>
-       </Card>
-      </div>
-    )}
+const Amount = ({ purchase, nextStep }) => (
+    purchase.cost != 0 && (
+        <div>
+          <Card raised className="md-block-centered">
+            <CardTitle
+              title={purchase.creditsAmount.toString().concat(" Creditos")}/> 
+            <Divider/>
+            <CardText>
+              <h2 className="md-display-3 display-override">{"$" + (purchase.cost.toString())}</h2>            
+            </CardText>
+            <CardActions>
+                <Button 
+                    raised 
+                    label="comprar" 
+                    primary 
+                    className="md-btn--dialog md-cell--right"
+                    onClick={ () => nextStep(purchase) } />)
+            </CardActions>
+        </Card>
+        </div>
+    ))
 
 const purchase = (creditsAmount, cost) => ({
     creditsAmount,
