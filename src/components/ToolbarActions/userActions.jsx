@@ -1,15 +1,15 @@
 import React from "react"
 import firebase from 'firebase'
-import { Link, Redirect } from "react-router-dom"
+import { Redirect } from "react-router-dom"
 import { connect } from "react-redux"
 import ListItem from "react-md/lib/Lists/ListItem"
 import Divider from 'react-md/lib/Dividers';
 import MenuButton from "react-md/lib/Menus/MenuButton"
-import Avatar from "react-md/lib/Avatars"
 import FontIcon from "react-md/lib/FontIcons"
 
 import { userSelector } from "../../redux/getters"
 import { app } from '../../libs/db'
+import UserAvatar from '../UserAvatar'
 
 @connect(state => ({
   user: userSelector(state)
@@ -39,7 +39,7 @@ class UserProfile extends React.Component {
       label={ this.props.user.displayName }
       flat
       buttonChildren={
-        <Avatar icon={<FontIcon>person</FontIcon>} />
+        <UserAvatar url={this.props.user.photoURL} />
       }
       className="menu-example"
     >

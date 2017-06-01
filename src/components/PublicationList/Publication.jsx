@@ -1,13 +1,13 @@
 import React from "react"
+import firebase from "firebase"
 import Card from "react-md/lib/Cards/Card"
 import CardTitle from "react-md/lib/Cards/CardTitle"
 import CardActions from "react-md/lib/Cards/CardActions"
-import CardText from "react-md/lib/Cards/CardText"
 import Media, { MediaOverlay } from "react-md/lib/Media"
-import Avatar from "react-md/lib/Avatars"
 import Button from "react-md/lib/Buttons"
 
 import rootRef from "../../libs/db"
+import UserAvatar from "../UserAvatar"
 
 class Publication extends React.Component {
   constructor(props) {
@@ -50,26 +50,25 @@ class Publication extends React.Component {
   render = () => (
     <Card style={{ maxWidth: 400 }} className="md-block-centered">
       <CardTitle
-        avatar={
-          <Avatar
-            src={`https://unsplash.it/40/40?random&time=${new Date().getTime()}`}
-            role="presentation"
-          />
-        }
-        title={this.props.publication.title}
-        subtitle={this.state.user.name}
+        avatar={<UserAvatar url={this.state.user.photoURL} />}
+        title={this.state.user.name}
+        subtitle={this.state.state.name}
       />
-      <CardText>
-        <p>{this.props.publication.text}</p>
-      </CardText>
       <Media>
         <img
           src={`https://unsplash.it/350/150/?random&time=${new Date().getTime()}`}
           role="presentation"
         />
+        <MediaOverlay>
+          <CardTitle title={this.props.publication.title} />
+        </MediaOverlay>
       </Media>
       <CardActions>
-        <Button flat label="View" />
+        {firebase.auth().currentUser
+          ? <a href={"#/favor/" + this.props.publication.id}>
+              <Button flat label="Ver" />
+            </a>
+          : ""}
       </CardActions>
     </Card>
   )
