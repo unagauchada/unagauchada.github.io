@@ -1,6 +1,6 @@
 import React from "react"
+import _ from "lodash"
 import { connect } from "react-redux"
-import Avatar from "react-md/lib/Avatars"
 import FontIcon from "react-md/lib/FontIcons"
 import Button from "react-md/lib/Buttons/Button"
 import TextField from "react-md/lib/TextFields"
@@ -9,24 +9,9 @@ import Snackbar from 'react-md/lib/Snackbars';
 
 import { userSelector } from "../../redux/getters"
 import rootRef, { storageRef } from "../../libs/db"
-import ImageUpload from './ImageUpload';
+import UserAvatar from "../UserAvatar"
+import ImageUpload from "./ImageUpload"
 import firebase from "firebase"
-
-const stateItems = [{
-  name: "La Plata",
-  value: 1
-},{
-  name: "otro",
-  value: 2
-}]
-
-const categoryItems = [{
-  name: "Entretenimiento",
-  value: 1
-},{
-  name: "Otros",
-  value: 2
-}]
 
 const duration = 15
 const thisDate = new Date()
@@ -35,7 +20,6 @@ const thisDate = new Date()
 class Publish extends React.Component {
   constructor(props) {
     super(props)
-
 
     this.state = {
       toasts: [],
@@ -46,7 +30,9 @@ class Publish extends React.Component {
       submissions: 0,
       text: "",
       end: thisDate.setDate(thisDate.getDate() + duration),
-      image: {url: "", file: null}
+      image: { url: "", file: null },
+      categories: [{ name: "loading", value: "1" }],
+      states: [{ name: "loading", value: "1" }]
     }
   }
 
@@ -78,32 +64,50 @@ class Publish extends React.Component {
   }
 
 
+  componentDidMount = () => {
+    rootRef.child("states").on("value", snap =>
+      this.setState({
+        states: _.map(snap.val(), (state, value) => ({ ...state, value })).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        )
+      })
+    )
+    rootRef.child("categories").on("value", snap =>
+      this.setState({
+        categories: _.map(snap.val(), (category, value) => ({
+          ...category,
+          value
+        })).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        )
+      })
+    )
+  }
+
   getUserId = () => {
-    var uid;
+    var uid
 
     if (this.props.user != null) {
-        uid = this.props.user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
-                        // this value to authenticate with your backend server, if
-                        // you have one. Use User.getToken() instead.
+      uid = this.props.user.uid
     }
 
     return uid
   }
 
   submit = () => {
-    if(this.state.title == ""){ 
+    if(this.state.title === ""){ 
       this.toastError('titulo')
       return
     }
-    if(this.state.text == ""){ 
+    if(this.state.text === ""){ 
       this.toastError('descripcion')
       return
     }
-    if(this.state.category == 0){ 
+    if(this.state.category === 0){ 
       this.toastError('categoria')
       return
     }
-    if(this.state.state == 0){ 
+    if(this.state.state === 0){ 
       this.toastError('lugar')
       return
     }
@@ -112,41 +116,39 @@ class Publish extends React.Component {
     let imageURL = ""
     let user = this.props.user.uid
     let key = rootRef
-                .child("publications")
-                .push({ title, category, state, submissions, text, end, imageURL, user },() => this.clean()).key
+      .child("publications")
+      .push(
+        { title, category, state, submissions, text, end, imageURL, user },
+        () => this.clean()
+      ).key
 
-    console.log(this.state.image.file)
-    console.log(key)
-    //image uploading to Firebase
     let uploadTask = storageRef
-                        .child('publications/'.concat(key))
-                        .put(this.state.image.file);
+      .child("publications/".concat(key))
+      .put(this.state.image.file)
 
-    uploadTask.on('state_changed', function(snapshot){
-      // Observe state change events such as progress, pause, and resume
-      // See below for more detail
-    }, function(error) {
-      // Handle unsuccessful uploads
-    }, () => {
-      // Handle successful uploads on complete
-      // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-      this.state.image.url = uploadTask.snapshot.downloadURL;
-      
-      console.log(this.state.image.url)
-      rootRef
-        .child("publications/".concat(key).concat("/imageURL"))
-        .set(this.state.image.url)
+    uploadTask.on(
+      "state_changed",
+      function(snapshot) {},
+      function(error) {
+        console.error(error)
+      },
+      () => {
+        this.state.image.url = uploadTask.snapshot.downloadURL
 
-      rootRef
-        .child("users/" + this.getUserId().toString() + "/credits")
-        .once(
-          "value",
-          snap => 
-              rootRef
-                  .child("users/" + this.getUserId().toString() + "/credits")
-                  .set(snap.val() - 1))    
-      });
-}
+        rootRef
+          .child("publications/".concat(key).concat("/imageURL"))
+          .set(this.state.image.url)
+
+        rootRef
+          .child("users/" + this.getUserId().toString() + "/credits")
+          .once("value", snap =>
+            rootRef
+              .child("users/" + this.getUserId().toString() + "/credits")
+              .set(snap.val() - 1)
+          )
+      }
+    )
+  }
 
   cancel = () => this.clean()
 
@@ -158,25 +160,27 @@ class Publish extends React.Component {
   _handleStateChange = (value, index, event) => { // eslint-disable-line no-unused-vars
     this.setState({ state: value, error: false });
   };
+  _handleStateChange = (value, index, event) => {
+    this.setState({ state: value })
+  }
 
-  _handleCategoryChange = (value, index, event) => { // eslint-disable-line no-unused-vars
-    this.setState({ category: value });
-  };
+  _handleCategoryChange = (value, index, event) => {
+    this.setState({ category: value })
+  }
 
   handleChange = property => value => this.setState({ [property]: value })
 
-  setImage = (image) => {
+  setImage = image => {
     let state = this.state
     state.image.file = image
     this.setState(state)
   }
 
   render = () => {
-    let placepicker = null
     return(
     <section className="dialog md-grid">
       <section className="header md-cell md-cell--2 md-cell--middle md-text-center ">
-        <Avatar icon={<FontIcon>person</FontIcon>} />
+        <UserAvatar icon={<FontIcon>person</FontIcon>} />
       </section>
       <TextField
         id="floatingTitle"
@@ -201,43 +205,45 @@ class Publish extends React.Component {
         onChange={this.handleChange('text')}
       />
 
-      <section className="md-cell md-cell--12">
-        <SelectField
-          primary
-          id="state"
-          label="Lugar"
-          itemLabel="name"
-          itemValue="value"
-          value={this.state.state}
-          menuItems={stateItems}
-          onChange={this._handleStateChange}
-          required
-          errorText="Debes seleccionar un lugar para el favor"
-          className="md-cell"
-          leftIcon={<FontIcon>place</FontIcon>}
-        />
-        <SelectField
-          primary
-          id="category"
-          label="Categoria"
-          itemLabel="name"
-          itemValue="value"
-          value={this.state.category}
-          menuItems={categoryItems}
-          onChange={this._handleCategoryChange}
-          required
-          errorText="Debes seleccionar una categoria para el favor"
-          className="md-cell"
-        />
-        <ImageUpload setImage={this.setImage}/>
-      </section>
-      <section className="footer md-cell md-cell--12 md-text-right">
-        <Button flat label="Cancelar" onClick={this.cancel} />
-        <Button raised primary label="Publicar!" onClick={this.submit} />
-      </section>
+        <section className="md-cell md-cell--12">
+          <SelectField
+            primary
+            id="state"
+            label="Lugar"
+            itemLabel="name"
+            itemValue="value"
+            value={this.state.state}
+            menuItems={this.state.states}
+            onChange={this._handleStateChange}
+            required
+            errorText="Debes seleccionar un lugar para el favor"
+            className="md-cell"
+            leftIcon={<FontIcon>place</FontIcon>}
+          />
+          <SelectField
+            primary
+            id="category"
+            label="Categoria"
+            itemLabel="name"
+            itemValue="value"
+            value={this.state.category}
+            menuItems={this.state.categories}
+            onChange={this._handleCategoryChange}
+            required
+            errorText="Debes seleccionar una categoria para el favor"
+            className="md-cell"
+          />
+          <ImageUpload setImage={this.setImage} />
+        </section>
+        <section className="footer md-cell md-cell--12 md-text-right">
+          <Button flat label="Cancelar" onClick={this.cancel} />
+          <Button raised primary label="Publicar!" onClick={this.submit} />
+        </section>
       <Snackbar {...this.state} onDismiss={this.removeToast} />
-   </section>
+      </section>
   )}
-}
+    
+  }
+
 
 export default Publish

@@ -1,5 +1,6 @@
 import React from "react"
 import firebase from "firebase"
+import { Link } from "react-router-dom"
 import Card from "react-md/lib/Cards/Card"
 import CardTitle from "react-md/lib/Cards/CardTitle"
 import CardText from "react-md/lib/Cards/CardText"
@@ -78,9 +79,9 @@ class Publication extends React.Component {
           {this.props.publication.text}
         </CardText>,
         <CardActions key="actions">
-          <a href={"#/favor/" + this.props.publication.id}>
+          <Link to={"/publication/" + this.props.publication.id}>
             <Button flat secondary label="Ver" />
-          </a>
+          </Link>
         </CardActions>
       ]}
     </Card>

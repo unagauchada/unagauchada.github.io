@@ -79,20 +79,23 @@ class Singup extends React.Component {
         })
         return user
       })
-      .then(user =>{
-        rootRef.child('credits').child(user.uid).push({ date: new Date(), type: 'Initial', price: 0, value: 1 })
+      .then(user => {
+        rootRef
+          .child("credits")
+          .child(user.uid)
+          .push({ date: new Date(), type: "Initial", price: 0, value: 1 })
         rootRef
           .child("users")
           .child(user.uid)
           .set({ name, lastname, city, birthdate, phone, credits: 1 })
-        return user;
+        return user
       })
-      .then( user => user.sendEmailVerification() )
+      .then(user => user.sendEmailVerification())
       .then(() => this.setState({ done: true }))
       .catch(error => {
         console.log(error)
         this.setState({ error })
-    })
+      })
   }
 
   componentDidMount() {
@@ -104,7 +107,9 @@ class Singup extends React.Component {
       "value",
       snap => {
         this.setState({
-          stateItems: _.map(snap.val(), (state, id) => ({ ...state, id }))
+          stateItems: _.map(snap.val(), (state, id) => ({ ...state, id })).sort(
+            (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+          )
         })
       },
       err => console.error(err)
@@ -112,17 +117,17 @@ class Singup extends React.Component {
   }
 
   getUserError = () => {
-    if(!this.state.error){
-      return null;
+    if (!this.state.error) {
+      return null
     }
 
     switch (this.state.error.code) {
-      case 'auth/email-already-in-use':
-        return 'Cuenta de email ya registrada'
-      case 'auth/invalid-email':
-        return 'Email inválido'
+      case "auth/email-already-in-use":
+        return "Cuenta de email ya registrada"
+      case "auth/invalid-email":
+        return "Email inválido"
       default:
-        return null;
+        return null
     }
   }
 
@@ -140,10 +145,9 @@ class Singup extends React.Component {
               value={this.state.email}
               error={
                 this.state.error &&
-                  [
-                    "auth/email-already-in-use",
-                    "auth/invalid-email"
-                  ].indexOf(this.state.error.code) > -1
+                  ["auth/email-already-in-use", "auth/invalid-email"].indexOf(
+                    this.state.error.code
+                  ) > -1
               }
               errorText={this.getUserError()}
               onChange={this.handleChange("email")}

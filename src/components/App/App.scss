@@ -7,9 +7,18 @@ body {
     background-color: $md-grey-50;
 }
 
+body{
+    padding-top: 65px;
+}
+
 app {
     header.md-toolbar {
         //background-color: $md-white-base;
+        position: fixed;
+        top:0;
+        width: 100%;
+        z-index: 10000;
+
         section {
             border-left: 1px solid rgba(255, 255, 255, 0.2);
             padding-left: 24px;
@@ -29,6 +38,7 @@ app {
             margin-left: 48px;
             padding: 11px 12px;
             border-radius: 3px;
+            flex: 1 0;
             max-width: 720px;
             .md-text-field-icon-container {
                 align-items: center;
