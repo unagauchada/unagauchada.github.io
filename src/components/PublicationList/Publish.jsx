@@ -7,7 +7,7 @@ import TextField from "react-md/lib/TextFields"
 import SelectField from 'react-md/lib/SelectFields';
 
 import { userSelector } from "../../redux/getters"
-import rootRef from "../../libs/db"
+import rootRef, { storageRef } from "../../libs/db"
 import ImageUpload from './ImageUpload';
 import firebase from "firebase"
 
@@ -30,8 +30,6 @@ const categoryItems = [{
 const duration = 15
 const thisDate = new Date()
 
-const storageRef = firebase.storage.ref()
-
 @connect(state => ({ user: userSelector(state) }))
 class Publish extends React.Component {
   constructor(props) {
@@ -42,6 +40,7 @@ class Publish extends React.Component {
       title: "",
       category: 1,
       state: 1,
+      submissions: 0,
       text: "",
       end: thisDate.setDate(thisDate.getDate() + duration),
       image: {url: "", file: null}
@@ -62,9 +61,18 @@ class Publish extends React.Component {
 
   submit = () => {
 
+    let { title, category, state, submissions, text, end } = this.state
+    let imageURL = ""
+    let user = this.props.user.uid
+    let key = rootRef
+                .child("publications")
+                .push({ title, category, state, submissions, text, end, imageURL, user },() => this.clean()).key
+
+    console.log(this.state.image.file)
+    console.log(key)
     //image uploading to Firebase
     let uploadTask = storageRef
-                        .child('images/'.concat(this.state.title))
+                        .child('publications/'.concat(key))
                         .put(this.state.image.file);
 
     uploadTask.on('state_changed', function(snapshot){
@@ -72,28 +80,26 @@ class Publish extends React.Component {
       // See below for more detail
     }, function(error) {
       // Handle unsuccessful uploads
-    }, function() {
+    }, () => {
       // Handle successful uploads on complete
       // For instance, get the download URL: https://firebasestorage.googleapis.com/...
       this.state.image.url = uploadTask.snapshot.downloadURL;
-    });
+      
+      console.log(this.state.image.url)
+      rootRef
+        .child("publications/".concat(key).concat("/imageURL"))
+        .set(this.state.image.url)
 
-    let { title, category, state, text, end } = this.state
-    let imageurl = this.state.image.url
-    let user = this.props.user.uid
-    rootRef
-      .child("publications")
-      .push({ title, category, state, text, end, imageurl, user },() => this.clean())
-
-    rootRef
-      .child("users/" + this.getUserId().toString() + "/credits")
-      .once(
-        "value",
-        snap => 
-            rootRef
-                .child("users/" + this.getUserId().toString() + "/credits")
-                .set(snap.val() - 1))    
-  }
+      rootRef
+        .child("users/" + this.getUserId().toString() + "/credits")
+        .once(
+          "value",
+          snap => 
+              rootRef
+                  .child("users/" + this.getUserId().toString() + "/credits")
+                  .set(snap.val() - 1))    
+      });
+}
 
   cancel = () => this.clean()
 

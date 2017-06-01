@@ -4,6 +4,8 @@ import Button from 'react-md/lib/Buttons';
 import LinearProgress from 'react-md/lib/Progress/LinearProgress';
 import FileUpload from 'react-md/lib/FileInputs/FileUpload';
 
+import './publish.scss'
+
 export default class FileUploadExample extends PureComponent {
   constructor(props) {
     super(props);
@@ -32,7 +34,7 @@ export default class FileUploadExample extends PureComponent {
 
     this.props.setImage(file)
 
-    const files = Object.assign({}, this.state.files);
+    const files = {};
     files[name] = {
       name,
       type,
@@ -77,24 +79,27 @@ export default class FileUploadExample extends PureComponent {
 
   render() {
     const { files, progress } = this.state;
-    const cards = Object.keys(files).map(key => <img src={files[key].uploadResult} alt={files[key].name} />);
+    const cards = Object.keys(files).map(key => <img id="image" src={files[key].uploadResult} alt={files[key].name} />);
 
     return (
       <div>
         <FileUpload
           id="ImageUpload"
           accept="image/*"
-          secondary
+          primary
           name="file-upload"
+          iconChildren='photo_camera'
           ref={this._setUpload}
           label="Selecciona una imagen"
           onLoadStart={this._setFile}
           onProgress={this._handleProgress}
           onLoad={this._onLoad}
+          flat
+          iconBefore
         />
         <CSSTransitionGroup
           component="output"
-          className="md-grid"
+          className="image-section"
           transitionName="md-cross-fade"
           transitionEnterTimeout={300}
           transitionLeave={false}
