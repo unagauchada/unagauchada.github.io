@@ -80,7 +80,9 @@ class Publication extends React.Component {
         </CardText>,
         <CardActions key="actions">
           <Link to={"/publication/" + this.props.publication.id}>
-            <Button flat secondary label="Ver" />
+            {firebase.auth().currentUser.uid == this.props.publication.user
+              ? <Button raised secondary label="Ver" />
+              : <Button flat secondary label="Ver" />}
           </Link>
         </CardActions>
       ]}
