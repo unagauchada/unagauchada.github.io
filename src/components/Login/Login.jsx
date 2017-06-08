@@ -15,7 +15,8 @@ class Login extends React.Component {
 
   handleChange = property => value => {
     this.setState({
-      [property]: value
+      [property]: value,
+      error: null
     })
   }
 
