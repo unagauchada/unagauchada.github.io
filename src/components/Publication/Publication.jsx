@@ -14,6 +14,8 @@ import MainPage from "../MainPage"
 import { userSelector } from "../../redux/getters"
 import UserAvatar from "../UserAvatar"
 import "./Publication.scss"
+import MakeComment from "./MakeComment"
+import Divider from "react-md/lib/Dividers"
 
 @connect(state => ({ user: userSelector(state) }))
 class Publication extends PureComponent {
@@ -231,6 +233,8 @@ class Publication extends PureComponent {
                 })}
               </ul>
             </CardText>
+            <Divider/>
+            <MakeComment user={this.props.user}/>
           </Card>}
       </MainPage>
     )
