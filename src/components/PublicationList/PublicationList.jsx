@@ -304,7 +304,7 @@ class PublicationList extends React.Component {
       </div>
       <publications>
         {this.state.publications
-          //.filter(function(x) { return x.endDate > new Date(); })
+          .filter((x) => { return x.end > new Date(); })
           .filter(this.searchFilter)
           .sort(this.searchSort)
           .map(
