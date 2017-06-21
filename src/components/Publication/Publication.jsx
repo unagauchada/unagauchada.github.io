@@ -86,14 +86,20 @@ class Publication extends PureComponent {
     )
   }
 
+  getPublicationId = publication => {
+    this.setState({ publicationId: publication })
+  }
+
   componentDidMount = () => {
     this.getPublication(this.props.match.params.favorID)
+    this.getPublicationId(this.props.match.params.favorID)
     this.getComments(this.props.match.params.favorID)
     this.getSubmissions(this.props.match.params.favorID)
   }
 
   componentWillReceiveProps = nextProps => {
     this.getPublication(nextProps.match.params.favorID)
+    this.getPublicationId(nextProps.match.params.favorID)
     this.getComments(nextProps.match.params.favorID)
     this.getSubmissions(nextProps.match.params.favorID)
   }
@@ -234,7 +240,7 @@ class Publication extends PureComponent {
               </ul>
             </CardText>
             <Divider/>
-            <MakeComment user={this.props.user}/>
+            <MakeComment user={this.props.user} publicationId={this.state.publicationId}/>
           </Card>}
       </MainPage>
     )

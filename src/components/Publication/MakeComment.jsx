@@ -5,13 +5,16 @@ import UserAvatar from '../UserAvatar'
 import CardText from "react-md/lib/Cards/CardText"
 import CardActions from "react-md/lib/Cards/CardActions"
 import Button from "react-md/lib/Buttons"
+import firebase from "firebase"
 import "./Comment.scss"
 
 class MakeComment extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      user: { name: "", lastname: "", id: 1 }
+      user: { name: "", lastname: "", id: 1 },
+      showingActions: false,
+      text: ""
     }
   }
 
@@ -24,6 +27,39 @@ class MakeComment extends React.Component {
       .child("users")
       .child(user)
       .on("value", snap => this.setState({ user: snap.val() }))
+  }
+
+  showActions = () => {
+    this.setState({showingActions: true})
+  }
+
+  handleChange = value => {
+    this.setState({
+      text: value
+    })
+  }
+
+  publishComment = () => {
+    if(this.state.text === ""){ 
+      return
+    }
+
+
+    let date = firebase.database.ServerValue.TIMESTAMP
+    let text = this.state.text
+    let user = this.props.user.uid
+    console.log(this.props.publicationId)
+
+    rootRef
+        .child("comments/".concat(this.props.publicationId))
+        .push(
+            { date, text, user },
+            () => this.clean()
+        )
+    }
+
+  clean = () => {
+    this.setState({ showingActions: false, text: "" })
   }
 
   render = () => (
@@ -41,21 +77,26 @@ class MakeComment extends React.Component {
                             id="makeCommentField"
                             placeholder="Añadir un comentario..."
                             rows={1}
+                            value={this.state.text}
                             inputStyle={{fontSize: 16}}
+                            onClick={this.showActions}
+                            onChange={this.handleChange}
                         />
                     </section>
                 </comment>
             </li>
         </ul>
     </CardText>
-    <CardActions key="actions">
-        <Button 
-            className="md-btn--dialog md-cell--right"
-            flat 
-            secondary 
-            style={{fontSize: 16}}
-            label="Publicar" />
-    </CardActions>
+    {this.state.showingActions && 
+        <CardActions key="actions">
+            <Button 
+                className="md-btn--dialog md-cell--right"
+                flat 
+                secondary 
+                style={{fontSize: 16}}
+                label="Publicar"
+                onClick={this.publishComment} />
+        </CardActions>}
     </div>
   )
 }
