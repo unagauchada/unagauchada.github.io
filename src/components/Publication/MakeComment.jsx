@@ -48,10 +48,10 @@ class MakeComment extends React.Component {
     let date = firebase.database.ServerValue.TIMESTAMP
     let text = this.state.text
     let user = this.props.user.uid
-    console.log(this.props.publicationId)
+    console.log(this.props.path)
 
     rootRef
-        .child("comments/".concat(this.props.publicationId))
+        .child("comments/".concat(this.props.path))
         .push(
             { date, text, user },
             () => this.clean()
@@ -65,27 +65,23 @@ class MakeComment extends React.Component {
   render = () => (
     <div>
     <CardText className="comments">
-        <ul className="md-list">
-            <li className="md-list-tile">
-                <comment>
-                    <div className="user">
-                        <UserAvatar url={this.state.user.photoURL} />
-                    </div>
-                    <section>
-                        <TextField
-                            block
-                            id="makeCommentField"
-                            placeholder="Añadir un comentario..."
-                            rows={1}
-                            value={this.state.text}
-                            inputStyle={{fontSize: 16}}
-                            onClick={this.showActions}
-                            onChange={this.handleChange}
-                        />
-                    </section>
-                </comment>
-            </li>
-        </ul>
+        <comment>
+            <div className="user">
+                <UserAvatar url={this.state.user.photoURL} />
+            </div>
+            <section>
+                <TextField
+                    block
+                    id="makeCommentField"
+                    placeholder="Añadir un comentario..."
+                    rows={1}
+                    value={this.state.text}
+                    inputStyle={{fontSize: 16}}
+                    onClick={this.showActions}
+                    onChange={this.handleChange}
+                />
+            </section>
+        </comment>
     </CardText>
     {this.state.showingActions && 
         <CardActions key="actions">

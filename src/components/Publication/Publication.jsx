@@ -233,6 +233,7 @@ class Publication extends PureComponent {
                           this.props.user.uid === this.state.publication.user
                         }
                         user={this.props.user}
+                        publicationId={this.state.publicationId}
                       />
                     </li>
                   )
@@ -240,7 +241,8 @@ class Publication extends PureComponent {
               </ul>
             </CardText>
             <Divider/>
-            <MakeComment user={this.props.user} publicationId={this.state.publicationId}/>
+            {this.props.user.uid !== this.state.publication.user &&
+              <MakeComment user={this.props.user} path={this.state.publicationId}/>}
           </Card>}
       </MainPage>
     )
