@@ -14,6 +14,8 @@ import MainPage from "../MainPage"
 import { userSelector } from "../../redux/getters"
 import UserAvatar from "../UserAvatar"
 import "./Publication.scss"
+import MakeComment from "./MakeComment"
+import Divider from "react-md/lib/Dividers"
 
 @connect(state => ({ user: userSelector(state) }))
 class Publication extends PureComponent {
@@ -84,14 +86,20 @@ class Publication extends PureComponent {
     )
   }
 
+  getPublicationId = publication => {
+    this.setState({ publicationId: publication })
+  }
+
   componentDidMount = () => {
     this.getPublication(this.props.match.params.favorID)
+    this.getPublicationId(this.props.match.params.favorID)
     this.getComments(this.props.match.params.favorID)
     this.getSubmissions(this.props.match.params.favorID)
   }
 
   componentWillReceiveProps = nextProps => {
     this.getPublication(nextProps.match.params.favorID)
+    this.getPublicationId(nextProps.match.params.favorID)
     this.getComments(nextProps.match.params.favorID)
     this.getSubmissions(nextProps.match.params.favorID)
   }
@@ -225,12 +233,16 @@ class Publication extends PureComponent {
                           this.props.user.uid === this.state.publication.user
                         }
                         user={this.props.user}
+                        publicationId={this.state.publicationId}
                       />
                     </li>
                   )
                 })}
               </ul>
             </CardText>
+            <Divider/>
+            {this.props.user.uid !== this.state.publication.user &&
+              <MakeComment user={this.props.user} path={this.state.publicationId}/>}
           </Card>}
       </MainPage>
     )
