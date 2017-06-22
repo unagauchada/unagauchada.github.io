@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react"
+import firebase from "firebase"
 import _ from "lodash"
 import { connect } from "react-redux"
 import Card from "react-md/lib/Cards/Card"
@@ -84,22 +85,43 @@ class Publication extends PureComponent {
     )
   }
 
+  getPublicationId = publication => {
+    this.setState({ publicationId: publication })
+  }
+
   componentDidMount = () => {
     this.getPublication(this.props.match.params.favorID)
+    this.getPublicationId(this.props.match.params.favorID)
     this.getComments(this.props.match.params.favorID)
     this.getSubmissions(this.props.match.params.favorID)
   }
 
   componentWillReceiveProps = nextProps => {
     this.getPublication(nextProps.match.params.favorID)
+    this.getPublicationId(nextProps.match.params.favorID)
     this.getComments(nextProps.match.params.favorID)
     this.getSubmissions(nextProps.match.params.favorID)
-  }
+}
 
   getPostulados = () =>
     this.state.publication.submissions === 1
       ? this.state.publication.submissions + " Postulado"
       : (this.state.publication.submissions || 0) + " Postulados"
+
+  postularse = () => {
+    rootRef
+      .child("submissions/" + this.state.publicationId + "/" + this.props.user.uid)
+      .child("date").set(firebase.database.ServerValue.TIMESTAMP)
+    
+    rootRef
+      .child("publications/" + this.state.publicationId)
+      .transaction(
+        function(publication){
+          publication.submissions++
+          return publication
+        }
+      )
+  }
 
   render = () => {
     return (
@@ -206,6 +228,7 @@ class Publication extends PureComponent {
                       : <Button
                           tooltipLabel="Postularme!"
                           tooltipPosition="top"
+                          onClick={this.postularse}
                           primary
                           icon
                         >
