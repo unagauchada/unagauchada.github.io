@@ -7,6 +7,7 @@ import Slider from 'react-md/lib/Sliders';
 import { userSelector } from "../../redux/getters"
 import { connect } from "react-redux"
 import FilteredPublicationList from "./FilteredPublicationList"
+import ProfileInformation from "./ProfileInformation"
 import rootRef from "../../libs/db"
 import _ from "lodash"
 
@@ -72,7 +73,6 @@ export default class ProfileMenu extends PureComponent {
   }
 
   filterSubmissions = publication => {
-    console.log(this.state.submissions)
     return this.state.submissions.find(
         submissions => 
             submissions.publication === publication.id &&
@@ -91,14 +91,14 @@ export default class ProfileMenu extends PureComponent {
     return (
       <TabsContainer onTabChange={this._handleTabChange} activeTabIndex={activeTabIndex} panelClassName="md-grid" colored>
         <Tabs tabId="tab">
+          <Tab label="Informacion">
+            <ProfileInformation user={this.props.user}/>
+          </Tab>
           <Tab label="Publicaciones">
             <FilteredPublicationList filter={this.filterPublications}/>
           </Tab>
           <Tab label="Postulaciones">
             <FilteredPublicationList filter={this.filterSubmissions}/>
-          </Tab>
-          <Tab label="Informacion">
-            
           </Tab>
         </Tabs>
       </TabsContainer>

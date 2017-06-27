@@ -17,6 +17,7 @@ import Tab from 'react-md/lib/Tabs/Tab';
 import TabsContainer from 'react-md/lib/Tabs/TabsContainer';
 import CSSTransitionGroup from 'react-addons-css-transition-group';
 import ProfileMenu from "./ProfileMenu"
+import rootRef from "../../libs/db"
 import "./ProfileView.scss"
 
 @connect(state => ({ user: userSelector(state) }))
@@ -26,6 +27,21 @@ class ProfileView extends PureComponent {
     this.state = {
       user: { name: "", lastname: "", photo: "" },
     }
+  }
+
+  componentDidMount = () => {
+    this.getUser(this.props.user.uid)
+  }
+
+  componentWillReceiveProps = nextProps => {
+    this.getUser(nextProps.user.uid)
+  }
+
+  getUser = user => {
+    rootRef
+      .child("users")
+      .child(user)
+      .on("value", snap => this.setState({ user: snap.val() }))
   }
 
   render = () => {
@@ -40,16 +56,16 @@ class ProfileView extends PureComponent {
                     <Media aspectRatio="4-3">
                         <img
                             src={
-                                this.props.user.photoURL &&
-                                this.props.user.photoURL != ""
-                                ? this.props.user.photoURL
+                                this.state.user.photoURL &&
+                                this.state.user.photoURL != ""
+                                ? this.state.user.photoURL
                                 : CompanyLogo
                             }
                             role="presentation"
                         />
                     </Media>
                 </div>
-                <h1 className="title-element">{this.props.user.displayName}</h1>
+                <h1 className="title-element">{`${this.state.user.lastname}, ${this.state.user.name}`}</h1>
                 <Button
                     className="md-cell--right title-element"
                     flat
