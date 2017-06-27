@@ -15,6 +15,7 @@ import Login from "../Login"
 import Home from "../Home"
 import BuyCredits from "../BuyCredits"
 import FavorView from "../Publication"
+import ProfileView from "../ProfileView"
 import actionCreator from "../ToolbarActions"
 import MainPage from "../MainPage"
 import "./App.scss"
@@ -73,6 +74,7 @@ class App extends React.Component {
           <Route path="/signin" component={Login} />
           <Route path="/buy" component={this.props.user ? BuyCredits : Login} />
           <Route path="/publication/:favorID"  component={this.props.user ? FavorView : Login } />
+          <Route path="/profile"  component={this.props.user ? ProfileView : Login } />
           <Route path="*" component={Error404} />
         </Switch>
       </app>

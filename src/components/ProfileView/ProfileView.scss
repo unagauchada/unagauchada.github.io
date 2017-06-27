@@ -1,0 +1,36 @@
+.profile-view {
+    .title-element{
+            margin-top: 80px;
+    }
+    .md-card-title {
+        .md-avatar {
+            margin-right: 16px;
+        }
+        .md-card-title--title-block {
+            i {
+                font-size: 14px;
+                vertical-align: middle;
+            }
+        }
+    }
+    img{
+        object-fit: cover;
+    }
+    .comments {
+        ul {
+            user-select: initial;
+            li.md-list-tile {
+                /* border-top: 1px solid #ebebeb; */
+                padding: 12px 0;
+                transition: background-color .3s cubic-bezier(0, 0, 0.2, 1);
+                height: initial;
+                &:first-child {
+                    padding-top: 0;
+                }
+                &:last-child {
+                    padding-bottom: 0;
+                }
+            }
+        }
+    }
+}
