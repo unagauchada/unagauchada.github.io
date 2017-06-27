@@ -18,40 +18,16 @@ class PublicationList extends React.Component {
     super(props)
     this.state = {
       publications: [],
-      visible: false,
-      credits: 0,
-      toasts: [],
-      autohide: true
     }
-  }
-
-  _addToast = (text, action) => {
-    const toasts = this.state.toasts.slice()
-    toasts.push({ text, action })
-
-    this.setState({ toasts })
-  }
-
-  _removeToast = () => {
-    const [, ...toasts] = this.state.toasts
-    this.setState({ toasts })
-  }
-
-  toastFailure = () => {
-    this._addToast("No posee suficiente credito")
   }
 
   componentDidMount = () => {
     this.getPublications()
   }
 
-  componentWillReceiveProps = nextProps => {
-    this.getCredits(nextProps)
+  componentWillMount = () => {
+    this.getPublications()
   }
-
-  openDialog = () => this.setState({ visible: true })
-
-  closeDialog = () => this.setState({ visible: false })
 
   getPublications = () =>
     rootRef.child("publications").on("value", snap => {
@@ -68,28 +44,6 @@ class PublicationList extends React.Component {
         )
       })
     })
-
-  getUserId = props => {
-    var uid
-
-    if (props.user != null) {
-      uid = props.user.uid.toString() // The user's ID, unique to the Firebase project. Do NOT use
-      // this value to authenticate with your backend server, if
-      // you have one. Use User.getToken() instead.
-    }
-
-    console.log(uid)
-    return uid
-  }
-
-  getCredits = props => {
-    rootRef
-      .child("users/" + this.getUserId(props) + "/credits")
-      .on("value", snap => {
-        console.log(snap.val())
-        this.setState({ credits: snap.val() })
-      })
-  }
 
   render = () => {
     return (

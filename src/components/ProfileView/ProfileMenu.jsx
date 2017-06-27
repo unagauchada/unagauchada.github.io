@@ -35,6 +35,10 @@ export default class ProfileMenu extends PureComponent {
     this.getSubmissions()
   }
 
+  componentWillMount = () => {
+    this.getSubmissions()
+  }
+
   _handleTabChange(activeTabIndex) {
     if (activeTabIndex === 1 && !this.state.tabTwoChildren) {
       // Fake async loading
@@ -55,9 +59,9 @@ export default class ProfileMenu extends PureComponent {
   getSubmissions = () => {
     rootRef.child("submissions").on("value", snap =>
       this.setState({
-        submissions: _.map(snap.val(), (submission, user) => ({
+        submissions: _.map(snap.val(), (submission, publication) => ({
           ...submission,
-          user
+          publication
         }))
       })
     )
@@ -70,12 +74,10 @@ export default class ProfileMenu extends PureComponent {
   filterSubmissions = publication => {
     console.log(this.state.submissions)
     return this.state.submissions.find(
-        publicationSubmission => 
-            {console.log(publicationSubmission)
-            return publicationSubmission
-            .filter(publicationSubmission => publicationSubmission.id === publication.id)
-            .find(userSubmission => userSubmission === this.props.user.uid)}
-        )
+        submissions => 
+            submissions.publication === publication.id &&
+            Object.keys(submissions).find(user => user === this.props.user.uid)
+    )
   }
 
   render() {
