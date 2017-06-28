@@ -26,6 +26,7 @@ class PublicationList extends React.Component {
       searchText: "",
       searchLoc: "default",
       searchCat: "default",
+      categories: [],
       publications: [],
       visible: false,
       catVisible:false,
@@ -79,97 +80,22 @@ class PublicationList extends React.Component {
   }
 
   componentWillMount = () => {
-    this.setState({searchText: this.props.searchText})
+
+    this.setState({
+      searchText: this.props.searchText,
+      searchLoc: this.props.searchLoc,
+      searchCat: this.props.searchCat
+    })
   }
 
-  isSearching = () => {
-    return (
-      this.searchCat == "default" ||
-      this.searchLoc == "default" || 
-      this.searchText == "default")
-  }
+      
+
   componentWillReceiveProps = nextProps => {
     this.getCredits(nextProps)
     this.setState({searchText: nextProps.searchText})
   }
 
-  openCatDialog = () => this.setState({ catVisible: true })
 
-  closeCatDialog = () => this.setState({ catVisible: false })
-
-  catChange = (value, index, event) => {
-    this.setState({ searchCat: value })
-    this.closeCatDialog()
-  }
-
-  getCatDialog = () => {
-    return(
-      <Dialog
-          id="publicationDialog"
-          visible={this.state.catVisible}
-          title="Seleccione Categoria"
-          onHide={this.closeCatDialog}
-        >
-        <SelectField
-            id="category"
-            label="Seleccione una categoria"
-            itemLabel="name"
-            itemValue="value"
-            value={this.state.searchCat}
-            menuItems={this.state.categories}
-            onChange={this.catChange}
-          />          
-        </Dialog>
-    )  
-  }
-
-  categoryChip = () => {
-    return  this.state.searchCat == "default"? "":
-     <Chip label={this.state.categories.find((x)=> {return x.value == this.state.searchCat}).name}
-      onClick={()=> {this.setState({searchCat: "default"})}}
-      removable
-      />
-  }
-
-  openLocDialog = () => this.setState({ locVisible: true })
-
-  closeLocDialog = () => this.setState({ locVisible: false })
-
-  locChange = (value, index, event) => {
-    this.setState({ searchLoc: value })
-    this.closeLocDialog()
-  }
-
-  getLocDialog = () => {
-    return(
-      <Dialog
-          id="locationDialog"
-          visible={this.state.locVisible}
-          title="Seleccione Ubicacion"
-          onHide={this.closeLocDialog}
-          className=""
-        >
-          <SelectField
-            id="state"
-            label="Seleccione un Lugar"
-            itemLabel="name"
-            itemValue="value"
-            value={this.state.state}
-            menuItems={this.state.states}
-            onChange={this.locChange}
-            className="md-cell stretch"
-          />
-        </Dialog>
-    )  
-  }
-
-  locationChip = () => {
-    return  this.state.searchLoc == "default"? "":
-     <Chip label={this.state.states.find((x)=> {return x.value == this.state.searchLoc}).name}
-      onClick={()=> {this.setState({searchLoc: "default"})}}
-      removable
-      />
-  }
 
   openDialog = () => this.setState({ visible: true })
 
@@ -206,14 +132,17 @@ class PublicationList extends React.Component {
 
   searchFilter = (x) =>{
     return( 
-      ( x.title.toLowerCase().includes(this.state.searchText.toLowerCase() ) ) && 
-      ( this.state.searchLoc == "default" || x.state == this.state.searchLoc ) && 
-      ( this.state.searchCat == "default" || x.category == this.state.searchCat )
+      ( (x.text + x.title).toLowerCase().includes(this.state.searchText.toLowerCase() ) ) && 
+      ( this.state.searchLoc == "default" || this.state.searchLoc == "" || x.state == this.state.searchLoc ) && 
+      ( this.state.searchCat == "default" || this.state.searchCat == "" || x.category == this.state.searchCat )
     )
   }
 
   searchSort = (a, b) => {
-    if (this.isSearching()){
+    if ((this.state.searchCat != "default", this.state.searchCat != "") ||
+        (this.state.searchLoc != "default", this.state.searchLoc != "") || 
+        this.state.searchText != ""
+      ){
       return b.user.score - a.user.score
     }
     else{
@@ -221,24 +150,30 @@ class PublicationList extends React.Component {
     }
   }
 
+  getCategory = (category) => {
+    return this.state.categories.find((x) => { return x.value == category}).name
+  }
+
   searchHeader = () =>{
   return (
     <div>
-      <h2> {"Resultados para: " + this.state.searchText+"\t"} 
-      <Button
-        flat
-        disabled={this.state.searchLoc != "default"} 
-        label="Seleccionar Ubicacion" 
-        onClick={this.openLocDialog}
-      />
-      <Button
-        flat
-        disabled={this.state.searchCat != "default"}
-        label="Seleccionar Categoria"
-        onClick={this.openCatDialog}
-       />
+      <h2> 
+      {
+        (
+          (this.state.searchCat != "default" && this.state.searchCat != "") ||
+          (this.state.searchLoc != "default" && this.state.searchLoc != "") || 
+          this.state.searchText != ""
+        )?"Favores":"" 
+      }
+      {this.state.searchText != ""? " que contienen: " + this.state.searchText : ""}
       </h2>
-      <Divider />
+      {
+        (
+          (this.state.searchCat != "default" && this.state.searchCat != "") ||
+          (this.state.searchLoc != "default" && this.state.searchLoc != "") || 
+          this.state.searchText != ""
+        )?<Divider/>:"" 
+      }
     </div>
       )
   }
@@ -295,12 +230,8 @@ class PublicationList extends React.Component {
     let publishButton = this.getButton()
     return (
       <div>
-      {this.state.searchText !== ""? this.searchHeader() : ""}
-      {this.getLocDialog()}
-      {this.getCatDialog()}      
+      {this.searchHeader()}  
       <div className="chip-list">
-        {this.locationChip()}
-        {this.categoryChip()}
       </div>
       <publications>
         {this.state.publications
