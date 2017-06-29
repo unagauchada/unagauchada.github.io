@@ -3,13 +3,15 @@ import rootRef from "../../libs/db"
 import ListItem from "react-md/lib/Lists/ListItem"
 import MenuButton from "react-md/lib/Menus/MenuButton"
 import UserAvatar from '../UserAvatar'
+import MakeComment from './MakeComment'
 import "./Comment.scss"
 
 class Comment extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      user: { name: "", lastname: "", id: 1 }
+      user: { name: "", lastname: "", id: 1 },
+      showReplyBox: false
     }
   }
 
@@ -24,17 +26,28 @@ class Comment extends React.Component {
       .on("value", snap => this.setState({ user: snap.val() }))
   }
 
+  showReplyBox = () => {
+    this.setState({showReplyBox: true})
+  }
+
   makeOwnerMenu = () =>
     this.props.canReplay && !this.props.comment.response
-      ? [<ListItem key="replay" primaryText="Responder" />]
+      ? [<ListItem key="replay" primaryText="Responder" onClick={this.showReplyBox} />]
       : []
+
+  delete = () => {
+    rootRef
+        .child("comments/" + this.props.publicationId + "/" + this.props.comment.id)
+        .remove()
+  }
+
   makePublisherMenu = () =>
     this.props.user &&
       this.props.user.uid === this.props.comment.user &&
       !this.props.comment.response
       ? [
           <ListItem key="edit" primaryText="Modificar" />,
-          <ListItem key="delete" primaryText="Eliminar" />
+          <ListItem key="delete" primaryText="Eliminar" onClick={this.delete}/>
         ]
       : []
 
@@ -60,10 +73,14 @@ class Comment extends React.Component {
 
         </h3>
         {this.props.comment.text}
-
+        {this.state.showReplyBox && !this.props.comment.response &&
+          <MakeComment 
+            user={this.props.user} 
+            path={this.props.publicationId + "/" + this.props.comment.id + "/response"}/>
+        }
         {this.props.comment.response &&
           <Comment
-            comment={this.props.comment.response}
+            comment={Object.values(this.props.comment.response)[0]}
             canReplay={false}
             user={this.props.user}
           />}
