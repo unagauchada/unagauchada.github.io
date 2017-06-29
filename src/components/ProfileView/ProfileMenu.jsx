@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import CSSTransitionGroup from 'react-addons-css-transition-group';
 import Tabs from 'react-md/lib/Tabs/Tabs';
 import Tab from 'react-md/lib/Tabs/Tab';
 import TabsContainer from 'react-md/lib/Tabs/TabsContainer';

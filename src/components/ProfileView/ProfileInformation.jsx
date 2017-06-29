@@ -1,19 +1,11 @@
 import React, { PureComponent } from "react"
 import _ from "lodash"
-import { connect } from "react-redux"
 import List from 'react-md/lib/Lists/List';
 import ListItem from 'react-md/lib/Lists/ListItem';
 import Card from "react-md/lib/Cards/Card"
 import CardTitle from "react-md/lib/Cards/CardTitle"
-import CardActions from "react-md/lib/Cards/CardActions"
 import CardText from "react-md/lib/Cards/CardText"
-import Media from "react-md/lib/Media"
-import Button from "react-md/lib/Buttons/Button"
 import FontIcon from "react-md/lib/FontIcons"
-import MainPage from "../MainPage"
-import { userSelector } from "../../redux/getters"
-import UserAvatar from "../UserAvatar"
-import CompanyLogo from "../../assets/logo.png"
 import rootRef from "../../libs/db"
 import "./ProfileView.scss"
 
@@ -97,7 +89,7 @@ export default class ProfileInformation extends PureComponent {
   }
 
   renderCredits = () => {
-    if (this.state.user.credits == 1){ 
+    if (this.state.user.credits === 1){ 
         return <h2 className="md-display-3 display-override">{this.state.user.credits + " Credito"}</h2>
     }else{
         return <h2 className="md-display-3 display-override">{this.state.user.credits + " Creditos"}</h2>}         
