@@ -247,7 +247,7 @@ class PublicationList extends React.Component {
       {this.searchHeader()}  
       <publications>
         {this.state.publications
-          .filter((x) => { return x.end > new Date(); })
+          .filter((x) => { return x.end > new Date() && ! x.gaucho })
           .filter(this.searchFilter)
           .sort(this.searchSort)
           .map(
