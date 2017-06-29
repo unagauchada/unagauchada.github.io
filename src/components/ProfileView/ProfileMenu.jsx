@@ -21,7 +21,7 @@ export default class ProfileMenu extends PureComponent {
     this.state = { 
         activeTabIndex: 0, 
         tabTwoChildren: null,
-        submissions: []
+        submissions: null
     };
     this._handleTabChange = this._handleTabChange.bind(this);
   }
@@ -33,10 +33,6 @@ export default class ProfileMenu extends PureComponent {
   }
 
   componentDidMount = () => {
-    this.getSubmissions()
-  }
-
-  componentWillMount = () => {
     this.getSubmissions()
   }
 
@@ -60,10 +56,7 @@ export default class ProfileMenu extends PureComponent {
   getSubmissions = () => {
     rootRef.child("submissions").on("value", snap =>
       this.setState({
-        submissions: _.map(snap.val(), (submission, publication) => ({
-          ...submission,
-          publication
-        }))
+        submissions: snap.val()
       })
     )
   }
@@ -73,11 +66,11 @@ export default class ProfileMenu extends PureComponent {
   }
 
   filterSubmissions = publication => {
-    return this.state.submissions.find(
-        submissions => 
-            submissions.publication === publication.id &&
-            Object.keys(submissions).find(user => user === this.props.user.uid)
-    )
+    if (typeof this.state.submissions[publication.id] === 'undefined') {
+      return false
+    }else{
+      return typeof this.state.submissions[publication.id][this.props.user.uid] !== 'undefined'
+    }
   }
 
   render() {
@@ -98,7 +91,7 @@ export default class ProfileMenu extends PureComponent {
             <FilteredPublicationList filter={this.filterPublications}/>
           </Tab>
           <Tab label="Postulaciones">
-            <FilteredPublicationList filter={this.filterSubmissions}/>
+            {this.state.submissions && <FilteredPublicationList filter={this.filterSubmissions}/>}
           </Tab>
         </Tabs>
       </TabsContainer>

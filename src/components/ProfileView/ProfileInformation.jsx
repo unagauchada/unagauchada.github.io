@@ -21,14 +21,31 @@ export default class ProfileInformation extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      user: { name: "", lastname: "", photo: "", credits: "" },
-      states: [{ name: "loading", value: "1" }]
+      user: { name: "", lastname: "", photo: "", credits: null, qualification: null },
+      states: [{ name: "loading", value: "1" }],
+      archievements: null
     }
   }
 
   componentDidMount = () => {
     this.getStates()
+    this.getArchievements()
     this.getUser(this.props.user.uid)
+  }
+
+  getArchievements = () => {
+    rootRef.child("⁠⁠⁠achievements").on("value", snap =>
+      this.setState({
+        archievements: _.map(
+          snap.val(),
+          (archievement, name) =>
+            ({
+                  ...archievement,
+                  name
+                })
+        )
+      })
+    )      
   }
 
   getStates = () => {
@@ -53,7 +70,6 @@ export default class ProfileInformation extends PureComponent {
   }
 
   getInformation = () => {
-    console.log(this.state.states)
     return(
         <List>
             {this.state.user.birthday && 
@@ -80,6 +96,13 @@ export default class ProfileInformation extends PureComponent {
     )
   }
 
+  renderCredits = () => {
+    if (this.state.user.credits == 1){ 
+        return <h2 className="md-display-3 display-override">{this.state.user.credits + " Credito"}</h2>
+    }else{
+        return <h2 className="md-display-3 display-override">{this.state.user.credits + " Creditos"}</h2>}         
+  }
+
   render = () => {
     return (
        <div style={{ width: "100%" }} className="information">
@@ -100,10 +123,7 @@ export default class ProfileInformation extends PureComponent {
                     <CardTitle
                         title="Creditos"/>
                     <CardText>
-                        {this.state.user.credits == 1 &&
-                        <h2 className="md-display-3 display-override">{this.state.user.credits + " Credito"}</h2>}            
-                        {this.state.user.credits != 1 &&
-                        <h2 className="md-display-3 display-override">{this.state.user.credits + " Creditos"}</h2>}            
+                        {this.state.user.credits && this.renderCredits()}
                     </CardText>    
             </Card>
             <Card
@@ -113,6 +133,12 @@ export default class ProfileInformation extends PureComponent {
                     <CardTitle
                         title="Calificaciones"/>
                     <CardText>
+                        {  this.state.archievements && 
+                            <h2 className="md-display-3 display-override md-text-center">{this.state.archievements.find(archievement => archievement.gt >= this.state.user.qualification < archievement.lt).name}</h2>
+                        }
+                        {  this.state.user.qualification &&
+                            <h4 className="md-display-1 display-override md-text-center">{this.state.user.qualification + ' puntos'}</h4>
+                        }
                     </CardText>    
             </Card>
        </div>

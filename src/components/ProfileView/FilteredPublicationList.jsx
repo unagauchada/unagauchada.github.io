@@ -25,10 +25,6 @@ class PublicationList extends React.Component {
     this.getPublications()
   }
 
-  componentWillMount = () => {
-    this.getPublications()
-  }
-
   getPublications = () =>
     rootRef.child("publications").on("value", snap => {
       this.setState({
