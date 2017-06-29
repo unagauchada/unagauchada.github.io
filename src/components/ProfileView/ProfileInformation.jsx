@@ -64,10 +64,10 @@ export default class ProfileInformation extends PureComponent {
   getInformation = () => {
     return(
         <List>
-            {this.state.user.birthday && 
+            {this.state.user.birthdate && 
             <ListItem
                 primaryText="Cumpleaños"
-                secondaryText={this.state.user.birthday}
+                secondaryText={this.state.user.birthdate}
                 rightAvatar={<FontIcon>create</FontIcon>}
             />}
             {this.state.user.city && 
@@ -126,7 +126,7 @@ export default class ProfileInformation extends PureComponent {
                         title="Calificaciones"/>
                     <CardText>
                         {  this.state.archievements && 
-                            <h2 className="md-display-3 display-override md-text-center">{this.state.archievements.find(archievement => archievement.gt >= this.state.user.qualification < archievement.lt).name}</h2>
+                            <h2 className="md-display-3 display-override md-text-center">{this.state.archievements.find(archievement => (archievement.gt <= this.state.user.qualification && (this.state.user.qualification <= archievement.lt))).name}</h2>
                         }
                         {  this.state.user.qualification &&
                             <h4 className="md-display-1 display-override md-text-center">{this.state.user.qualification + ' puntos'}</h4>
