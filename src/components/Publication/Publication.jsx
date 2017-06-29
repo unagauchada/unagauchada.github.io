@@ -20,6 +20,7 @@ import Dialog from 'react-md/lib/Dialogs'
 import List from 'react-md/lib/Lists/List'
 import ListItem from 'react-md/lib/Lists/ListItem'
 import Divider from "react-md/lib/Dividers"
+import Edit from "./Edit.jsx"
 
 @connect(state => ({ user: userSelector(state) }))
 class Publication extends PureComponent {
@@ -33,7 +34,8 @@ class Publication extends PureComponent {
       category: "",
       comments: [],
       state: "",
-      submissions: []
+      submissions: [],
+      editVisible: false
     }
   }
 
@@ -131,6 +133,7 @@ class Publication extends PureComponent {
     this.setState({ visible: false });
   };
 
+
   getPostuladosDialog = () =>{
     return (
       <Dialog
@@ -192,9 +195,35 @@ class Publication extends PureComponent {
       )
   }
 
+
+  openEdit = () => {
+    this.setState({ editVisible: true });
+  };
+
+  closeEdit = () => {
+    this.setState({ editVisible: false });
+  };
+
+  getEditDialog = () => {
+    return (
+    <Dialog
+      id="publishDialog"
+      visible={this.state.editVisible}
+      className="googleDialog"
+    >
+      <Edit
+        publication={this.state.publication}
+        publicationId={this.state.publicationId}
+        handleClose={this.closeEdit}
+      />
+    </Dialog>
+    )
+  }
+
   render = () => {
     return (
       <MainPage>
+        {this.getEditDialog()}
         {this.state.publication &&
           <Card
             style={{ width: "100%", maxWidth: 600 }}
@@ -248,10 +277,14 @@ class Publication extends PureComponent {
             </CardText>
             <CardActions>
               <Button
-                flat
+                raised
                 label={this.getPostulados()}
                 tooltipPosition="top"
-                tooltipLabel={"Ver Postulados"}
+                tooltipLabel={
+                  (this.state.publication.user !== this.props.user.uid || null)
+                  || this.state.publication.submissions < 1                
+                  ?null:"Ver Postulados"
+                }
                 disabled={
                   (this.state.publication.user !== this.props.user.uid || null)
                   || this.state.publication.submissions < 1
@@ -272,8 +305,9 @@ class Publication extends PureComponent {
                       tooltipLabel="Editar"
                       tooltipPosition="top"
                       icon
-                      disabled
-                    >
+                      disabled={this.state.publication.submissions > 0 || this.state.comments.length > 0}
+                      onClick={()=>{this.openEdit()}}
+                      >
                       create
                     </Button>
                     <Button
