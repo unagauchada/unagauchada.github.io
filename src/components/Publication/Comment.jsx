@@ -34,13 +34,20 @@ class Comment extends React.Component {
     this.props.canReplay && !this.props.comment.response
       ? [<ListItem key="replay" primaryText="Responder" onClick={this.showReplyBox} />]
       : []
+
+  delete = () => {
+    rootRef
+        .child("comments/" + this.props.publicationId + "/" + this.props.comment.id)
+        .remove()
+  }
+
   makePublisherMenu = () =>
     this.props.user &&
       this.props.user.uid === this.props.comment.user &&
       !this.props.comment.response
       ? [
           <ListItem key="edit" primaryText="Modificar" />,
-          <ListItem key="delete" primaryText="Eliminar" />
+          <ListItem key="delete" primaryText="Eliminar" onClick={this.delete}/>
         ]
       : []
 

@@ -1,24 +1,29 @@
 // @flow
+import _ from "lodash"
 import React from "react"
 import firebase from "firebase"
 import { Redirect } from 'react-router'
 import { HashRouter as Router, Route, Link, Switch } from "react-router-dom"
 import { connect } from "react-redux"
 import Toolbar from "react-md/lib/Toolbars"
+import TextField from "react-md/lib/TextFields"
 import Button from "react-md/lib/Buttons/Button"
 import FontIcon from "react-md/lib/FontIcons"
 import { app as fbApp } from "../../libs/db"
 import { userSelector } from "../../redux/getters"
 import { updateUser } from "../../redux/actions"
 import Divider from 'react-md/lib/Dividers'
+import Dialog from "react-md/lib/Dialogs"
+import SelectField from 'react-md/lib/SelectFields';
 import Signup from "../Signup"
 import Login from "../Login"
 import Home from "../Home"
 import BuyCredits from "../BuyCredits"
 import FavorView from "../Publication"
+import ProfileView from "../ProfileView"
 import actionCreator from "../ToolbarActions"
 import MainPage from "../MainPage"
-
+import rootRef from "../../libs/db"
 import Autocomplete from 'react-md/lib/Autocompletes';
 import "./App.scss"
 
@@ -45,13 +50,46 @@ class App extends React.Component {
         super();
         this.state = {
             searchText: "",
-            shouldRedir: false
+
+            searchLoc: "",
+            searchCat: "",
+            text: "",
+            showButtons: false,
+            shouldRedir: false,
+            locVisible: false,
+            catVisible: false
         };
     }
 
   componentWillMount() {
     firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
+    this.getStates()
+    this.getCategories()
   }
+
+  componentDidMount = () => {
+
+  }
+
+  getStates = () => {
+    rootRef.child("states").on("value", snap =>
+      this.setState({
+        states: _.map(snap.val(), (state, value) => ({ ...state, value })).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        ).concat({name:'Todas', value:'default'})
+      })
+    )
+  }
+
+  getCategories = () => {
+    rootRef.child("categories").on("value", snap =>
+      this.setState({
+        categories: _.map(snap.val(), (category, value) => ({ ...category, value})).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        ).concat({name:'Todas', value:'default'})
+      })
+    )
+  }  
 
    handleClear() {
     
@@ -65,6 +103,10 @@ class App extends React.Component {
   }
   }
 
+  showButtons = () => this.setState({showButtons: true})
+
+  hideButtons = () => this.setState({showButtons: false})
+
   handleSelection = value => {
     
   }
@@ -74,11 +116,24 @@ class App extends React.Component {
     return <Redirect to="/" />
   }
 
-  handleSearch = () => {
+  handleChange = value => {this.setState({text: value})}
+
+  handleSearch =() => {
+      if (this.state.text || this.state.searchCat || this.state.searchLoc ) {
       this.setState({
+        searchText: this.state.text,
         shouldRedir: true
       })      
+      }
   }
+  locChange = (value, index, event) => {
+    this.setState({ searchLoc: value })
+  }
+
+  catChange = (value, index, event) => {
+    this.setState({ searchCat: value })
+  }
+
 
   render = () => (
     <form  onSubmit={(e) => {e.preventDefault(); this.handleSearch(); }}>
@@ -89,7 +144,16 @@ class App extends React.Component {
           colored
           title={
             <h2>
-              <Link to="/">Una<span>Gauchada</span></Link>
+              <Link to="/"onClick={() => {this.setState(
+                {
+                  showButtons: false,
+                  searchText: "",
+                  searchLoc: "",
+                  searchCat: ""
+                }
+              )
+              }}>
+              Una<span>Gauchada</span></Link>
             </h2>
 
           }
@@ -100,25 +164,60 @@ class App extends React.Component {
           {this.state.shouldRedir? this.redir() : ""}
           <section>Explorar</section>
           <div className="md-cell--middle">
-          <Autocomplete
+
+          <TextField
               id="iconLeftPhone"
               block
               data={[]}
               placeholder="Buscar"
               leftIcon={<Button icon onClick={this.handleSearch}>search</Button>}
               onChange={this.handleChange}
-              size={10}
+              onFocus={this.showButtons}              size={10}
               className="md-title--toolbar md-cell--middle toolbar-text"
               inputClassName="md-text-field--toolbar"
             />
           </div>
+
+          <div className="md-cell">
+            {this.state.showButtons? 
+              <SelectField
+                toolbar
+                id="state"
+                placeholder='Ubicacion'
+                itemLabel="name"
+                itemValue="value"
+                value={this.state.searchLoc}
+                menuItems={this.state.states}
+                onChange={this.locChange}
+                position={SelectField.Positions.BELOW}
+                className="md-cell--2-offset"
+              />
+              :""
+            }
+           {this.state.showButtons? 
+              <SelectField
+                toolbar
+                id="category"
+                placeholder="Categoria"
+                itemLabel="name"
+                itemValue="value"
+                value={this.state.searchCat}
+                menuItems={this.state.categories}
+                onChange={this.catChange}
+                position={SelectField.Positions.BELOW}
+                className="md-cell--1-offset"
+              />
+              :""
+            }
+          </div>
         </Toolbar>
         <Switch>
-          <Route exact path="/" component={() => <Home searchText={this.state.searchText} />} />
+          <Route exact path="/" component={() => <Home searchText={this.state.searchText} searchLoc={this.state.searchLoc} searchCat={this.state.searchCat} />} />
           <Route path="/signup" component={Signup} />
           <Route path="/signin" component={Login} />
           <Route path="/buy" component={this.props.user ? BuyCredits : Login} />
           <Route path="/publication/:favorID"  component={this.props.user ? FavorView : Login } />
+          <Route path="/profile"  component={this.props.user ? ProfileView : Login } />
           <Route path="*" component={Error404} />
         </Switch> 
       </app>
