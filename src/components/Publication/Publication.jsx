@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react"
+import firebase from "firebase"
 import _ from "lodash"
 import { connect } from "react-redux"
 import Card from "react-md/lib/Cards/Card"
@@ -14,6 +15,12 @@ import MainPage from "../MainPage"
 import { userSelector } from "../../redux/getters"
 import UserAvatar from "../UserAvatar"
 import "./Publication.scss"
+import MakeComment from "./MakeComment"
+import Dialog from 'react-md/lib/Dialogs'
+import List from 'react-md/lib/Lists/List'
+import ListItem from 'react-md/lib/Lists/ListItem'
+import Divider from "react-md/lib/Dividers"
+import Edit from "./Edit.jsx"
 
 @connect(state => ({ user: userSelector(state) }))
 class Publication extends PureComponent {
@@ -22,10 +29,13 @@ class Publication extends PureComponent {
     this.state = {
       user: { name: "", lastname: "", photo: "" },
       publication: null,
+      postulados:[],
+      visible: false,
       category: "",
       comments: [],
       state: "",
-      submissions: []
+      submissions: [],
+      editVisible: false
     }
   }
 
@@ -73,6 +83,17 @@ class Publication extends PureComponent {
     })
   }
 
+  getUsuariosPostulados = () =>{
+    rootRef.child("users").on("value", snap =>
+      this.setState({
+        postulados: _.map(snap.val(), (postulado, user) => ({
+          ...postulado,
+          user
+        }))
+      })
+    )
+  }
+
   getSubmissions = publication => {
     rootRef.child("submissions").child(publication).on("value", snap =>
       this.setState({
@@ -84,16 +105,60 @@ class Publication extends PureComponent {
     )
   }
 
+  getPublicationId = publication => {
+    this.setState({ publicationId: publication })
+  }
+
   componentDidMount = () => {
+    this.getUsuariosPostulados()
     this.getPublication(this.props.match.params.favorID)
+    this.getPublicationId(this.props.match.params.favorID)
     this.getComments(this.props.match.params.favorID)
     this.getSubmissions(this.props.match.params.favorID)
   }
 
   componentWillReceiveProps = nextProps => {
+    this.getUsuariosPostulados()
     this.getPublication(nextProps.match.params.favorID)
+    this.getPublicationId(nextProps.match.params.favorID)
     this.getComments(nextProps.match.params.favorID)
     this.getSubmissions(nextProps.match.params.favorID)
+}
+
+  openDialog = () => {
+    this.setState({ visible: true });
+  };
+
+  closeDialog = () => {
+    this.setState({ visible: false });
+  };
+
+
+  getPostuladosDialog = () =>{
+    return (
+      <Dialog
+          id="simpleDialogExample"
+          visible={this.state.visible}
+          title={"Postulados"}
+          onHide={this.closeDialog}
+      >
+        <List>
+          {
+            (this.state.postulados)
+              .filter((x)=> {return (this.state.submissions.map((y)=> {return y.user})).includes(x.user)})
+              .map((x) => {
+                return( 
+                  <ListItem 
+                    primaryText={x.name+" "+x.lastname}
+                    leftAvatar={<UserAvatar url={x.photoURL} />} 
+                  />
+                )
+              })
+          }
+        </List>
+      </Dialog>
+
+    )
   }
 
   getPostulados = () =>
@@ -101,9 +166,64 @@ class Publication extends PureComponent {
       ? this.state.publication.submissions + " Postulado"
       : (this.state.publication.submissions || 0) + " Postulados"
 
+  postularse = () => {
+    rootRef
+      .child("submissions/" + this.state.publicationId + "/" + this.props.user.uid)
+      .child("date").set(firebase.database.ServerValue.TIMESTAMP)
+    
+    rootRef
+      .child("publications/" + this.state.publicationId)
+      .transaction(
+        function(publication){
+          publication.submissions++
+          return publication
+        }
+      )
+  }
+  despostularse = () => {
+    rootRef
+      .child("submissions/" + this.state.publicationId + "/" + this.props.user.uid)
+      .remove()
+    
+    rootRef
+      .child("publications/" + this.state.publicationId)
+      .transaction(
+        function(publication){
+          publication.submissions--
+          return publication
+        }
+      )
+  }
+
+
+  openEdit = () => {
+    this.setState({ editVisible: true });
+  };
+
+  closeEdit = () => {
+    this.setState({ editVisible: false });
+  };
+
+  getEditDialog = () => {
+    return (
+    <Dialog
+      id="publishDialog"
+      visible={this.state.editVisible}
+      className="googleDialog"
+    >
+      <Edit
+        publication={this.state.publication}
+        publicationId={this.state.publicationId}
+        handleClose={this.closeEdit}
+      />
+    </Dialog>
+    )
+  }
+
   render = () => {
     return (
       <MainPage>
+        {this.getEditDialog()}
         {this.state.publication &&
           <Card
             style={{ width: "100%", maxWidth: 600 }}
@@ -157,12 +277,21 @@ class Publication extends PureComponent {
             </CardText>
             <CardActions>
               <Button
-                flat
+                raised
                 label={this.getPostulados()}
-                disabled={
-                  this.state.publication.user !== this.props.user.uid || null
+                tooltipPosition="top"
+                tooltipLabel={
+                  (this.state.publication.user !== this.props.user.uid || null)
+                  || this.state.publication.submissions < 1                
+                  ?null:"Ver Postulados"
                 }
+                disabled={
+                  (this.state.publication.user !== this.props.user.uid || null)
+                  || this.state.publication.submissions < 1
+                }
+                onClick={() => {this.openDialog()}}
               />
+              {this.getPostuladosDialog()}
               {this.props.user.uid === this.state.publication.user
                 ? <div className="md-cell--right">
                     <Button
@@ -176,8 +305,9 @@ class Publication extends PureComponent {
                       tooltipLabel="Editar"
                       tooltipPosition="top"
                       icon
-                      disabled
-                    >
+                      disabled={this.state.publication.submissions > 0 || this.state.comments.length > 0}
+                      onClick={()=>{this.openEdit()}}
+                      >
                       create
                     </Button>
                     <Button
@@ -199,6 +329,7 @@ class Publication extends PureComponent {
                       ? <Button
                           tooltipLabel="Despostularme"
                           tooltipPosition="top"
+                          onClick={this.despostularse}
                           icon
                         >
                           thumb_down
@@ -206,6 +337,7 @@ class Publication extends PureComponent {
                       : <Button
                           tooltipLabel="Postularme!"
                           tooltipPosition="top"
+                          onClick={this.postularse}
                           primary
                           icon
                         >
@@ -225,12 +357,16 @@ class Publication extends PureComponent {
                           this.props.user.uid === this.state.publication.user
                         }
                         user={this.props.user}
+                        publicationId={this.state.publicationId}
                       />
                     </li>
                   )
                 })}
               </ul>
             </CardText>
+            <Divider/>
+            {this.props.user.uid !== this.state.publication.user &&
+              <MakeComment user={this.props.user} path={this.state.publicationId}/>}
           </Card>}
       </MainPage>
     )

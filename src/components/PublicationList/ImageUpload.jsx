@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react';
 import CSSTransitionGroup from 'react-addons-css-transition-group';
-import Button from 'react-md/lib/Buttons';
-import LinearProgress from 'react-md/lib/Progress/LinearProgress';
 import FileUpload from 'react-md/lib/FileInputs/FileUpload';
 
 import './publish.scss'
@@ -78,7 +76,7 @@ export default class FileUploadExample extends PureComponent {
   }
 
   render() {
-    const { files, progress } = this.state;
+    const { files } = this.state;
     const cards = Object.keys(files).map(key => <img id="image" src={files[key].uploadResult} alt={files[key].name} />);
 
     return (

@@ -1,15 +1,17 @@
 // @flow
+import _ from "lodash"
 import React from "react"
 import firebase from "firebase"
+import { Redirect } from 'react-router'
 import { HashRouter as Router, Route, Link, Switch } from "react-router-dom"
 import { connect } from "react-redux"
 import Toolbar from "react-md/lib/Toolbars"
-import Button from "react-md/lib/Buttons/Button"
 import TextField from "react-md/lib/TextFields"
-import FontIcon from "react-md/lib/FontIcons"
+import Button from "react-md/lib/Buttons/Button"
 import { app as fbApp } from "../../libs/db"
 import { userSelector } from "../../redux/getters"
 import { updateUser } from "../../redux/actions"
+import SelectField from 'react-md/lib/SelectFields';
 import Signup from "../Signup"
 import Login from "../Login"
 import Home from "../Home"
@@ -18,6 +20,7 @@ import FavorView from "../Publication"
 import ProfileView from "../ProfileView"
 import actionCreator from "../ToolbarActions"
 import MainPage from "../MainPage"
+import rootRef from "../../libs/db"
 import "./App.scss"
 
 const nav = <Button key="nav" icon>menu</Button>
@@ -39,11 +42,97 @@ const Error404 = () => (
 
 @connect(mapStateToProps, mapDispatchToProps)
 class App extends React.Component {
+  constructor() {
+        super();
+        this.state = {
+            searchText: "",
+
+            searchLoc: "",
+            searchCat: "",
+            text: "",
+            showButtons: false,
+            shouldRedir: false,
+            locVisible: false,
+            catVisible: false
+        };
+    }
+
   componentWillMount() {
     firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
+    this.getStates()
+    this.getCategories()
   }
 
+  componentDidMount = () => {
+
+  }
+
+  getStates = () => {
+    rootRef.child("states").on("value", snap =>
+      this.setState({
+        states: _.map(snap.val(), (state, value) => ({ ...state, value })).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        ).concat({name:'Todas', value:'default'})
+      })
+    )
+  }
+
+  getCategories = () => {
+    rootRef.child("categories").on("value", snap =>
+      this.setState({
+        categories: _.map(snap.val(), (category, value) => ({ ...category, value})).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        ).concat({name:'Todas', value:'default'})
+      })
+    )
+  }  
+
+   handleClear() {
+    
+  }
+
+  handleChange= value =>{
+    if (value) {
+      this.setState({
+        searchText: value
+      });   
+  }
+  }
+
+  showButtons = () => this.setState({showButtons: true})
+
+  hideButtons = () => this.setState({showButtons: false})
+
+  handleSelection = value => {
+    
+  }
+
+  redir = () => {
+    this.setState({shouldRedir: false})
+    return <Redirect to="/" />
+  }
+
+  handleChange = value => {this.setState({text: value})}
+
+  handleSearch =() => {
+      if (this.state.text || this.state.searchCat || this.state.searchLoc ) {
+      this.setState({
+        searchText: this.state.text,
+        shouldRedir: true
+      })      
+      }
+  }
+  locChange = (value, index, event) => {
+    this.setState({ searchLoc: value })
+  }
+
+  catChange = (value, index, event) => {
+    this.setState({ searchCat: value })
+  }
+
+
   render = () => (
+    <form  onSubmit={(e) => {e.preventDefault(); this.handleSearch(); }}>
     <Router>
       <app>
         <Toolbar
@@ -51,34 +140,85 @@ class App extends React.Component {
           colored
           title={
             <h2>
-              <Link to="/">Una<span>Gauchada</span></Link>
+              <Link to="/"onClick={() => {this.setState(
+                {
+                  showButtons: false,
+                  searchText: "",
+                  searchLoc: "",
+                  searchCat: ""
+                }
+              )
+              }}>
+              Una<span>Gauchada</span></Link>
             </h2>
+
           }
           actions={actionCreator(this.props.user)}
           nav={nav}
         >
+
+          {this.state.shouldRedir? this.redir() : ""}
           <section>Explorar</section>
+          <div className="md-cell--middle">
+
           <TextField
-            id="iconLeftPhone"
-            block
-            placeholder="Buscar"
-            leftIcon={<FontIcon>search</FontIcon>}
-            size={10}
-            className="md-title--toolbar md-cell--middle toolbar-text"
-            inputClassName="md-text-field--toolbar"
-          />
+              id="iconLeftPhone"
+              block
+              data={[]}
+              placeholder="Buscar"
+              leftIcon={<Button icon onClick={this.handleSearch}>search</Button>}
+              onChange={this.handleChange}
+              onFocus={this.showButtons}              size={10}
+              className="md-title--toolbar md-cell--middle toolbar-text"
+              inputClassName="md-text-field--toolbar"
+            />
+          </div>
+
+          <div className="md-cell">
+            {this.state.showButtons? 
+              <SelectField
+                toolbar
+                id="state"
+                placeholder='Ubicacion'
+                itemLabel="name"
+                itemValue="value"
+                value={this.state.searchLoc}
+                menuItems={this.state.states}
+                onChange={this.locChange}
+                position={SelectField.Positions.BELOW}
+                className="md-cell--2-offset"
+              />
+              :""
+            }
+           {this.state.showButtons? 
+              <SelectField
+                toolbar
+                id="category"
+                placeholder="Categoria"
+                itemLabel="name"
+                itemValue="value"
+                value={this.state.searchCat}
+                menuItems={this.state.categories}
+                onChange={this.catChange}
+                position={SelectField.Positions.BELOW}
+                className="md-cell--1-offset"
+              />
+              :""
+            }
+          </div>
         </Toolbar>
         <Switch>
-          <Route exact path="/" component={Home} />
+          <Route exact path="/" component={() => <Home searchText={this.state.searchText} searchLoc={this.state.searchLoc} searchCat={this.state.searchCat} />} />
           <Route path="/signup" component={Signup} />
           <Route path="/signin" component={Login} />
           <Route path="/buy" component={this.props.user ? BuyCredits : Login} />
           <Route path="/publication/:favorID"  component={this.props.user ? FavorView : Login } />
           <Route path="/profile"  component={this.props.user ? ProfileView : Login } />
           <Route path="*" component={Error404} />
-        </Switch>
+        </Switch> 
       </app>
     </Router>
+    </form>
   )
 }
 

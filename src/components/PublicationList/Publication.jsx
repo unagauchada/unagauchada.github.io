@@ -64,7 +64,7 @@ class Publication extends React.Component {
         <img
           src={
             this.props.publication.imageURL &&
-              this.props.publication.imageURL != ""
+              this.props.publication.imageURL !== ""
               ? this.props.publication.imageURL
               : CompanyLogo
           }
@@ -80,7 +80,7 @@ class Publication extends React.Component {
         </CardText>,
         <CardActions key="actions">
           <Link to={"/publication/" + this.props.publication.id}>
-            {firebase.auth().currentUser.uid == this.props.publication.user
+            {firebase.auth().currentUser.uid === this.props.publication.user
               ? <Button raised secondary label="Ver" />
               : <Button flat secondary label="Ver" />}
           </Link>

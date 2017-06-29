@@ -6,29 +6,27 @@ import Button from "react-md/lib/Buttons/Button"
 import TextField from "react-md/lib/TextFields"
 import SelectField from 'react-md/lib/SelectFields';
 import Snackbar from 'react-md/lib/Snackbars';
+
 import { userSelector } from "../../redux/getters"
 import rootRef, { storageRef } from "../../libs/db"
 import UserAvatar from "../UserAvatar"
-import ImageUpload from "./ImageUpload"
-
-const duration = 15
-const thisDate = new Date()
+import ImageUpload from "../PublicationList/ImageUpload"
 
 @connect(state => ({ user: userSelector(state) }))
-class Publish extends React.Component {
+class Edit extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {
       toasts: [],
       autohide: true,
-      title: "",
-      category: 0,
-      state: 0,
-      submissions: 0,
-      text: "",
-      end: thisDate.setDate(thisDate.getDate() + duration),
-      image: { url: "", file: null },
+      title: this.props.publication.title,
+      category: this.props.publication.category,
+      state: this.props.publication.state,
+      submissions: this.props.publication.submissions,
+      text: this.props.publication.text,
+      end: this.props.publication.end,
+      image: { url: this.props.publication.imageURL, file: this.props.publication.image },
       categories: [{ name: "loading", value: "1" }],
       states: [{ name: "loading", value: "1" }]
     }
@@ -111,26 +109,17 @@ class Publish extends React.Component {
     }
 
     let { title, category, state, submissions, text, end } = this.state
-    let imageURL = ""
+    let imageURL = this.props.publication.imageURL
     let user = this.props.user.uid
     let key = rootRef
-      .child("publications")
-      .push(
+      .child("publications/"+this.props.publicationId)
+      .update(
         { title, category, state, submissions, text, end, imageURL, user },
-        () =>{ 
-        rootRef
-          .child("users/" + this.getUserId().toString() + "/credits")
-          .once("value", snap =>
-            rootRef
-              .child("users/" + this.getUserId().toString() + "/credits")
-              .set(snap.val() - 1)
-          )
-          this.clean()
-        }
-      ).key
-
+        () => this.clean()
+      )
+    console.log(key)
     let uploadTask = storageRef
-      .child("publications/".concat(key))
+      .child("publications/"+this.props.publicationId)
       .put(this.state.image.file)
 
     uploadTask.on(
@@ -140,11 +129,10 @@ class Publish extends React.Component {
         console.error(error)
       },
       () => {
-        let image = { ...this.state.image, url: uploadTask.snapshot.downloadURL}
-        this.setState({ image })
-
+        let image = {...this.state.image, url: uploadTask.snapshot.downloadURL}
+        this.setState({image})
         rootRef
-          .child("publications/".concat(key).concat("/imageURL"))
+          .child("publications/"+this.props.publicationId+"/imageURL")
           .set(this.state.image.url)
 
       }
@@ -238,7 +226,7 @@ class Publish extends React.Component {
         </section>
         <section className="footer md-cell md-cell--12 md-text-right">
           <Button flat label="Cancelar" onClick={this.cancel} />
-          <Button raised primary label="Publicar!" onClick={this.submit} />
+          <Button raised primary label="Editar!" onClick={this.submit} />
         </section>
       <Snackbar {...this.state} onDismiss={this.removeToast} />
       </section>
@@ -247,4 +235,4 @@ class Publish extends React.Component {
   }
 
 
-export default Publish
+export default Edit

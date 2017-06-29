@@ -21,7 +21,7 @@ export default class Stepper extends PureComponent {
         this.setState({ purchase })
     }
     if (index < this.steps.length){
-        index = index + 1
+        index += 1
         this.setState({index})
         console.log("next step")
     }
