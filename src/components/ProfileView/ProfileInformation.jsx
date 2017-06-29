@@ -90,9 +90,9 @@ export default class ProfileInformation extends PureComponent {
 
   renderCredits = () => {
     if (this.state.user.credits === 1){ 
-        return <h2 className="md-display-3 display-override">{this.state.user.credits + " Credito"}</h2>
+        return <h2 className="md-display-3 display-override md-text-center">{this.state.user.credits + " Credito"}</h2>
     }else{
-        return <h2 className="md-display-3 display-override">{this.state.user.credits + " Creditos"}</h2>}         
+        return <h2 className="md-display-3 display-override md-text-center">{this.state.user.credits + " Creditos"}</h2>}         
   }
 
   render = () => {
