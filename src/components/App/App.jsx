@@ -115,7 +115,7 @@ class App extends React.Component {
   handleChange = value => {this.setState({text: value})}
 
   handleSearch =() => {
-      if (this.state.text || this.state.searchCat || this.state.searchLoc ) {
+      if (this.state.searchText || this.state.text || this.state.searchCat || this.state.searchLoc ) {
       this.setState({
         searchText: this.state.text,
         shouldRedir: true
