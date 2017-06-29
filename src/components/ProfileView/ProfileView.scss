@@ -1,0 +1,70 @@
+.profile-view {
+    .title-element{
+            margin-top: 80px;
+    }
+    .md-card-title {
+        .md-avatar {
+            margin-right: 16px;
+        }
+        .md-card-title--title-block {
+            i {
+                font-size: 14px;
+                vertical-align: middle;
+            }
+        }
+    }
+    img{
+        object-fit: cover;
+    }
+    .comments {
+        ul {
+            user-select: initial;
+            li.md-list-tile {
+                /* border-top: 1px solid #ebebeb; */
+                padding: 12px 0;
+                transition: background-color .3s cubic-bezier(0, 0, 0.2, 1);
+                height: initial;
+                &:first-child {
+                    padding-top: 0;
+                }
+                &:last-child {
+                    padding-bottom: 0;
+                }
+            }
+        }
+    }
+}
+.information{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    .md-card{
+        margin: 10px 15px;
+        width: 300px;
+        .md-avatar{
+            margin-right: 16px;
+        }
+
+        .md-card-text{
+            font-weight: 100;
+            font-size: 15px;
+
+            &.descr{
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        img{
+            object-fit: cover;
+        }
+    }
+
+    .add-publication{
+        position: fixed;
+        bottom: 27px;
+        right: 27px;
+    }
+}
