@@ -26,6 +26,7 @@ class PublicationList extends React.Component {
       searchText: "",
       searchLoc: "default",
       searchCat: "default",
+
       categories: [],
       publications: [],
       visible: false,
@@ -131,7 +132,7 @@ class PublicationList extends React.Component {
   }
 
   searchFilter = (x) =>{
-    return( 
+    return(
       ( (x.text + x.title).toLowerCase().includes(this.state.searchText.toLowerCase() ) ) && 
       ( this.state.searchLoc == "default" || this.state.searchLoc == "" || x.state == this.state.searchLoc ) && 
       ( this.state.searchCat == "default" || this.state.searchCat == "" || x.category == this.state.searchCat )
@@ -149,7 +150,6 @@ class PublicationList extends React.Component {
       return b.submissions - a.submissions
     }
   }
-
   getCategory = (category) => {
     return this.state.categories.find((x) => { return x.value == category}).name
   }
@@ -231,8 +231,6 @@ class PublicationList extends React.Component {
     return (
       <div>
       {this.searchHeader()}  
-      <div className="chip-list">
-      </div>
       <publications>
         {this.state.publications
           .filter((x) => { return x.end > new Date(); })

@@ -248,10 +248,14 @@ class Publication extends PureComponent {
             </CardText>
             <CardActions>
               <Button
-                flat
+                raised
                 label={this.getPostulados()}
                 tooltipPosition="top"
-                tooltipLabel={"Ver Postulados"}
+                tooltipLabel={
+                  (this.state.publication.user !== this.props.user.uid || null)
+                  || this.state.publication.submissions < 1                
+                  ?null:"Ver Postulados"
+                }
                 disabled={
                   (this.state.publication.user !== this.props.user.uid || null)
                   || this.state.publication.submissions < 1

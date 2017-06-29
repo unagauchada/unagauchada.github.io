@@ -50,6 +50,7 @@ class App extends React.Component {
         super();
         this.state = {
             searchText: "",
+
             searchLoc: "",
             searchCat: "",
             text: "",
@@ -125,7 +126,6 @@ class App extends React.Component {
       })      
       }
   }
-
   locChange = (value, index, event) => {
     this.setState({ searchLoc: value })
   }
@@ -164,6 +164,7 @@ class App extends React.Component {
           {this.state.shouldRedir? this.redir() : ""}
           <section>Explorar</section>
           <div className="md-cell--middle">
+
           <TextField
               id="iconLeftPhone"
               block
@@ -171,12 +172,12 @@ class App extends React.Component {
               placeholder="Buscar"
               leftIcon={<Button icon onClick={this.handleSearch}>search</Button>}
               onChange={this.handleChange}
-              onFocus={this.showButtons}
-              size={10}
+              onFocus={this.showButtons}              size={10}
               className="md-title--toolbar md-cell--middle toolbar-text"
               inputClassName="md-text-field--toolbar"
             />
           </div>
+
           <div className="md-cell">
             {this.state.showButtons? 
               <SelectField
