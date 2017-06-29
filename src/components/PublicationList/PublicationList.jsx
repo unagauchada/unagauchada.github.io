@@ -58,6 +58,11 @@ class PublicationList extends React.Component {
     this.getPublications()
     this.getStates()
     this.getCategories()
+    this.setState({
+      searchText: this.props.searchText,
+      searchLoc: this.props.searchLoc,
+      searchCat: this.props.searchCat
+    })
   }
 
   getStates = () => {
@@ -80,23 +85,10 @@ class PublicationList extends React.Component {
     )
   }
 
-  componentWillMount = () => {
-
-    this.setState({
-      searchText: this.props.searchText,
-      searchLoc: this.props.searchLoc,
-      searchCat: this.props.searchCat
-    })
-  }
-
-      
-
   componentWillReceiveProps = nextProps => {
     this.getCredits(nextProps)
     this.setState({searchText: nextProps.searchText})
   }
-
-
 
   openDialog = () => this.setState({ visible: true })
 
