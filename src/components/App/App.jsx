@@ -10,7 +10,7 @@ import TextField from "react-md/lib/TextFields"
 import Button from "react-md/lib/Buttons/Button"
 import { app as fbApp } from "../../libs/db"
 import { userSelector } from "../../redux/getters"
-import { updateUser } from "../../redux/actions"
+import { updateUser } from "../../redux/actions"'
 import SelectField from 'react-md/lib/SelectFields';
 import Signup from "../Signup"
 import Login from "../Login"

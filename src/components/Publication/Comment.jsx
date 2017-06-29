@@ -4,6 +4,7 @@ import ListItem from "react-md/lib/Lists/ListItem"
 import MenuButton from "react-md/lib/Menus/MenuButton"
 import UserAvatar from '../UserAvatar'
 import MakeComment from './MakeComment'
+import MakeEdit from './MakeEdit'
 import "./Comment.scss"
 
 class Comment extends React.Component {
@@ -11,7 +12,8 @@ class Comment extends React.Component {
     super(props)
     this.state = {
       user: { name: "", lastname: "", id: 1 },
-      showReplyBox: false
+      showReplyBox: false,
+      showEditBox: false
     }
   }
 
@@ -30,6 +32,15 @@ class Comment extends React.Component {
     this.setState({showReplyBox: true})
   }
 
+  showEditBox = () => {
+    this.setState({showEditBox: true})
+  }
+
+  hideEditBox= () => {
+    this.setState({showEditBox: false})
+  }
+
+
   makeOwnerMenu = () =>
     this.props.canReplay && !this.props.comment.response
       ? [<ListItem key="replay" primaryText="Responder" onClick={this.showReplyBox} />]
@@ -44,9 +55,9 @@ class Comment extends React.Component {
   makePublisherMenu = () =>
     this.props.user &&
       this.props.user.uid === this.props.comment.user &&
-      !this.props.comment.response
+      !this.props.comment.response && ! this.props.isReply
       ? [
-          <ListItem key="edit" primaryText="Modificar" />,
+          <ListItem key="edit" primaryText="Modificar" onClick={this.showEditBox} />,
           <ListItem key="delete" primaryText="Eliminar" onClick={this.delete}/>
         ]
       : []
@@ -78,10 +89,18 @@ class Comment extends React.Component {
             user={this.props.user} 
             path={this.props.publicationId + "/" + this.props.comment.id + "/response"}/>
         }
+        {this.state.showEditBox && !this.props.comment.response &&
+          <MakeEdit
+            user={this.props.user} 
+            path={this.props.publicationId + "/" + this.props.comment.id}
+            hide={this.hideEditBox}
+            text={this.props.comment.text}/>
+        }
         {this.props.comment.response &&
           <Comment
             comment={Object.values(this.props.comment.response)[0]}
             canReplay={false}
+            isReply={true}
             user={this.props.user}
           />}
       </section>
