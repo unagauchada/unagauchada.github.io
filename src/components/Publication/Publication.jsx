@@ -168,7 +168,7 @@ class Publication extends PureComponent {
       return;
     }
     let user = this.state.postulados.find( user => user.user  === this.state.publication.gaucho )
-    let { credits, qualification} = { ... user }
+    let { credits, qualification } = { ...user }
 
     switch (value) {
       case -1:
@@ -181,6 +181,8 @@ class Publication extends PureComponent {
         qualification += 5;
         credits += 1;
         break;
+      default:
+        return;
     }
 
     rootRef

@@ -2,14 +2,11 @@ import React from "react"
 import _ from "lodash"
 import { connect } from "react-redux"
 import Button from "react-md/lib/Buttons/Button"
-import Chip from 'react-md/lib/Chips';
 import Dialog from "react-md/lib/Dialogs"
 import Snackbar from "react-md/lib/Snackbars";
 import Divider from 'react-md/lib/Dividers';
 import rootRef from "../../libs/db"
 import Publication from "./Publication"
-import SelectField from 'react-md/lib/SelectFields';
-import FontIcon from "react-md/lib/FontIcons"
 import Publish from "./Publish"
 import { userSelector } from "../../redux/getters"
 import "./PublicationList.scss"
@@ -134,7 +131,7 @@ class PublicationList extends React.Component {
   getUserId = props => {
     var uid
 
-    if (props.user != null) {
+    if (props.user !== null) {
       uid = props.user.uid.toString() // The user's ID, unique to the Firebase project. Do NOT use
       // this value to authenticate with your backend server, if
       // you have one. Use User.getToken() instead.
@@ -147,15 +144,15 @@ class PublicationList extends React.Component {
   searchFilter = (x) =>{
     return(
       ( (x.text + x.title).toLowerCase().includes(this.state.searchText.toLowerCase() ) ) && 
-      ( this.state.searchLoc == "default" || this.state.searchLoc == "" || x.state == this.state.searchLoc ) && 
-      ( this.state.searchCat == "default" || this.state.searchCat == "" || x.category == this.state.searchCat )
+      ( this.state.searchLoc === "default" || this.state.searchLoc === "" || x.state === this.state.searchLoc ) && 
+      ( this.state.searchCat === "default" || this.state.searchCat === "" || x.category === this.state.searchCat )
     )
   }
 
   searchSort = (a, b) => {
-    if ((this.state.searchCat != "default", this.state.searchCat != "") ||
-        (this.state.searchLoc != "default", this.state.searchLoc != "") || 
-        this.state.searchText != ""
+    if ((this.state.searchCat !== "default", this.state.searchCat !== "") ||
+        (this.state.searchLoc !== "default", this.state.searchLoc !== "") || 
+        this.state.searchText !== ""
       ){
       return this.state.users.find( x =>  x.id === b.user).qualification 
       - this.state.users.find( x =>  x.id === a.user).qualification
@@ -165,7 +162,7 @@ class PublicationList extends React.Component {
     }
   }
   getCategory = (category) => {
-    return this.state.categories.find((x) => { return x.value == category}).name
+    return this.state.categories.find((x) => { return x.value === category}).name
   }
 
   searchHeader = () =>{
@@ -174,18 +171,18 @@ class PublicationList extends React.Component {
       <h2> 
       {
         (
-          (this.state.searchCat != "default" && this.state.searchCat != "") ||
-          (this.state.searchLoc != "default" && this.state.searchLoc != "") || 
-          this.state.searchText != ""
+          (this.state.searchCat !== "default" && this.state.searchCat !== "") ||
+          (this.state.searchLoc !== "default" && this.state.searchLoc !== "") || 
+          this.state.searchText !== ""
         )?"Favores":"" 
       }
-      {this.state.searchText != ""? " que contienen: " + this.state.searchText : ""}
+      {this.state.searchText !== ""? " que contienen: " + this.state.searchText : ""}
       </h2>
       {
         (
-          (this.state.searchCat != "default" && this.state.searchCat != "") ||
-          (this.state.searchLoc != "default" && this.state.searchLoc != "") || 
-          this.state.searchText != ""
+          (this.state.searchCat !== "default" && this.state.searchCat !== "") ||
+          (this.state.searchLoc !== "default" && this.state.searchLoc !== "") || 
+          this.state.searchText !== ""
         )?<Divider/>:"" 
       }
     </div>

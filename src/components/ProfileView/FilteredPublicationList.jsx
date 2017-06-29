@@ -1,16 +1,10 @@
 import React from "react"
 import _ from "lodash"
 import { connect } from "react-redux"
-import Button from "react-md/lib/Buttons/Button"
-import Dialog from "react-md/lib/Dialogs"
-import Snackbar from "react-md/lib/Snackbars"
-
 import rootRef from "../../libs/db"
 import Publication from "../PublicationList/Publication"
 import { userSelector } from "../../redux/getters"
 import "../PublicationList/PublicationList.scss"
-
-const publicationCost = 1
 
 @connect(state => ({ user: userSelector(state) }))
 class PublicationList extends React.Component {

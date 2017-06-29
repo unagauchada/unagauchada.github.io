@@ -6,7 +6,6 @@ import FontIcon from "react-md/lib/FontIcons"
 import "./MainPage.scss"
 
 const HomeIcon = () => <FontIcon>home</FontIcon>
-const ExplorIcon = () => <FontIcon>group_work</FontIcon>
 const ProfileIcon = () => <FontIcon>account_circle</FontIcon>
 const CreditIcon = () => <FontIcon>shopping_cart</FontIcon>
 

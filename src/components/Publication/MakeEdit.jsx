@@ -5,7 +5,6 @@ import UserAvatar from '../UserAvatar'
 import CardText from "react-md/lib/Cards/CardText"
 import CardActions from "react-md/lib/Cards/CardActions"
 import Button from "react-md/lib/Buttons"
-import firebase from "firebase"
 import "./Comment.scss"
 
 class MakeEdit extends React.Component {
@@ -47,11 +46,7 @@ class MakeEdit extends React.Component {
       return
     }
 
-
     let text = this.state.text
-    let user = this.props.user.uid
-    console.log(this.props.path)
-
     rootRef
         .child("comments/".concat(this.props.path))
         .update({ text },
