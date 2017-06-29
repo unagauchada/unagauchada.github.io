@@ -16,10 +16,7 @@ const SideBar = () => (
       <Link to="/">
         <ListItem leftIcon={<HomeIcon />} primaryText="Inicio" />
       </Link>
-      <Link to="/">
-        <ListItem leftIcon={<ExplorIcon />} primaryText="Explorar" />
-      </Link>
-      <Link to="/">
+      <Link to="/profile">
         <ListItem leftIcon={<ProfileIcon />} primaryText="Mi Perfil" />
       </Link>
       <Link to="/buy">
