@@ -96,6 +96,7 @@ export default class ProfileInformation extends PureComponent {
   }
 
   render = () => {
+      if(!this.state.user) return;
     return (
        <div style={{ width: "100%" }} className="information">
             <Card
