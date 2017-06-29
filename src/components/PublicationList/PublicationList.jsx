@@ -2,14 +2,19 @@ import React from "react"
 import _ from "lodash"
 import { connect } from "react-redux"
 import Button from "react-md/lib/Buttons/Button"
+import Chip from 'react-md/lib/Chips';
 import Dialog from "react-md/lib/Dialogs"
-import Snackbar from "react-md/lib/Snackbars"
-
+import Snackbar from "react-md/lib/Snackbars";
+import Divider from 'react-md/lib/Dividers';
 import rootRef from "../../libs/db"
 import Publication from "./Publication"
+import SelectField from 'react-md/lib/SelectFields';
+import FontIcon from "react-md/lib/FontIcons"
 import Publish from "./Publish"
 import { userSelector } from "../../redux/getters"
 import "./PublicationList.scss"
+
+
 
 const publicationCost = 1
 
@@ -18,8 +23,14 @@ class PublicationList extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      searchText: "",
+      searchLoc: "default",
+      searchCat: "default",
+      categories: [],
       publications: [],
       visible: false,
+      catVisible:false,
+      locVisible:false,
       credits: 0,
       toasts: [],
       autohide: true
@@ -44,11 +55,47 @@ class PublicationList extends React.Component {
 
   componentDidMount = () => {
     this.getPublications()
+    this.getStates()
+    this.getCategories()
   }
+
+  getStates = () => {
+    rootRef.child("states").on("value", snap =>
+      this.setState({
+        states: _.map(snap.val(), (state, value) => ({ ...state, value })).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        )
+      })
+    )
+  }
+
+  getCategories = () => {
+    rootRef.child("categories").on("value", snap =>
+      this.setState({
+        categories: _.map(snap.val(), (category, value) => ({ ...category, value})).sort(
+          (a, b) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1)
+        )
+      })
+    )
+  }
+
+  componentWillMount = () => {
+
+    this.setState({
+      searchText: this.props.searchText,
+      searchLoc: this.props.searchLoc,
+      searchCat: this.props.searchCat
+    })
+  }
+
+      
 
   componentWillReceiveProps = nextProps => {
     this.getCredits(nextProps)
+    this.setState({searchText: nextProps.searchText})
   }
+
+
 
   openDialog = () => this.setState({ visible: true })
 
@@ -83,6 +130,54 @@ class PublicationList extends React.Component {
     return uid
   }
 
+  searchFilter = (x) =>{
+    return( 
+      ( (x.text + x.title).toLowerCase().includes(this.state.searchText.toLowerCase() ) ) && 
+      ( this.state.searchLoc == "default" || this.state.searchLoc == "" || x.state == this.state.searchLoc ) && 
+      ( this.state.searchCat == "default" || this.state.searchCat == "" || x.category == this.state.searchCat )
+    )
+  }
+
+  searchSort = (a, b) => {
+    if ((this.state.searchCat != "default", this.state.searchCat != "") ||
+        (this.state.searchLoc != "default", this.state.searchLoc != "") || 
+        this.state.searchText != ""
+      ){
+      return b.user.score - a.user.score
+    }
+    else{
+      return b.submissions - a.submissions
+    }
+  }
+
+  getCategory = (category) => {
+    return this.state.categories.find((x) => { return x.value == category}).name
+  }
+
+  searchHeader = () =>{
+  return (
+    <div>
+      <h2> 
+      {
+        (
+          (this.state.searchCat != "default" && this.state.searchCat != "") ||
+          (this.state.searchLoc != "default" && this.state.searchLoc != "") || 
+          this.state.searchText != ""
+        )?"Favores":"" 
+      }
+      {this.state.searchText != ""? " que contienen: " + this.state.searchText : ""}
+      </h2>
+      {
+        (
+          (this.state.searchCat != "default" && this.state.searchCat != "") ||
+          (this.state.searchLoc != "default" && this.state.searchLoc != "") || 
+          this.state.searchText != ""
+        )?<Divider/>:"" 
+      }
+    </div>
+      )
+  }
+
   getCredits = props => {
     rootRef
       .child("users/" + this.getUserId(props) + "/credits")
@@ -100,7 +195,7 @@ class PublicationList extends React.Component {
           <Button
             className="add-publication"
             floating
-            secundary
+            secondary
             onClick={this.toastFailure}
           >
             money_off
@@ -134,11 +229,15 @@ class PublicationList extends React.Component {
   render = () => {
     let publishButton = this.getButton()
     return (
+      <div>
+      {this.searchHeader()}  
+      <div className="chip-list">
+      </div>
       <publications>
         {this.state.publications
-          .sort(function(a, b) {
-            return b.submissions - a.submissions
-          })
+          .filter((x) => { return x.end > new Date(); })
+          .filter(this.searchFilter)
+          .sort(this.searchSort)
           .map(
             publication =>
               publication &&
@@ -147,6 +246,7 @@ class PublicationList extends React.Component {
         {publishButton}
         <Snackbar {...this.state} onDismiss={this._removeToast} />
       </publications>
+      </div>
     )
   }
 }

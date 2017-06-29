@@ -177,6 +177,20 @@ class Publication extends PureComponent {
         }
       )
   }
+  despostularse = () => {
+    rootRef
+      .child("submissions/" + this.state.publicationId + "/" + this.props.user.uid)
+      .remove()
+    
+    rootRef
+      .child("publications/" + this.state.publicationId)
+      .transaction(
+        function(publication){
+          publication.submissions--
+          return publication
+        }
+      )
+  }
 
   render = () => {
     return (
@@ -281,6 +295,7 @@ class Publication extends PureComponent {
                       ? <Button
                           tooltipLabel="Despostularme"
                           tooltipPosition="top"
+                          onClick={this.despostularse}
                           icon
                         >
                           thumb_down
