@@ -2,31 +2,25 @@ import React from "react"
 import _ from "lodash"
 import { connect } from "react-redux"
 import Button from "react-md/lib/Buttons/Button"
-import Chip from 'react-md/lib/Chips';
 import Dialog from "react-md/lib/Dialogs"
 import Snackbar from "react-md/lib/Snackbars";
 import Divider from 'react-md/lib/Dividers';
 import rootRef from "../../libs/db"
 import Publication from "./Publication"
-import SelectField from 'react-md/lib/SelectFields';
-import FontIcon from "react-md/lib/FontIcons"
 import Publish from "./Publish"
 import { userSelector } from "../../redux/getters"
 import "./PublicationList.scss"
 
-
-
 const publicationCost = 1
 
 @connect(state => ({ user: userSelector(state) }))
-class PublicationList extends React.Component {
+class PublicationList extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
       searchText: "",
       searchLoc: "default",
       searchCat: "default",
-
       categories: [],
       publications: [],
       visible: false,
@@ -34,7 +28,8 @@ class PublicationList extends React.Component {
       locVisible:false,
       credits: 0,
       toasts: [],
-      autohide: true
+      autohide: true,
+      notMounted : true
     }
   }
 
@@ -58,11 +53,9 @@ class PublicationList extends React.Component {
     this.getPublications()
     this.getStates()
     this.getCategories()
-    this.setState({
-      searchText: this.props.searchText,
-      searchLoc: this.props.searchLoc,
-      searchCat: this.props.searchCat
-    })
+    this.setState({notMounted: false});
+
+    this.componentWillReceiveProps(this.props);  
   }
 
   getStates = () => {
@@ -85,7 +78,13 @@ class PublicationList extends React.Component {
     )
   }
 
-  componentWillReceiveProps = nextProps => {
+  componentWillReceiveProps = (nextProps, nextContext) => {
+    console.log(nextProps)
+    this.setState({
+      searchText: this.props.searchText,
+      searchLoc: this.props.searchLoc,
+      searchCat: this.props.searchCat
+    })
     this.getCredits(nextProps)
     this.setState({searchText: nextProps.searchText})
   }
@@ -113,7 +112,7 @@ class PublicationList extends React.Component {
   getUserId = props => {
     var uid
 
-    if (props.user != null) {
+    if (props.user !== null) {
       uid = props.user.uid.toString() // The user's ID, unique to the Firebase project. Do NOT use
       // this value to authenticate with your backend server, if
       // you have one. Use User.getToken() instead.
@@ -126,15 +125,15 @@ class PublicationList extends React.Component {
   searchFilter = (x) =>{
     return(
       ( (x.text + x.title).toLowerCase().includes(this.state.searchText.toLowerCase() ) ) && 
-      ( this.state.searchLoc == "default" || this.state.searchLoc == "" || x.state == this.state.searchLoc ) && 
-      ( this.state.searchCat == "default" || this.state.searchCat == "" || x.category == this.state.searchCat )
+      ( this.state.searchLoc === "default" || this.state.searchLoc === "" || x.state === this.state.searchLoc ) && 
+      ( this.state.searchCat === "default" || this.state.searchCat === "" || x.category === this.state.searchCat )
     )
   }
 
   searchSort = (a, b) => {
-    if ((this.state.searchCat != "default", this.state.searchCat != "") ||
-        (this.state.searchLoc != "default", this.state.searchLoc != "") || 
-        this.state.searchText != ""
+    if ((this.state.searchCat !== "default", this.state.searchCat !== "") ||
+        (this.state.searchLoc !== "default", this.state.searchLoc !== "") || 
+        this.state.searchText !== ""
       ){
       return b.user.score - a.user.score
     }
@@ -143,7 +142,7 @@ class PublicationList extends React.Component {
     }
   }
   getCategory = (category) => {
-    return this.state.categories.find((x) => { return x.value == category}).name
+    return this.state.categories.find((x) => { return x.value === category}).name
   }
 
   searchHeader = () =>{
@@ -152,18 +151,18 @@ class PublicationList extends React.Component {
       <h2> 
       {
         (
-          (this.state.searchCat != "default" && this.state.searchCat != "") ||
-          (this.state.searchLoc != "default" && this.state.searchLoc != "") || 
-          this.state.searchText != ""
+          (this.state.searchCat !== "default" && this.state.searchCat !== "") ||
+          (this.state.searchLoc !== "default" && this.state.searchLoc !== "") || 
+          this.state.searchText !== ""
         )?"Favores":"" 
       }
-      {this.state.searchText != ""? " que contienen: " + this.state.searchText : ""}
+      {this.state.searchText !== ""? " que contienen: " + this.state.searchText : ""}
       </h2>
       {
         (
-          (this.state.searchCat != "default" && this.state.searchCat != "") ||
-          (this.state.searchLoc != "default" && this.state.searchLoc != "") || 
-          this.state.searchText != ""
+          (this.state.searchCat !== "default" && this.state.searchCat !== "") ||
+          (this.state.searchLoc !== "default" && this.state.searchLoc !== "") || 
+          this.state.searchText !== ""
         )?<Divider/>:"" 
       }
     </div>
@@ -171,8 +170,11 @@ class PublicationList extends React.Component {
   }
 
   getCredits = props => {
+    if(!props.user) return;
     rootRef
-      .child("users/" + this.getUserId(props) + "/credits")
+      .child("users")
+      .child(this.getUserId(props))
+      .child("credits")
       .on("value", snap => {
         console.log(snap.val())
         this.setState({ credits: snap.val() })
@@ -210,6 +212,7 @@ class PublicationList extends React.Component {
             visible={this.state.visible}
             onHide={this.closeDialog}
             className="googleDialog"
+            aria-label="New Dialog"
           >
             <Publish handleClose={this.closeDialog} />
           </Dialog>
@@ -220,6 +223,8 @@ class PublicationList extends React.Component {
 
   render = () => {
     let publishButton = this.getButton()
+    if (this.state.notMounted)
+      return null;
     return (
       <div>
       {this.searchHeader()}  

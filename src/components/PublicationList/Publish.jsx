@@ -6,12 +6,10 @@ import Button from "react-md/lib/Buttons/Button"
 import TextField from "react-md/lib/TextFields"
 import SelectField from 'react-md/lib/SelectFields';
 import Snackbar from 'react-md/lib/Snackbars';
-
 import { userSelector } from "../../redux/getters"
 import rootRef, { storageRef } from "../../libs/db"
 import UserAvatar from "../UserAvatar"
 import ImageUpload from "./ImageUpload"
-import firebase from "firebase"
 
 const duration = 15
 const thisDate = new Date()
@@ -119,7 +117,16 @@ class Publish extends React.Component {
       .child("publications")
       .push(
         { title, category, state, submissions, text, end, imageURL, user },
-        () => this.clean()
+        () =>{ 
+        rootRef
+          .child("users/" + this.getUserId().toString() + "/credits")
+          .once("value", snap =>
+            rootRef
+              .child("users/" + this.getUserId().toString() + "/credits")
+              .set(snap.val() - 1)
+          )
+          this.clean()
+        }
       ).key
 
     let uploadTask = storageRef
@@ -133,19 +140,13 @@ class Publish extends React.Component {
         console.error(error)
       },
       () => {
-        this.state.image.url = uploadTask.snapshot.downloadURL
+        let image = { ...this.state.image, url: uploadTask.snapshot.downloadURL}
+        this.setState({ image })
 
         rootRef
           .child("publications/".concat(key).concat("/imageURL"))
           .set(this.state.image.url)
 
-        rootRef
-          .child("users/" + this.getUserId().toString() + "/credits")
-          .once("value", snap =>
-            rootRef
-              .child("users/" + this.getUserId().toString() + "/credits")
-              .set(snap.val() - 1)
-          )
       }
     )
   }

@@ -2,12 +2,9 @@ import React, { PureComponent } from 'react'
 import CardReactFormContainer from 'card-react'
 import Card from 'react-md/lib/Cards/Card'
 import CardTitle from 'react-md/lib/Cards/CardTitle'
-import Media from 'react-md/lib/Media'
 import CardActions from "react-md/lib/Cards/CardActions"
-import TextField from 'react-md/lib/TextFields'
 import Button from "react-md/lib/Buttons"
-import firebase from "firebase"
-import rootRef, { app } from "../../libs/db"
+import rootRef from "../../libs/db"
 import Snackbar from 'react-md/lib/Snackbars'
 
 import "./card.scss"
@@ -63,7 +60,7 @@ export default class BuyingMethodSelector extends PureComponent {
   getUserId = () => {
     var uid;
 
-    if (this.props.user != null) {
+    if (this.props.user !== null) {
         uid = this.props.user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
                         // this value to authenticate with your backend server, if
                         // you have one. Use User.getToken() instead.
@@ -121,7 +118,7 @@ export default class BuyingMethodSelector extends PureComponent {
 
 
     
-    if(this.state.cvc != 123){
+    if(this.state.cvc !== 123){
         this.writeNewCredits()
         this.updateCredits(this.props.purchase.creditsAmount)
         this.props.nextStep()

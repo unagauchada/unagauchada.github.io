@@ -8,12 +8,9 @@ import { connect } from "react-redux"
 import Toolbar from "react-md/lib/Toolbars"
 import TextField from "react-md/lib/TextFields"
 import Button from "react-md/lib/Buttons/Button"
-import FontIcon from "react-md/lib/FontIcons"
 import { app as fbApp } from "../../libs/db"
 import { userSelector } from "../../redux/getters"
 import { updateUser } from "../../redux/actions"
-import Divider from 'react-md/lib/Dividers'
-import Dialog from "react-md/lib/Dialogs"
 import SelectField from 'react-md/lib/SelectFields';
 import Signup from "../Signup"
 import Login from "../Login"
@@ -24,7 +21,6 @@ import ProfileView from "../ProfileView"
 import actionCreator from "../ToolbarActions"
 import MainPage from "../MainPage"
 import rootRef from "../../libs/db"
-import Autocomplete from 'react-md/lib/Autocompletes';
 import "./App.scss"
 
 const nav = <Button key="nav" icon>menu</Button>

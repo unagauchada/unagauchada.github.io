@@ -11,10 +11,6 @@ import { userSelector } from "../../redux/getters"
 import rootRef, { storageRef } from "../../libs/db"
 import UserAvatar from "../UserAvatar"
 import ImageUpload from "../PublicationList/ImageUpload"
-import firebase from "firebase"
-
-const duration = 15
-const thisDate = new Date()
 
 @connect(state => ({ user: userSelector(state) }))
 class Edit extends React.Component {
@@ -133,8 +129,8 @@ class Edit extends React.Component {
         console.error(error)
       },
       () => {
-        this.state.image.url = uploadTask.snapshot.downloadURL
-
+        let image = {...this.state.image, url: uploadTask.snapshot.downloadURL}
+        this.setState({image})
         rootRef
           .child("publications/"+this.props.publicationId+"/imageURL")
           .set(this.state.image.url)
