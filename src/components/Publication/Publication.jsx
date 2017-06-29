@@ -430,7 +430,7 @@ class Publication extends PureComponent {
                       this.openDialog();
                     }}
                   />}
-              {this.getQualifyDialog()}
+              {this.state.publication.gaucho && this.getQualifyDialog()}
               {this.getPostuladosDialog()}
               {this.props.user.uid === this.state.publication.user
                 ? <div className="md-cell--right">
