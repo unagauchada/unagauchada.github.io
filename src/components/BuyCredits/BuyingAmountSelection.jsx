@@ -18,7 +18,7 @@ import rootRef from "../../libs/db"
 const Amount = ({ purchase, nextStep }) => (
     purchase.cost != 0 && (
         <div>
-          <Card raised className="md-block-centered">
+          <Card className="md-block-centered">
             <CardTitle
               title={purchase.creditsAmount.toString().concat(" Creditos")}/> 
             <Divider/>

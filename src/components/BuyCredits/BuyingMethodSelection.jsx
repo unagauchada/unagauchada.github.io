@@ -109,7 +109,7 @@ export default class BuyingMethodSelector extends PureComponent {
            return
       }
 
-      if(this.state.date.length < 9){
+      if(this.state.date.length < 5){
            this.addToast('La fecha es incorrecta');
            return
       }
@@ -199,12 +199,12 @@ export default class BuyingMethodSelector extends PureComponent {
                 formatting={true} // optional - default true
                 >
                 
-                <form>
+                {/*<form>*/}
                     <input placeholder="Full name" type="text" name="CCname" onChange={this.setName}/>
                     <input placeholder="Card number" type="text" name="CCnumber" onChange={this.setNumber}/>
                     <input placeholder="MM/YY" type="text" name="CCexpiry" onChange={this.setDate}/>
                     <input placeholder="CVC" type="text" name="CCcvc" onChange={this.setCvc}/>
-                </form>
+                {/*</form>*/}
                 
             </CardReactFormContainer>
     
