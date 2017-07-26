@@ -40,14 +40,7 @@ class ProfileView extends PureComponent {
 
   renderImage = () => {
     if (this.state.user.photoURL && this.state.user.photoURL !== ""){ 
-      return  <div className="md-cell md-cell--2-tablet md-cell--3-desktop">
-                <Media aspectRatio="4-3">
-                  <img
-                      src={this.state.user.photoURL}
-                      role="presentation"
-                  />
-                </Media>
-              </div>
+      return  <Avatar style={{fontSize: 100, height: 100, width: 100 }} src={this.state.user.photoURL} role="presentation" />
     }else return <Avatar style={{fontSize: 100, height: 100, width: 100 }} icon={<FontIcon style={{fontSize: 100, height: 100, width: 100 }}>person</FontIcon>} role="presentation" />
   }
 
