@@ -56,6 +56,7 @@ class PublicationList extends React.Component {
     this.getStates()
     this.getCategories()
     this.getUsers()
+    this.componentWillReceiveProps(this.props);  
   }
 
   getStates = () => {
@@ -91,7 +92,6 @@ class PublicationList extends React.Component {
   }
 
   componentWillMount = () => {
-
     this.setState({
       searchText: this.props.searchText,
       searchLoc: this.props.searchLoc,
@@ -101,7 +101,8 @@ class PublicationList extends React.Component {
 
       
 
-  componentWillReceiveProps = nextProps => {
+  componentWillReceiveProps = (nextProps, nextContext) => {
+    console.log(nextProps)
     this.getCredits(nextProps)
     this.setState({searchText: nextProps.searchText})
   }
