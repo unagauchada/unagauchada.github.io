@@ -101,8 +101,15 @@ class Edit extends React.Component {
 
           rootRef
             .child("users/".concat(user).concat("/photoURL"))
-            .set(this.state.image.url)
+            .set(image.url)
 
+          this.props.currentUser.updateProfile({
+            photoURL: image.url
+          }).then(function() {
+            // Update successful.
+          }, function(error) {
+            // An error happened.
+          });
         }
       )
     }

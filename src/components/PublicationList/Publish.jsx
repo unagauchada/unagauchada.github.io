@@ -145,7 +145,7 @@ class Publish extends React.Component {
 
         rootRef
           .child("publications/".concat(key).concat("/imageURL"))
-          .set(this.state.image.url)
+          .set(image.url)
 
       }
     )
