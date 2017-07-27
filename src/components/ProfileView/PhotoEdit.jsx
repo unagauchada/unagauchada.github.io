@@ -76,6 +76,7 @@ export default class FileUploadExample extends PureComponent {
     if (this.props.photoURL && this.props.photoURL !== ""){ 
       console.log(this.state.image)
       return  <Avatar 
+                className="bigAvatar"
                 style={{fontSize: 100, height: 100, width: 100 }} 
                 src={this.state.image} 
                 role="presentation" />
