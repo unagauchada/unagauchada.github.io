@@ -106,6 +106,7 @@ class Edit extends React.Component {
         }
       )
     }
+    this.clean()
   }
 
   cancel = () => this.clean()
