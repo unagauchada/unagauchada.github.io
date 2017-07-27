@@ -173,14 +173,15 @@ class Edit extends React.Component {
         />
         <div className="md-grid" style={{ padding: 0 }}>
           <DatePicker
-            id="localeBrowser"
+            id="datePicker"
             label="Fecha de nacimiento"
             value={this.state.birthdate}
             onChange={this.handleBirthdateChange}
             maxDate={new Date()}
             defaultCalendarMode="year"
+            fullWidth={false}
             inline
-            className="md-cell"
+            className="md-cell datePicker"
           />
         </div>
       </section>
