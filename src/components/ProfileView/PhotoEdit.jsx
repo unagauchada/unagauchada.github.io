@@ -73,7 +73,7 @@ export default class FileUploadExample extends PureComponent {
   }
 
   renderImage = () => {
-    if (this.props.photoURL && this.props.photoURL !== ""){ 
+    if (this.state.image && this.state.image !== ""){ 
       console.log(this.state.image)
       return  <Avatar 
                 className="bigAvatar"
