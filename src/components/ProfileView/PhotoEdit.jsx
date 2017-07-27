@@ -4,6 +4,10 @@ import FileUpload from 'react-md/lib/FileInputs/FileUpload';
 import FontIcon from "react-md/lib/FontIcons"
 import Avatar from "react-md/lib/Avatars"
 
+import { connect } from "react-redux"
+import { userSelector } from "../../redux/getters"
+
+@connect(state => ({ user: userSelector(state) }))
 export default class FileUploadExample extends PureComponent {
   constructor(props) {
     super(props);
@@ -21,8 +25,8 @@ export default class FileUploadExample extends PureComponent {
     }
   }
 
-  componentWillReceiveProps = nextProps => {
-    this.setStateImage(nextProps.user.photoURL)
+  componentDidMount = () => {
+    this.setStateImage(this.props.photoURL)
   }
 
   setStateImage = (image) => {
@@ -69,7 +73,7 @@ export default class FileUploadExample extends PureComponent {
   }
 
   renderImage = () => {
-    if (this.props.user.photoURL && this.props.user.photoURL !== ""){ 
+    if (this.props.photoURL && this.props.photoURL !== ""){ 
       console.log(this.state.image)
       return  <Avatar 
                 style={{fontSize: 100, height: 100, width: 100 }} 

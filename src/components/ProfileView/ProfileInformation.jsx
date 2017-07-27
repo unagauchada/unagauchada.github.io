@@ -80,7 +80,6 @@ export default class ProfileInformation extends PureComponent {
             <ListItem
                 primaryText="Telefono"
                 secondaryText={this.state.user.phone}
-                rightAvatar={<FontIcon>create</FontIcon>}
             />}
         </List>
     )
