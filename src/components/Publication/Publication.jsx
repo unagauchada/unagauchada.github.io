@@ -194,7 +194,7 @@ class Publication extends PureComponent {
       .child("qualifications")
       .child(this.state.publication.user)
       .child(this.state.publicationId)
-      .push({
+      .set({
         comment: this.state.gauchoDescription,
         gaucho: this.state.publication.gaucho,
       })
