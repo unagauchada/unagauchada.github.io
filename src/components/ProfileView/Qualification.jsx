@@ -3,6 +3,7 @@ import rootRef from "../../libs/db"
 import UserAvatar from '../UserAvatar'
 import "./qualification.scss"
 import Button from "react-md/lib/Buttons"
+import { Link } from "react-router-dom"
 
 class Qualification extends React.Component {
   constructor(props) {
@@ -39,7 +40,9 @@ class Qualification extends React.Component {
   render = () => (
     <div className="qualification">
       <div className="user">
+        <Link to={"/profile/"+this.props.qualification.gaucho}>
         <UserAvatar url={this.state.user.photoURL} />
+        </Link>
       </div>
       <section>
         <h3>

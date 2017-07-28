@@ -30,7 +30,7 @@ export default class ProfileInformation extends PureComponent {
   componentDidMount = () => {
     this.getStates()
     this.getArchievements()
-    this.getQualifications()
+    this.getQualifications(this.props.user)
     this.getUser(this.props.user)
   }
 
@@ -49,8 +49,8 @@ export default class ProfileInformation extends PureComponent {
     )      
   }
 
-  getQualifications = () => {
-    rootRef.child("qualifications").child(this.props.user).on("value", snap => {
+  getQualifications = user => {
+    rootRef.child("qualifications").child(user).on("value", snap => {
       this.setState({
         qualifications: _.map(snap.val(), (qualification, id) => ({ ...qualification, id }))
       });
@@ -68,6 +68,9 @@ export default class ProfileInformation extends PureComponent {
   }
 
   componentWillReceiveProps = nextProps => {
+    this.getStates()
+    this.getArchievements()
+    this.getQualifications(nextProps.user)
     this.getUser(nextProps.user)
   }
 
@@ -142,6 +145,7 @@ export default class ProfileInformation extends PureComponent {
                 style={{ width: "45%" }}
                 className="md-block-centered md-cell--top"
                 >
+                    {this.state.qualifications && this.state.qualifications.length>0 &&
                     <CardTitle
                         title="Calificaciones">
                         {this.state.showQualifications &&
@@ -165,6 +169,7 @@ export default class ProfileInformation extends PureComponent {
                         </Button>
                         }
                     </CardTitle>
+                    }
                     <CardText>
                         {  this.state.archievements && 
                             <h2 className="md-display-3 display-override md-text-center">{this.state.archievements.find(archievement => (archievement.gt <= this.state.user.qualification && (this.state.user.qualification <= archievement.lt))).name}</h2>
@@ -173,11 +178,12 @@ export default class ProfileInformation extends PureComponent {
                             <h4 className="md-display-1 display-override md-text-center">{this.state.user.qualification + ' puntos'}</h4>
                         }
                     </CardText>    
-                    {this.state.showQualifications &&
+                    {this.state.showQualifications && this.state.qualifications.length>0 &&
                     <section>
                         <Divider />
                         <CardText className="comments">
                             <ul className="md-list">
+                                {console.log(this.state.qualifications)}
                                 {this.state.qualifications.map(qualification => {
                                 return (
                                     <li className="md-list-tile" key={qualification.id}>
