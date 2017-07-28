@@ -197,6 +197,7 @@ class Publication extends PureComponent {
       .set({
         comment: this.state.gauchoDescription,
         gaucho: this.state.publication.gaucho,
+        value: value
       })
 
       rootRef

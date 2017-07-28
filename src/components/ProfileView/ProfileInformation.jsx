@@ -8,6 +8,9 @@ import CardText from "react-md/lib/Cards/CardText"
 import FontIcon from "react-md/lib/FontIcons"
 import rootRef from "../../libs/db"
 import "./ProfileView.scss"
+import Button from "react-md/lib/Buttons"
+import Qualification from "./Qualification"
+import Divider from "react-md/lib/Dividers";
 
 export default class ProfileInformation extends PureComponent {
   constructor(props) {
@@ -15,13 +18,16 @@ export default class ProfileInformation extends PureComponent {
     this.state = {
       user: { name: "", lastname: "", photo: "", credits: null, qualification: null },
       states: [{ name: "loading", value: "1" }],
-      archievements: null
+      archievements: null,
+      showQualifications: false,
+      qualifications: null
     }
   }
 
   componentDidMount = () => {
     this.getStates()
     this.getArchievements()
+    this.getQualifications()
     this.getUser(this.props.user.uid)
   }
 
@@ -38,6 +44,14 @@ export default class ProfileInformation extends PureComponent {
         )
       })
     )      
+  }
+
+  getQualifications = () => {
+    rootRef.child("qualifications").child(this.props.user.uid).on("value", snap => {
+      this.setState({
+        qualifications: _.map(snap.val(), (qualification, id) => ({ ...qualification, id }))
+      });
+    });
   }
 
   getStates = () => {
@@ -124,7 +138,17 @@ export default class ProfileInformation extends PureComponent {
                 className="md-block-centered md-cell--top"
                 >
                     <CardTitle
-                        title="Calificaciones"/>
+                        title="Calificaciones">
+                        <Button
+                            className="md-cell--right"
+                            tooltipLabel="view"
+                            tooltipPosition="top"
+                            icon
+                            onClick={() => this.setState({showQualifications: true})}
+                        >
+                            arrow_drop_down
+                        </Button>
+                    </CardTitle>
                     <CardText>
                         {  this.state.archievements && 
                             <h2 className="md-display-3 display-override md-text-center">{this.state.archievements.find(archievement => (archievement.gt <= this.state.user.qualification && (this.state.user.qualification <= archievement.lt))).name}</h2>
@@ -133,6 +157,24 @@ export default class ProfileInformation extends PureComponent {
                             <h4 className="md-display-1 display-override md-text-center">{this.state.user.qualification + ' puntos'}</h4>
                         }
                     </CardText>    
+                    {this.state.showQualifications &&
+                    <section>
+                        <Divider />
+                        <CardText className="comments">
+                            <ul className="md-list">
+                                {this.state.qualifications.map(qualification => {
+                                return (
+                                    <li className="md-list-tile" key={qualification.id}>
+                                    <Qualification
+                                        qualification={qualification}
+                                    />
+                                    </li>
+                                );
+                                })}
+                            </ul>
+                        </CardText>
+                    </section>
+                    }
             </Card>
        </div>
     )
