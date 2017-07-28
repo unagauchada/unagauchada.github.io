@@ -139,15 +139,26 @@ export default class ProfileInformation extends PureComponent {
                 >
                     <CardTitle
                         title="Calificaciones">
+                        {this.state.showQualifications &&
                         <Button
                             className="md-cell--right"
                             tooltipLabel="view"
                             tooltipPosition="top"
                             icon
-                            onClick={() => this.setState({showQualifications: true})}
+                            onClick={() => this.setState({showQualifications: !this.state.showQualifications})}
+                        >
+                            arrow_drop_up
+                        </Button> || 
+                        <Button
+                            className="md-cell--right"
+                            tooltipLabel="view"
+                            tooltipPosition="top"
+                            icon
+                            onClick={() => this.setState({showQualifications: !this.state.showQualifications})}
                         >
                             arrow_drop_down
                         </Button>
+                        }
                     </CardTitle>
                     <CardText>
                         {  this.state.archievements && 
