@@ -172,13 +172,13 @@ class Publication extends PureComponent {
 
     switch (value) {
       case -1:
-        qualification -= 5;
+        qualification -= 2;
         break;
       case 0:
-        qualification += 1;
+        qualification += 0;
         break;
       case 1:
-        qualification += 5;
+        qualification += 1;
         credits += 1;
         break;
       default:
