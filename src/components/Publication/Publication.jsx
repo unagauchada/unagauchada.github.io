@@ -192,11 +192,11 @@ class Publication extends PureComponent {
     
     rootRef
       .child("qualifications")
+      .child(this.state.publication.user)
       .child(this.state.publicationId)
       .push({
         comment: this.state.gauchoDescription,
         gaucho: this.state.publication.gaucho,
-        user: this.state.publication.user
       })
 
       rootRef
