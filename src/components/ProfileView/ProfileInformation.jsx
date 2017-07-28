@@ -11,7 +11,10 @@ import "./ProfileView.scss"
 import Button from "react-md/lib/Buttons"
 import Qualification from "./Qualification"
 import Divider from "react-md/lib/Dividers";
+import { userSelector } from "../../redux/getters"
+import { connect } from "react-redux"
 
+@connect(state => ({ currentUser: userSelector(state) }))
 export default class ProfileInformation extends PureComponent {
   constructor(props) {
     super(props)
@@ -28,7 +31,7 @@ export default class ProfileInformation extends PureComponent {
     this.getStates()
     this.getArchievements()
     this.getQualifications()
-    this.getUser(this.props.user.uid)
+    this.getUser(this.props.user)
   }
 
   getArchievements = () => {
@@ -47,7 +50,7 @@ export default class ProfileInformation extends PureComponent {
   }
 
   getQualifications = () => {
-    rootRef.child("qualifications").child(this.props.user.uid).on("value", snap => {
+    rootRef.child("qualifications").child(this.props.user).on("value", snap => {
       this.setState({
         qualifications: _.map(snap.val(), (qualification, id) => ({ ...qualification, id }))
       });
@@ -65,7 +68,7 @@ export default class ProfileInformation extends PureComponent {
   }
 
   componentWillReceiveProps = nextProps => {
-    this.getUser(nextProps.user.uid)
+    this.getUser(nextProps.user)
   }
 
   getUser = user => {
@@ -123,6 +126,7 @@ export default class ProfileInformation extends PureComponent {
                         {this.getInformation()}
                     </CardText>    
             </Card>
+            {this.props.user === this.props.currentUser.uid &&
             <Card
                 style={{ width: "45%" }}
                 className="md-block-centered md-cell--top"
@@ -133,6 +137,7 @@ export default class ProfileInformation extends PureComponent {
                         {this.state.user.credits && this.renderCredits()}
                     </CardText>    
             </Card>
+            }
             <Card
                 style={{ width: "45%" }}
                 className="md-block-centered md-cell--top"

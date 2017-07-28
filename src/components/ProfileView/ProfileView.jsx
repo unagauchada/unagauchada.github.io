@@ -24,11 +24,11 @@ class ProfileView extends PureComponent {
   }
 
   componentDidMount = () => {
-    this.getUser(this.props.user.uid)
+    this.getUser(this.props.location.pathname.substring(9))
   }
 
   componentWillReceiveProps = nextProps => {
-    this.getUser(nextProps.user.uid)
+    this.getUser(nextProps.location.pathname.substring(9))
   }
 
   getUser = user => {
@@ -70,7 +70,7 @@ class ProfileView extends PureComponent {
                 </Button>
             </CardActions>
             <CardText>
-                <ProfileMenu/>
+                <ProfileMenu user={this.props.location.pathname.substring(9)}/>
             </CardText>
         </Card>
       </MainPage>
