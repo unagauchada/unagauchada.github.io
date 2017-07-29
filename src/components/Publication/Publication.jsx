@@ -23,6 +23,7 @@ import ListItem from "react-md/lib/Lists/ListItem";
 import Divider from "react-md/lib/Dividers";
 import Edit from "./Edit.jsx";
 import { Link } from "react-router-dom"
+import { Redirect} from 'react-router-dom';
 
 @connect(state => ({ user: userSelector(state) }))
 class Publication extends PureComponent {
@@ -35,6 +36,7 @@ class Publication extends PureComponent {
       visible: false,
       category: "",
       comments: [],
+      misGauchadas: false,
       state: "",
       submissions: [],
       editVisible: false,
@@ -414,6 +416,7 @@ class Publication extends PureComponent {
   render = () => {
     return (
       <MainPage>
+        { this.state.misGauchadas && <Redirect to={"/profile/"+this.state.publication.user} /> }
         {this.getEditDialog()}
         {this.state.publication &&
           <Card
@@ -516,6 +519,9 @@ class Publication extends PureComponent {
                       tooltipLabel="Mis Gauchadas"
                       tooltipPosition="top"
                       icon
+                      onClick={
+                        () => {this.setState({misGauchadas: true})}
+                      }
                     >
                       apps
                     </Button>

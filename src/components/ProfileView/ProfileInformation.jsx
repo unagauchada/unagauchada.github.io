@@ -88,7 +88,6 @@ export default class ProfileInformation extends PureComponent {
             <ListItem
                 primaryText="Cumpleaños"
                 secondaryText={this.state.user.birthdate}
-                rightAvatar={<FontIcon>create</FontIcon>}
             />}
             {this.state.user.city && 
             <ListItem
@@ -96,13 +95,11 @@ export default class ProfileInformation extends PureComponent {
                 secondaryText={
                     this.state.states.find(
                         state => state.value === this.state.user.city).name}
-                rightAvatar={<FontIcon>create</FontIcon>}
             />}
             {this.state.user.phone && 
             <ListItem
                 primaryText="Telefono"
                 secondaryText={this.state.user.phone}
-                rightAvatar={<FontIcon>create</FontIcon>}
             />}
         </List>
     )
