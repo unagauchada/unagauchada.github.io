@@ -381,13 +381,17 @@ class Publication extends PureComponent {
     if(!this.state.publication.submissions){
       this.returnCredits()
     }else if(this.state.publication.gaucho){
-      this.notifyGaucho("Un favor en el que participabas ha sido eliminado", "El favor " + this.state.publication.title + " al que habias sido asignado como gaucho ha sido removido por su creador")
+      this.notifyGaucho(this.state.publication.gaucho, "El favor " + this.state.publication.title + " al que habias sido asignado como gaucho ha sido removido por su creador")
     }
     this.deletePublication()
     this.hideDeleteConfirmation()
   }
 
-  notifyGaucho = (title, message) => {    
+  notifyGaucho = (gaucho, message) => { 
+    rootRef
+      .child('users')
+      .child(gaucho).child("message")
+      .set(message)     
   }
 
   returnCredits = () => {

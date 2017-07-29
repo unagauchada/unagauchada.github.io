@@ -31,7 +31,8 @@ class PublicationList extends React.Component {
       locVisible:false,
       credits: 0,
       toasts: [],
-      autohide: true
+      autohide: true,
+      message: null
     }
   }
 
@@ -51,13 +52,25 @@ class PublicationList extends React.Component {
     this._addToast("No posee suficiente credito")
   }
 
+  toastMessage = () => {
+    this._addToast(this.state.message)
+    rootRef
+      .child('users')
+      .child(this.props.user.uid).child("message")
+      .remove()     
+
+  }
+
   componentDidMount = () => {
     this.getCredits(this.props)
     this.getPublications()
     this.getStates()
     this.getCategories()
     this.getUsers()
+    this.getMessage(this.props)
   }
+
+
 
   getStates = () => {
     rootRef.child("states").on("value", snap =>
@@ -104,6 +117,7 @@ class PublicationList extends React.Component {
 
   componentWillReceiveProps = nextProps => {
     this.getCredits(nextProps)
+    this.getMessage(nextProps)
     this.setState({searchText: nextProps.searchText})
   }
 
@@ -199,6 +213,15 @@ class PublicationList extends React.Component {
       })
   }
 
+  getMessage = props => {
+    rootRef
+      .child("users/" + this.getUserId(props) + "/message")
+      .on("value", snap => {
+        console.log(snap.val())
+        this.setState({ message: snap.val() })
+      })
+  }
+
   getButton = () => {
     let shadowed = this.state.credits && this.state.credits >= publicationCost
     if (this.props.user && !shadowed) {
@@ -240,6 +263,7 @@ class PublicationList extends React.Component {
 
   render = () => {
     let publishButton = this.getButton()
+    this.state.message && this.toastMessage()
     return (
       <div>
       {this.searchHeader()}  
