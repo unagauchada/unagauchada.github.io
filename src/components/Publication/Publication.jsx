@@ -22,6 +22,7 @@ import List from "react-md/lib/Lists/List";
 import ListItem from "react-md/lib/Lists/ListItem";
 import Divider from "react-md/lib/Dividers";
 import Edit from "./Edit.jsx";
+import { Link } from "react-router-dom"
 
 @connect(state => ({ user: userSelector(state) }))
 class Publication extends PureComponent {
@@ -39,7 +40,8 @@ class Publication extends PureComponent {
       editVisible: false,
       qualifyVisible: false,
       gauchoDescription: "",
-      qualifyError: false
+      qualifyError: false,
+      showDeleteConfirmation: false
     };
   }
 
@@ -338,6 +340,72 @@ class Publication extends PureComponent {
     );
   };
 
+  getConfirmationMessage = () => {
+    if(!this.state.publication.submissions){
+      return (
+        <div>
+          <h2>¿Desea eliminar el favor?</h2>
+          <h4>Se le retornaran los creditos utilizados</h4>
+        </div>)
+    }else{
+      return(
+        <div>
+          <h2>¿Desea eliminar el favor?</h2>
+          <h4>No recuperará los creditos utilizados</h4>
+        </div>)
+    }
+  }
+
+  deletePublicationConfirmationDialog = () => 
+      <Dialog
+        id="publishDialog"
+        visible={this.state.showDeleteConfirmation}
+        className="googleDialog"
+      >
+        <section className="dialog md-grid">
+          {this.getConfirmationMessage()}
+        </section>
+        <section className="footer md-cell md-cell--12 md-text-right">
+          <Button flat label="Cancelar" onClick={this.hideDeleteConfirmation}/>
+          <Link to="/">
+            <Button raised primary label="Aceptar" onClick={this.deletePublicationAcepted}/>
+          </Link>
+        </section>
+      </Dialog>    
+
+  showDeleteConfirmation = () => this.setState({showDeleteConfirmation: true})
+
+  hideDeleteConfirmation = () => this.setState({showDeleteConfirmation: false})
+
+  deletePublicationAcepted = () => {
+    if(!this.state.publication.submissions){
+      this.returnCredits()
+    }else if(this.state.publication.gaucho){
+      this.notifyGaucho("Un favor en el que participabas ha sido eliminado", "El favor " + this.state.publication.title + " al que habias sido asignado como gaucho ha sido removido por su creador")
+    }
+    this.deletePublication()
+    this.hideDeleteConfirmation()
+  }
+
+  notifyGaucho = (title, message) => {    
+  }
+
+  returnCredits = () => {
+    let user = this.state.user
+    let { credits } = { ...user }
+    
+    credits += 1
+    rootRef
+      .child('users')
+      .child(this.state.publication.user)
+      .update({ credits })
+  }
+
+  deletePublication = () => {
+    rootRef
+      .child("publications/" + this.state.publicationId).remove()
+  }
+
   render = () => {
     return (
       <MainPage>
@@ -443,6 +511,7 @@ class Publication extends PureComponent {
                     >
                       apps
                     </Button>
+                    {new Date(this.state.publication.end) > new Date() &&
                     <Button
                       tooltipLabel="Editar"
                       tooltipPosition="top"
@@ -457,14 +526,18 @@ class Publication extends PureComponent {
                     >
                       create
                     </Button>
+                    }
+                    {this.deletePublicationConfirmationDialog()}
+                    {new Date(this.state.publication.end) > new Date() &&
                     <Button
                       tooltipLabel="Eliminar"
                       tooltipPosition="top"
                       icon
-                      disabled
+                      onClick={this.showDeleteConfirmation}
                     >
                       delete
                     </Button>
+                    }
                   </div>
                 : <div className="md-cell--right">
                     <Button tooltipLabel="Preguntar" tooltipPosition="top" icon>

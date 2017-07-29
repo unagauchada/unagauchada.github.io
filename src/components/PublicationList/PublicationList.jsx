@@ -52,6 +52,7 @@ class PublicationList extends React.Component {
   }
 
   componentDidMount = () => {
+    this.getCredits(this.props)
     this.getPublications()
     this.getStates()
     this.getCategories()
