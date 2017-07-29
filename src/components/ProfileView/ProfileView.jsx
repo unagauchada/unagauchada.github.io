@@ -61,6 +61,7 @@ class ProfileView extends PureComponent {
             <CardActions>
                   {this.renderImage()}
                 <h1 className="title-element">{`${this.state.user.lastname}, ${this.state.user.name}`}</h1>
+                {this.props.location.pathname.substring(9) === this.props.user.uid &&
                 <Button
                     className="md-cell--right title-element"
                     flat
@@ -68,6 +69,7 @@ class ProfileView extends PureComponent {
                 >
                     create
                 </Button>
+                }
             </CardActions>
             <CardText>
                 <ProfileMenu user={this.props.location.pathname.substring(9)}/>
