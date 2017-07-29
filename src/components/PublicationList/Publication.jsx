@@ -56,7 +56,10 @@ class Publication extends React.Component {
       expanderTooltipLabel="Expandir descripcion!"
     >
       <CardTitle
-        avatar={<UserAvatar url={this.state.user.photoURL} />}
+        avatar={
+          <Link to={"/profile/"+this.props.publication.user}>
+            <UserAvatar url={this.state.user.photoURL}/> 
+          </Link>}
         title={this.state.user.name}
         subtitle={this.state.state.name}
       />

@@ -44,7 +44,7 @@ class UserProfile extends React.Component {
       }
       className="menu-example"
     >
-      <Link to="/profile">
+      <Link to={"/profile/"+this.props.user.uid}>
       <ListItem primaryText="Mi Perfil" leftIcon={<FontIcon>settings</FontIcon>} />
       </Link>
       <Divider />

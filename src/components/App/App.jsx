@@ -213,7 +213,7 @@ class App extends React.Component {
           <Route path="/signin" component={Login} />
           <Route path="/buy" component={this.props.user ? BuyCredits : Login} />
           <Route path="/publication/:favorID"  component={this.props.user ? FavorView : Login } />
-          <Route path="/profile"  component={this.props.user ? ProfileView : Login } />
+          <Route path="/profile/:userID"  component={this.props.user ? ProfileView : Login } />
           <Route path="*" component={Error404} />
         </Switch> 
       </app>

@@ -22,6 +22,7 @@ import List from "react-md/lib/Lists/List";
 import ListItem from "react-md/lib/Lists/ListItem";
 import Divider from "react-md/lib/Dividers";
 import Edit from "./Edit.jsx";
+import { Link } from "react-router-dom"
 
 @connect(state => ({ user: userSelector(state) }))
 class Publication extends PureComponent {
@@ -172,13 +173,13 @@ class Publication extends PureComponent {
 
     switch (value) {
       case -1:
-        qualification -= 5;
+        qualification -= 2;
         break;
       case 0:
-        qualification += 1;
+        qualification += 0;
         break;
       case 1:
-        qualification += 5;
+        qualification += 1;
         credits += 1;
         break;
       default:
@@ -192,11 +193,12 @@ class Publication extends PureComponent {
     
     rootRef
       .child("qualifications")
+      .child(this.state.publication.user)
       .child(this.state.publicationId)
-      .push({
+      .set({
         comment: this.state.gauchoDescription,
         gaucho: this.state.publication.gaucho,
-        user: this.state.publication.user
+        value: value
       })
 
       rootRef
@@ -348,7 +350,10 @@ class Publication extends PureComponent {
             className="md-block-centered publication-view"
           >
             <CardTitle
-              avatar={<UserAvatar url={this.state.user.photoURL} />}
+              avatar={
+                <Link to={"/profile/"+this.state.publication.user}>
+                  <UserAvatar url={this.state.user.photoURL} />
+                </Link>}
               title={`${this.state.user.lastname}, ${this.state.user.name}`}
               subtitle={
                 <a href="#/">

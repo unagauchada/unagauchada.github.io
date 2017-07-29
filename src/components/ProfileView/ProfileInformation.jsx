@@ -8,21 +8,30 @@ import CardText from "react-md/lib/Cards/CardText"
 import FontIcon from "react-md/lib/FontIcons"
 import rootRef from "../../libs/db"
 import "./ProfileView.scss"
+import Button from "react-md/lib/Buttons"
+import Qualification from "./Qualification"
+import Divider from "react-md/lib/Dividers";
+import { userSelector } from "../../redux/getters"
+import { connect } from "react-redux"
 
+@connect(state => ({ currentUser: userSelector(state) }))
 export default class ProfileInformation extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
       user: { name: "", lastname: "", photo: "", credits: null, qualification: null },
       states: [{ name: "loading", value: "1" }],
-      archievements: null
+      archievements: null,
+      showQualifications: false,
+      qualifications: null
     }
   }
 
   componentDidMount = () => {
     this.getStates()
     this.getArchievements()
-    this.getUser(this.props.user.uid)
+    this.getQualifications(this.props.user)
+    this.getUser(this.props.user)
   }
 
   getArchievements = () => {
@@ -40,6 +49,14 @@ export default class ProfileInformation extends PureComponent {
     )      
   }
 
+  getQualifications = user => {
+    rootRef.child("qualifications").child(user).on("value", snap => {
+      this.setState({
+        qualifications: _.map(snap.val(), (qualification, id) => ({ ...qualification, id }))
+      });
+    });
+  }
+
   getStates = () => {
     rootRef.child("states").on("value", snap =>
       this.setState({
@@ -51,7 +68,10 @@ export default class ProfileInformation extends PureComponent {
   }
 
   componentWillReceiveProps = nextProps => {
-    this.getUser(nextProps.user.uid)
+    this.getStates()
+    this.getArchievements()
+    this.getQualifications(nextProps.user)
+    this.getUser(nextProps.user)
   }
 
   getUser = user => {
@@ -109,6 +129,7 @@ export default class ProfileInformation extends PureComponent {
                         {this.getInformation()}
                     </CardText>    
             </Card>
+            {this.props.user === this.props.currentUser.uid &&
             <Card
                 style={{ width: "45%" }}
                 className="md-block-centered md-cell--top"
@@ -119,12 +140,36 @@ export default class ProfileInformation extends PureComponent {
                         {this.state.user.credits && this.renderCredits()}
                     </CardText>    
             </Card>
+            }
             <Card
                 style={{ width: "45%" }}
                 className="md-block-centered md-cell--top"
                 >
+                    {this.state.qualifications && this.state.qualifications.length>0 &&
                     <CardTitle
-                        title="Calificaciones"/>
+                        title="Calificaciones">
+                        {this.state.showQualifications &&
+                        <Button
+                            className="md-cell--right"
+                            tooltipLabel="view"
+                            tooltipPosition="top"
+                            icon
+                            onClick={() => this.setState({showQualifications: !this.state.showQualifications})}
+                        >
+                            arrow_drop_up
+                        </Button> || 
+                        <Button
+                            className="md-cell--right"
+                            tooltipLabel="view"
+                            tooltipPosition="top"
+                            icon
+                            onClick={() => this.setState({showQualifications: !this.state.showQualifications})}
+                        >
+                            arrow_drop_down
+                        </Button>
+                        }
+                    </CardTitle>
+                    }
                     <CardText>
                         {  this.state.archievements && 
                             <h2 className="md-display-3 display-override md-text-center">{this.state.archievements.find(archievement => (archievement.gt <= this.state.user.qualification && (this.state.user.qualification <= archievement.lt))).name}</h2>
@@ -133,6 +178,25 @@ export default class ProfileInformation extends PureComponent {
                             <h4 className="md-display-1 display-override md-text-center">{this.state.user.qualification + ' puntos'}</h4>
                         }
                     </CardText>    
+                    {this.state.showQualifications && this.state.qualifications.length>0 &&
+                    <section>
+                        <Divider />
+                        <CardText className="comments">
+                            <ul className="md-list">
+                                {console.log(this.state.qualifications)}
+                                {this.state.qualifications.map(qualification => {
+                                return (
+                                    <li className="md-list-tile" key={qualification.id}>
+                                    <Qualification
+                                        qualification={qualification}
+                                    />
+                                    </li>
+                                );
+                                })}
+                            </ul>
+                        </CardText>
+                    </section>
+                    }
             </Card>
        </div>
     )

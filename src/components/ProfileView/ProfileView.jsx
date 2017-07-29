@@ -24,11 +24,11 @@ class ProfileView extends PureComponent {
   }
 
   componentDidMount = () => {
-    this.getUser(this.props.user.uid)
+    this.getUser(this.props.location.pathname.substring(9))
   }
 
   componentWillReceiveProps = nextProps => {
-    this.getUser(nextProps.user.uid)
+    this.getUser(nextProps.location.pathname.substring(9))
   }
 
   getUser = user => {
@@ -61,6 +61,7 @@ class ProfileView extends PureComponent {
             <CardActions>
                   {this.renderImage()}
                 <h1 className="title-element">{`${this.state.user.lastname}, ${this.state.user.name}`}</h1>
+                {this.props.location.pathname.substring(9) === this.props.user.uid &&
                 <Button
                     className="md-cell--right title-element"
                     flat
@@ -68,9 +69,10 @@ class ProfileView extends PureComponent {
                 >
                     create
                 </Button>
+                }
             </CardActions>
             <CardText>
-                <ProfileMenu/>
+                <ProfileMenu user={this.props.location.pathname.substring(9)}/>
             </CardText>
         </Card>
       </MainPage>

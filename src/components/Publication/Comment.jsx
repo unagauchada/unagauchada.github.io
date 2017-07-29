@@ -6,6 +6,7 @@ import UserAvatar from '../UserAvatar'
 import MakeComment from './MakeComment'
 import MakeEdit from './MakeEdit'
 import "./Comment.scss"
+import { Link } from "react-router-dom"
 
 class Comment extends React.Component {
   constructor(props) {
@@ -76,7 +77,9 @@ class Comment extends React.Component {
           {this.makeMenu()}
         </MenuButton>}
       <div className="user">
-        <UserAvatar url={this.state.user.photoURL} />
+        <Link to={"/profile/"+this.props.comment.user}>
+          <UserAvatar url={this.state.user.photoURL} />
+        </Link>
       </div>
       <section>
         <h3>

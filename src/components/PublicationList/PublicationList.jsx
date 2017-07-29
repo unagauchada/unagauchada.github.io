@@ -56,7 +56,11 @@ class PublicationList extends React.Component {
     this.getStates()
     this.getCategories()
     this.getUsers()
+<<<<<<< HEAD
     this.componentWillReceiveProps(this.props);  
+=======
+    this.getCredits(this.props)
+>>>>>>> feature/anotherProfileView
   }
 
   getStates = () => {
