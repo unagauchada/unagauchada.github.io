@@ -22,16 +22,26 @@ class ProfileView extends PureComponent {
     this.state = {
       visible: false,
 
+      currentUser: { name: "", lastname: "", photo: "" },
       user: { name: "", lastname: "", photo: "" },
     }
   }
 
   componentDidMount = () => {
     this.getUser(this.props.location.pathname.substring(9))
+    this.getCurrentUser(this.props.user.uid)
   }
 
   componentWillReceiveProps = nextProps => {
     this.getUser(nextProps.location.pathname.substring(9))
+    this.getCurrentUser(nextProps.user.uid)
+  }
+
+  getCurrentUser = user => {
+    rootRef
+      .child("users")
+      .child(user)
+      .on("value", snap => this.setState({ currentUser: snap.val() }))
   }
 
   getUser = user => {
@@ -51,6 +61,10 @@ class ProfileView extends PureComponent {
     }else return <Avatar style={{fontSize: 100, height: 100, width: 100 }} icon={<FontIcon style={{fontSize: 100, height: 100, width: 100 }}>person</FontIcon>} role="presentation" />
   }
 
+/*
+   El administrador podra ver todos los datos del usuario.
+   Tambien podra acceder a funcionalidades extra como eliminacion, bloqueo y modificacion.
+*/
   render = () => {
     return (
       <MainPage>
@@ -70,6 +84,36 @@ class ProfileView extends PureComponent {
                 >
                     create
                 </Button>
+                || this.state.currentUser.admin &&
+                <section className="md-cell--right">
+                  <Button
+                      className="md-cell--right title-element"
+                      flat
+                      icon
+                      tooltipLabel="Modificar"
+                      tooltipPosition="top"                      
+                  >
+                      create
+                  </Button>
+                  <Button
+                      className="md-cell--right title-element"
+                      flat
+                      icon
+                      tooltipLabel="Bloquear"
+                      tooltipPosition="top"
+                  >
+                      block
+                  </Button>
+                  <Button
+                      className="md-cell--right title-element"
+                      flat
+                      icon
+                      tooltipLabel="Eliminar"
+                      tooltipPosition="top"
+                  >
+                      delete
+                  </Button>
+                </section>
                 }
                 <Dialog
                   id="editionDialog"
