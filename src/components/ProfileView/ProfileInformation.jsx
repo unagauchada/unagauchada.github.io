@@ -20,6 +20,7 @@ export default class ProfileInformation extends PureComponent {
     super(props)
     this.state = {
       user: { name: "", lastname: "", photo: "", credits: null, qualification: null },
+      currentUser: {admin: false},
       states: [{ name: "loading", value: "1" }],
       archievements: null,
       showQualifications: false,
@@ -32,6 +33,14 @@ export default class ProfileInformation extends PureComponent {
     this.getArchievements()
     this.getQualifications(this.props.user)
     this.getUser(this.props.user)
+    this.getCurrentUser(this.props.currentUser.uid)
+  }
+
+  getCurrentUser = user => {
+    rootRef
+      .child("users")
+      .child(user)
+      .on("value", snap => this.setState({ currentUser: snap.val() }))
   }
 
   getArchievements = () => {
@@ -126,7 +135,7 @@ export default class ProfileInformation extends PureComponent {
                         {this.getInformation()}
                     </CardText>    
             </Card>
-            {this.props.user === this.props.currentUser.uid &&
+            {this.props.user === this.props.currentUser.uid || this.state.currentUser.admin &&
             <Card
                 style={{ width: "45%" }}
                 className="md-block-centered md-cell--top"

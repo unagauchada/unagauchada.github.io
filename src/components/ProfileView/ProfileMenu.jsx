@@ -20,7 +20,8 @@ export default class ProfileMenu extends PureComponent {
     this.state = { 
         activeTabIndex: 0, 
         tabTwoChildren: null,
-        submissions: null
+        submissions: null,
+        currentUser: {admin: false},
     };
     this._handleTabChange = this._handleTabChange.bind(this);
   }
@@ -32,7 +33,15 @@ export default class ProfileMenu extends PureComponent {
   }
 
   componentDidMount = () => {
+    this.getCurrentUser(this.props.currentUser.uid)
     this.getSubmissions()
+  }
+ 
+  getCurrentUser = user => {
+    rootRef
+      .child("users")
+      .child(user)
+      .on("value", snap => this.setState({ currentUser: snap.val() }))
   }
 
   _handleTabChange(activeTabIndex) {
@@ -86,12 +95,12 @@ export default class ProfileMenu extends PureComponent {
           <Tab label="Informacion">
             <ProfileInformation user={this.props.user}/>
           </Tab>
-          {this.props.user === this.props.currentUser.uid &&
+          {this.props.user === this.props.currentUser.uid || this.state.currentUser.admin &&
           <Tab label="Publicaciones">
             <FilteredPublicationList filter={this.filterPublications}/>
           </Tab>
           }
-          {this.props.user === this.props.currentUser.uid &&
+          {this.props.user === this.props.currentUser.uid || this.state.currentUser.admin &&
           <Tab label="Postulaciones">
             {this.state.submissions && <FilteredPublicationList filter={this.filterSubmissions}/>}
           </Tab>
