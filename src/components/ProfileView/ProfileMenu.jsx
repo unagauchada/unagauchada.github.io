@@ -36,7 +36,12 @@ export default class ProfileMenu extends PureComponent {
     this.getCurrentUser(this.props.currentUser.uid)
     this.getSubmissions()
   }
- 
+
+  componentWillReceiveProps = nextProps => {
+    this.getCurrentUser(nextProps.currentUser.uid)
+    this.getSubmissions()      
+  }
+  
   getCurrentUser = user => {
     rootRef
       .child("users")
@@ -69,15 +74,15 @@ export default class ProfileMenu extends PureComponent {
     )
   }
 
-  filterPublications = publication => {
-    return publication.user === this.props.user
+  filterPublications = user => publication => {
+    return publication.user === user
   }
 
-  filterSubmissions = publication => {
+  filterSubmissions = user => publication => {
     if (typeof this.state.submissions[publication.id] === 'undefined') {
       return false
     }else{
-      return typeof this.state.submissions[publication.id][this.props.user] !== 'undefined'
+      return typeof this.state.submissions[publication.id][user] !== 'undefined'
     }
   }
 
@@ -95,14 +100,14 @@ export default class ProfileMenu extends PureComponent {
           <Tab label="Informacion">
             <ProfileInformation user={this.props.user}/>
           </Tab>
-          {this.props.user === this.props.currentUser.uid || this.state.currentUser.admin &&
+          {(this.props.user === this.props.currentUser.uid || this.state.currentUser.admin) &&
           <Tab label="Publicaciones">
-            <FilteredPublicationList filter={this.filterPublications}/>
+            <FilteredPublicationList filter={this.filterPublications(this.props.user)}/>
           </Tab>
           }
-          {this.props.user === this.props.currentUser.uid || this.state.currentUser.admin &&
+          {(this.props.user === this.props.currentUser.uid || this.state.currentUser.admin) &&
           <Tab label="Postulaciones">
-            {this.state.submissions && <FilteredPublicationList filter={this.filterSubmissions}/>}
+            {this.state.submissions && <FilteredPublicationList filter={this.filterSubmissions(this.props.user)}/>}
           </Tab>
           }
         </Tabs>

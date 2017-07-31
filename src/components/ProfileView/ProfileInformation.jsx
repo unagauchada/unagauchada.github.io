@@ -135,7 +135,7 @@ export default class ProfileInformation extends PureComponent {
                         {this.getInformation()}
                     </CardText>    
             </Card>
-            {this.props.user === this.props.currentUser.uid || this.state.currentUser.admin &&
+            {(this.props.user === this.props.currentUser.uid || this.state.currentUser.admin) &&
             <Card
                 style={{ width: "45%" }}
                 className="md-block-centered md-cell--top"
