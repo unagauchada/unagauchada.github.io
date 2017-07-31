@@ -43,7 +43,9 @@ class Publication extends PureComponent {
       qualifyVisible: false,
       gauchoDescription: "",
       qualifyError: false,
-      showDeleteConfirmation: false
+      showDeleteConfirmation: false,
+      showGauchoConfirmation: false,
+      gaucho: { name: "", lastname: "", photo: "" }
     };
   }
 
@@ -160,9 +162,33 @@ class Publication extends PureComponent {
       .child("publications")
       .child(this.state.publicationId)
       .update({ gaucho: user.user });
-
-    this.closeDialog();
+      
+    this.hideGauchoConfirmation()
   };
+
+  gauchoConfirmationDialog = () => 
+      <Dialog
+        id="gauchoDialog"
+        visible={this.state.showGauchoConfirmation}
+        className="googleDialog"
+        onHide={this.hideGauchoConfirmation}
+        aria-label="gauchoConfirmationDialog"
+      >
+        <section className="dialog md-grid">
+          {"¿Esta seguro que desea designar a " + this.state.gaucho.name + " " + this.state.gaucho.lastname + " como gaucho para su favor?"}
+        </section>
+        <section className="footer md-cell md-cell--12 md-text-right">
+          <Button flat label="Cancelar" onClick={this.hideGauchoConfirmation}/>
+          <Button raised primary label="Aceptar" onClick={this.grant(this.state.gaucho)}/>
+        </section>
+      </Dialog>    
+
+  showGauchoConfirmation = gaucho => () => 
+  {
+    this.closeDialog();
+    this.setState({showGauchoConfirmation: true, gaucho: gaucho})}
+
+  hideGauchoConfirmation = () => this.setState({showGauchoConfirmation: false})
 
   handleChange = property => value => this.setState({ [property]: value })
 
@@ -259,6 +285,7 @@ class Publication extends PureComponent {
         visible={this.state.visible}
         title={"Postulados"}
         onHide={this.closeDialog}
+        aria-label="postulados"
       >
         <List>
           {this.state.postulados
@@ -275,7 +302,7 @@ class Publication extends PureComponent {
                   key={key}
                   primaryText={x.name + " " + x.lastname}
                   leftAvatar={<UserAvatar url={x.photoURL} />}
-                  onClick={this.grant(x)}
+                  onClick={this.showGauchoConfirmation(x)}
                 />
               );
             })}
@@ -333,6 +360,8 @@ class Publication extends PureComponent {
         id="publishDialog"
         visible={this.state.editVisible}
         className="googleDialog"
+        onHide={this.closeEdit}
+        aria-label="edit"
       >
         <Edit
           publication={this.state.publication}
@@ -364,6 +393,8 @@ class Publication extends PureComponent {
         id="publishDialog"
         visible={this.state.showDeleteConfirmation}
         className="googleDialog"
+        onHide={this.hideDeleteConfirmation}
+        aria-label="delete"
       >
         <section className="dialog md-grid">
           {this.getConfirmationMessage()}
@@ -511,6 +542,7 @@ class Publication extends PureComponent {
                       this.openDialog();
                     }}
                   />}
+              {this.gauchoConfirmationDialog()}
               {this.state.publication.gaucho && this.getQualifyDialog()}
               {this.getPostuladosDialog()}
               {this.props.user.uid === this.state.publication.user

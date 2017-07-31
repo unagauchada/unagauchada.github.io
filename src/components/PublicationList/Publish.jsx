@@ -181,7 +181,7 @@ class Publish extends React.Component {
     return(
     <section className="dialog md-grid">
       <section className="header md-cell md-cell--2 md-cell--middle md-text-center ">
-        <UserAvatar icon={<FontIcon>person</FontIcon>} />
+          <UserAvatar url={this.props.user.photoURL}/> 
       </section>
       <TextField
         id="floatingTitle"
