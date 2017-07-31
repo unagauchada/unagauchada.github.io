@@ -40,6 +40,7 @@ export default class ProfileMenu extends PureComponent {
   componentWillReceiveProps = nextProps => {
     this.getCurrentUser(nextProps.currentUser.uid)
     this.getSubmissions()      
+    this.setState({activeTabIndex:0})
   }
   
   getCurrentUser = user => {
