@@ -10,6 +10,7 @@ import { connect } from "react-redux"
 import { userSelector } from "../../redux/getters"
 import ProfileMenu from "./ProfileMenu"
 import Edit from "./Edit"
+import AdminEdit from "./AdminEdit"
 import rootRef from "../../libs/db"
 import "./ProfileView.scss"
 import Avatar from "react-md/lib/Avatars"
@@ -21,6 +22,7 @@ class ProfileView extends PureComponent {
     super(props)
     this.state = {
       visible: false,
+      adminEditVisible: false,
 
       currentUser: { name: "", lastname: "", photo: "" },
       user: { name: "", lastname: "", photo: "" },
@@ -54,6 +56,10 @@ class ProfileView extends PureComponent {
   openDialog = () => this.setState({ visible: true })
 
   closeDialog = () => this.setState({ visible: false })
+
+  openAdminEditDialog = () => this.setState({ adminEditVisible: true })
+
+  closeAdminEditDialog = () => this.setState({ adminEditVisible: false })
 
   renderImage = () => {
     if (this.state.user.photoURL && this.state.user.photoURL !== ""){ 
@@ -91,7 +97,8 @@ class ProfileView extends PureComponent {
                       flat
                       icon
                       tooltipLabel="Modificar"
-                      tooltipPosition="top"                      
+                      tooltipPosition="top"                
+                      onClick={this.openAdminEditDialog}      
                   >
                       create
                   </Button>
@@ -115,6 +122,14 @@ class ProfileView extends PureComponent {
                   </Button>
                 </section>
                 }
+                <Dialog
+                  id="adminEditionDialog"
+                  visible={this.state.adminEditVisible}
+                  onHide={this.closeAdminEditDialog}
+                  className="googleDialog"
+                >
+                  <AdminEdit handleClose={this.closeAdminEditDialog} user={this.state.user} uid={this.props.location.pathname.substring(9)}/>
+                </Dialog>
                 <Dialog
                   id="editionDialog"
                   visible={this.state.visible}
