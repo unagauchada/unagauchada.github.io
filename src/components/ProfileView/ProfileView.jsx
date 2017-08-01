@@ -52,6 +52,55 @@ class ProfileView extends PureComponent {
       .child(user)
       .on("value", snap => this.setState({ user: snap.val() }))
   }
+  
+    blockUser = () => {
+    rootRef
+      .child("users")
+      .child(this.props.location.pathname.substring(9))
+      .child("blocked")
+      .set(true)
+  }
+
+  unlockUser = () => {
+    rootRef
+      .child("users")
+      .child(this.props.location.pathname.substring(9))
+      .child("blocked")
+      .set(false)
+  }
+
+  blockButton = () => {
+    console.log("blockButton")
+    return(
+      ( this.props.location.pathname.substring(9) != this.state.currentUser.uid)?
+        (
+          (this.state.user.blocked)?
+           <Button
+              className="md-cell--right title-element"
+              flat
+              tooltipLabel="Desbloquear usuario"
+              tooltipPosition="top"
+              onClick={this.unlockUser}
+            >
+              <FontIcon class="material-icons"> block</FontIcon>
+            </Button> 
+      
+                :
+                  <Button
+                    className="md-cell--right title-element"
+                    flat
+                    tooltipLabel="Bloquear usuario"
+                    tooltipPosition="top"
+                    onClick={this.blockUser}
+                    primary
+                  >
+                    <FontIcon class="material-icons"> block</FontIcon>
+                </Button>
+        ):""
+    )
+
+
+  }
 
   openDialog = () => this.setState({ visible: true })
 
@@ -102,15 +151,7 @@ class ProfileView extends PureComponent {
                   >
                       create
                   </Button>
-                  <Button
-                      className="md-cell--right title-element"
-                      flat
-                      icon
-                      tooltipLabel="Bloquear"
-                      tooltipPosition="top"
-                  >
-                      block
-                  </Button>
+                    {this.blockButton()}
                   <Button
                       className="md-cell--right title-element"
                       flat
