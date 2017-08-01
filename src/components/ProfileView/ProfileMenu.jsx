@@ -133,7 +133,7 @@ export default class ProfileMenu extends PureComponent {
             {this.state.submissions && <FilteredPublicationList filter={this.filterSubmissions(this.props.user)}/>}
           </Tab>
           }
-          {(this.state.currentUser.admin) &&
+          {(this.props.user === this.props.currentUser.uid && this.state.currentUser.admin) &&
           <Tab label="Publicaciones Reportadas">
             <FilteredPublicationList filter={this.filterReportedPublications(this.state.reports)}/> 
           </Tab>
