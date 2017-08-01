@@ -37,6 +37,7 @@ class Publication extends PureComponent {
       category: "",
       comments: [],
       misGauchadas: false,
+      reports: [],
       state: "",
       submissions: [],
       editVisible: false,
@@ -115,6 +116,17 @@ class Publication extends PureComponent {
     );
   };
 
+  getReports = publication => {
+    rootRef.child("reports").child(publication).on("value", snap =>
+      this.setState({
+        reports: _.map(snap.val(), (report, user) => ({
+          ...report,
+          user
+        }))
+      })
+    );
+  };
+
   getPublicationId = publication => {
     this.setState({ publicationId: publication });
   };
@@ -125,6 +137,7 @@ class Publication extends PureComponent {
     this.getPublicationId(this.props.match.params.favorID);
     this.getComments(this.props.match.params.favorID);
     this.getSubmissions(this.props.match.params.favorID);
+    this.getReports(this.props.match.params.favorID);
   };
 
   componentWillReceiveProps = nextProps => {
@@ -133,6 +146,7 @@ class Publication extends PureComponent {
     this.getPublicationId(nextProps.match.params.favorID);
     this.getComments(nextProps.match.params.favorID);
     this.getSubmissions(nextProps.match.params.favorID);
+    this.getReports(nextProps.match.params.favorID);
   };
 
   openDialog = () => {
@@ -372,6 +386,9 @@ class Publication extends PureComponent {
     );
   };
 
+
+
+
   getConfirmationMessage = () => {
     if(!this.state.publication.submissions){
       return (
@@ -442,6 +459,22 @@ class Publication extends PureComponent {
   deletePublication = () => {
     rootRef
       .child("publications/" + this.state.publicationId).remove()
+  }
+
+  reportPublication = () => {
+  console.log("Reported")
+    rootRef
+        .child("reports/" + this.state.publicationId)
+        .child(this.props.user.uid)
+        .child('date')
+        .set(firebase.database.ServerValue.TIMESTAMP)
+  }
+
+  disreportPublication = () => {
+  console.log("Report dissmissed")
+    rootRef
+        .child("reports/" + this.state.publicationId)
+        .child(this.props.user.uid).remove()
   }
 
   render = () => {
@@ -609,7 +642,28 @@ class Publication extends PureComponent {
                         >
                           thumb_up
                         </Button>}
-                  </div>}
+                    {this.state.reports.find(
+                      report => report.user === this.props.user.uid
+                    )
+                      ? <Button
+                          tooltipLabel="Desreportar"
+                          tooltipPosition="top"
+                          onClick={this.disreportPublication}
+                          icon
+                        >
+                          report_problem
+                        </Button>
+                      : <Button
+                          tooltipLabel="Reportar"
+                          tooltipPosition="top"
+                          onClick={this.reportPublication}
+                          primary
+                          icon
+                        >
+                          report_problem  
+                        </Button>}
+                </div>
+                  }
             </CardActions>
             <CardText className="comments">
               <ul className="md-list">
@@ -641,3 +695,4 @@ class Publication extends PureComponent {
   };
 }
 export default Publication;
+
