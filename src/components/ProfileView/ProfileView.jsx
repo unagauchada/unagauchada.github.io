@@ -22,6 +22,7 @@ class ProfileView extends PureComponent {
     super(props)
     this.state = {
       visible: false,
+      adminblockVisible:false,
       adminEditVisible: false,
 
       currentUser: { name: "", lastname: "", photo: "" },
@@ -59,6 +60,7 @@ class ProfileView extends PureComponent {
       .child(this.props.location.pathname.substring(9))
       .child("blocked")
       .set(true)
+    this.closeBlockDialog()
   }
 
   unlockUser = () => {
@@ -91,7 +93,7 @@ class ProfileView extends PureComponent {
                     flat
                     tooltipLabel="Bloquear usuario"
                     tooltipPosition="top"
-                    onClick={this.blockUser}
+                    onClick={this.openBlockDialog}
                     primary
                   >
                     <FontIcon class="material-icons"> block</FontIcon>
@@ -109,6 +111,34 @@ class ProfileView extends PureComponent {
   openAdminEditDialog = () => this.setState({ adminEditVisible: true })
 
   closeAdminEditDialog = () => this.setState({ adminEditVisible: false })
+
+  openBlockDialog = () => this.setState({ adminBlockVisible: true })
+
+  closeBlockDialog = () => this.setState({ adminBlockVisible: false })
+
+  blockDialog = () =>{
+    return(
+      <Dialog
+          visible={this.state.adminBlockVisible}
+          title="Bloquear Usuario"
+          onHide={this.closeDialog}
+          modal
+          actions={[{
+            onClick: this.blockUser,
+            primary: true,
+            label: 'Aceptar',
+          },{
+            onClick: this.closeBlockDialog,
+            primary: false,
+            label: 'Cancelar',
+          }]}
+        >
+          <p id="" className="md-color--secondary-text">
+            Estas seguro que deseas bloquear a {this.state.user.name + " " + this.state.user.lastname}?
+          </p>
+      </Dialog>
+    )
+  }
 
   renderImage = () => {
     if (this.state.user.photoURL && this.state.user.photoURL !== ""){ 
@@ -179,11 +209,31 @@ class ProfileView extends PureComponent {
                 >
                   <Edit handleClose={this.closeDialog} user={this.state.user}/>
                 </Dialog>
+                <Dialog
+                    visible={this.state.adminBlockVisible}
+                    title="Bloquear Usuario"
+                    onHide={this.closeDialog}
+                    modal
+                    actions={[{
+                      onClick: this.blockUser,
+                      primary: true,
+                      label: 'Aceptar',
+                    },{
+                      onClick: this.closeBlockDialog,
+                      primary: false,
+                      label: 'Cancelar',
+                    }]}
+                  >
+                    <p id="" className="md-color--secondary-text">
+                      Estas seguro que deseas bloquear a {this.state.user.name + " " + this.state.user.lastname}?
+                    </p>
+                </Dialog>
             </CardActions>
             <CardText>
                 <ProfileMenu user={this.props.location.pathname.substring(9)}/>
             </CardText>
         </Card>
+        {this.blockDialog}
       </MainPage>
     )
   }
