@@ -6,6 +6,7 @@ import { Redirect } from 'react-router'
 import { HashRouter as Router, Route, Link, Switch } from "react-router-dom"
 import { connect } from "react-redux"
 import Toolbar from "react-md/lib/Toolbars"
+import Dialog from "react-md/lib/Dialogs"
 import TextField from "react-md/lib/TextFields"
 import Button from "react-md/lib/Buttons/Button"
 import { app as fbApp } from "../../libs/db"
@@ -46,8 +47,9 @@ class App extends React.Component {
         super();
         this.state = {
             searchText: "",
-
+            
             searchLoc: "",
+            blocked: false,
             searchCat: "",
             text: "",
             showButtons: false,
@@ -64,7 +66,13 @@ class App extends React.Component {
   }
 
   componentDidMount = () => {
+    this.getBlocked(firebase)
 
+  }
+
+
+  componentWillReceiveProps = nextProps => {
+    this.getBlocked(firebase)
   }
 
   getStates = () => {
@@ -76,6 +84,55 @@ class App extends React.Component {
       })
     )
   }
+
+  getBlocked = (fb) =>{
+    console.log("getBlocked")
+    if(fb.auth().currentUser){
+      console.log("uid: "+ fb.auth().currentUser.uid)
+      rootRef
+      .child("users")
+      .child(fb.auth().currentUser.uid)
+      .child("blocked")
+      .on('value',  snap => {
+        console.log('snapback: ' + snap.val())
+        if( snap.val() == true){
+          this.openBlocked()
+          fb.auth().signOut()
+          }
+        } 
+      )
+  }
+  }
+
+  openBlocked = () => {
+    this.setState({ blocked: true });
+  };
+
+  closeBlocked = () => {
+    this.setState({ blocked: false });
+  };
+
+  getBlockedDialog = () => {
+    return(
+      <Dialog
+          visible={this.state.blocked}
+          title="Cuenta bloqueada"
+          onHide={this.closeDialog}
+          modal
+          actions={[{
+            onClick: this.closeBlocked,
+            primary: true,
+            label: 'Aceptar',
+          }]}
+        >
+          <p id="speedBoostDescription" className="md-color--secondary-text">
+            Tu cuenta a sido bloqueada por la administracion de UnaGauchada hasta nuevo aviso.
+          </p>
+        </Dialog>
+    )
+
+  }
+
 
   getCategories = () => {
     rootRef.child("categories").on("value", snap =>
@@ -135,6 +192,7 @@ class App extends React.Component {
     <form  onSubmit={(e) => {e.preventDefault(); this.handleSearch(); }}>
     <Router>
       <app>
+        {this.getBlockedDialog()}
         <Toolbar
           zDepth={1}
           colored
@@ -223,3 +281,4 @@ class App extends React.Component {
 }
 
 export default App
+
