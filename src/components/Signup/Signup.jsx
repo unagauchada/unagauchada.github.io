@@ -83,7 +83,7 @@ class Singup extends React.Component {
         rootRef
           .child("credits")
           .child(user.uid)
-          .push({ date: new Date(), type: "Initial", price: 0, value: 1 })
+          .push({ date: firebase.database.ServerValue.TIMESTAMP, type: "Initial", price: 0, value: 1 })
         rootRef
           .child("users")
           .child(user.uid)

@@ -21,6 +21,7 @@ import ProfileView from "../ProfileView"
 import actionCreator from "../ToolbarActions"
 import MainPage from "../MainPage"
 import rootRef from "../../libs/db"
+import Statistics from "../Statistics"
 import "./App.scss"
 
 const nav = <Button key="nav" icon>menu</Button>
@@ -64,7 +65,6 @@ class App extends React.Component {
   }
 
   componentDidMount = () => {
-
   }
 
   getStates = () => {
@@ -214,6 +214,7 @@ class App extends React.Component {
           <Route path="/buy" component={this.props.user ? BuyCredits : Login} />
           <Route path="/publication/:favorID"  component={this.props.user ? FavorView : Login } />
           <Route path="/profile/:userID"  component={this.props.user ? ProfileView : Login } />
+          <Route path="/statistics"  component={this.props.user ? Statistics : Login } />
           <Route path="*" component={Error404} />
         </Switch> 
       </app>
