@@ -41,6 +41,13 @@ const Error404 = () => (
   </MainPage>
 )
 
+const Error403 = () => (
+  <MainPage>
+    <h1 className="md-display-4">Error 403</h1>
+    <div className="md-display-2">Acceso denegado</div>
+  </MainPage>
+)
+
 @connect(mapStateToProps, mapDispatchToProps)
 class App extends React.Component {
   constructor() {
@@ -48,6 +55,7 @@ class App extends React.Component {
         this.state = {
             searchText: "",
 
+            user: { admin: false },
             searchLoc: "",
             searchCat: "",
             text: "",
@@ -59,12 +67,18 @@ class App extends React.Component {
     }
 
   componentWillMount() {
-    firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
+    firebase.auth(fbApp).onAuthStateChanged(user => {
+      this.getUser(user)
+      this.props.updateUser(user)})
     this.getStates()
     this.getCategories()
   }
-
-  componentDidMount = () => {
+ 
+  getUser = user => {
+    rootRef
+      .child("users")
+      .child(user.uid)
+      .on("value", snap => this.setState({ user: snap.val() }))
   }
 
   getStates = () => {
@@ -86,10 +100,6 @@ class App extends React.Component {
       })
     )
   }  
-
-   handleClear() {
-    
-  }
 
   handleChange= value =>{
     if (value) {
@@ -130,6 +140,7 @@ class App extends React.Component {
     this.setState({ searchCat: value })
   }
 
+  home = () => <Home searchText={this.state.searchText} searchLoc={this.state.searchLoc} searchCat={this.state.searchCat} />
 
   render = () => (
     <form  onSubmit={(e) => {e.preventDefault(); this.handleSearch(); }}>
@@ -208,13 +219,13 @@ class App extends React.Component {
           </div>
         </Toolbar>
         <Switch>
-          <Route exact path="/" component={() => <Home searchText={this.state.searchText} searchLoc={this.state.searchLoc} searchCat={this.state.searchCat} />} />
+          <Route exact path="/" component={this.home} />
           <Route path="/signup" component={Signup} />
           <Route path="/signin" component={Login} />
           <Route path="/buy" component={this.props.user ? BuyCredits : Login} />
           <Route path="/publication/:favorID"  component={this.props.user ? FavorView : Login } />
           <Route path="/profile/:userID"  component={this.props.user ? ProfileView : Login } />
-          <Route path="/statistics"  component={this.props.user ? Statistics : Login } />
+          <Route path="/statistics"  component={this.props.user ? this.state.user.admin && Statistics || Error403 : Login } />
           <Route path="*" component={Error404} />
         </Switch> 
       </app>

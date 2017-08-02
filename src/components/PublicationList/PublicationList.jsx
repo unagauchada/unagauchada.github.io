@@ -115,7 +115,6 @@ class PublicationList extends React.Component {
       
 
   componentWillReceiveProps = (nextProps, nextContext) => {
-    console.log(nextProps)
     this.getCredits(nextProps)
     this.getMessage(nextProps)
     this.setState({searchText: nextProps.searchText})
@@ -152,7 +151,6 @@ class PublicationList extends React.Component {
       // you have one. Use User.getToken() instead.
     }
 
-    console.log(uid)
     return uid
   }
 
@@ -208,7 +206,6 @@ class PublicationList extends React.Component {
     rootRef
       .child("users/" + this.getUserId(props) + "/credits")
       .on("value", snap => {
-        console.log(snap.val())
         this.setState({ credits: snap.val() })
       })
   }
@@ -217,7 +214,6 @@ class PublicationList extends React.Component {
     rootRef
       .child("users/" + this.getUserId(props) + "/message")
       .on("value", snap => {
-        console.log(snap.val())
         this.setState({ message: snap.val() })
       })
   }
