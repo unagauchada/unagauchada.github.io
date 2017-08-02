@@ -46,7 +46,7 @@ class Publication extends PureComponent {
       qualifyError: false, 
       showDeleteConfirmation: false,
       showGauchoConfirmation: false,
-      gaucho: { name: "", lastname: "", photo: "" }
+      gaucho: { name: "", lastname: "", photo: "" },
       showDeleteConfirmation: false
     };
   }
