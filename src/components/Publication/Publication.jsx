@@ -619,9 +619,6 @@ class Publication extends PureComponent {
                     }
                   </div>
                 : <div className="md-cell--right">
-                    <Button tooltipLabel="Preguntar" tooltipPosition="top" icon>
-                      comment
-                    </Button>
                     {this.state.submissions.find(
                       submission => submission.user === this.props.user.uid
                     )
