@@ -21,7 +21,8 @@ import FavorView from "../Publication"
 import ProfileView from "../ProfileView"
 import actionCreator from "../ToolbarActions"
 import MainPage from "../MainPage"
-import rootRef from "../../libs/db"
+import rootRef from "../../libs/db" 
+import Statistics from "../Statistics" 
 import "./App.scss"
 
 const nav = <Button key="nav" icon>menu</Button>
@@ -41,13 +42,20 @@ const Error404 = () => (
   </MainPage>
 )
 
+const Error403 = () => (
+  <MainPage>
+    <h1 className="md-display-4">Error 403</h1>
+    <div className="md-display-2">Acceso denegado</div>
+  </MainPage>
+)
+
 @connect(mapStateToProps, mapDispatchToProps)
 class App extends React.Component {
   constructor() {
         super();
         this.state = {
             searchText: "",
-            
+            user: { admin: false },
             searchLoc: "",
             blocked: false,
             deleted:false,
@@ -61,16 +69,26 @@ class App extends React.Component {
     }
 
   componentWillMount() {
-    firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
+    firebase.auth(fbApp).onAuthStateChanged(user => {
+      this.getUser(user)
+      this.props.updateUser(user)})
     this.getStates()
     this.getCategories()
   }
 
   componentDidMount = () => {
     this.getBlocked(firebase)
+    firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
     this.getDeleted(firebase)
 
   }
+  
+  getUser = user => {
+    rootRef
+      .child("users")
+      .child(user.uid)
+      .on("value", snap => this.setState({ user: snap.val() }))
+   }
 
 
   componentWillReceiveProps = nextProps => {
@@ -324,6 +342,7 @@ class App extends React.Component {
           <Route path="/buy" component={this.props.user ? BuyCredits : Login} />
           <Route path="/publication/:favorID"  component={this.props.user ? FavorView : Login } />
           <Route path="/profile/:userID"  component={this.props.user ? ProfileView : Login } />
+          <Route path="/statistics"  component={this.props.user ? this.state.user.admin && Statistics || Error403 : Login } />
           <Route path="*" component={Error404} />
         </Switch> 
       </app>
