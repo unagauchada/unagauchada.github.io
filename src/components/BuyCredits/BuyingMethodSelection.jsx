@@ -7,6 +7,7 @@ import Button from "react-md/lib/Buttons"
 import rootRef from "../../libs/db"
 import Snackbar from 'react-md/lib/Snackbars'
 import firebase from "firebase"
+import { Link } from "react-router-dom"
 
 import "./card.scss"
 import "./BuyCredits.scss"
@@ -207,13 +208,13 @@ export default class BuyingMethodSelector extends PureComponent {
             </CardReactFormContainer>
     
             <CardActions>
-                <Button 
-                    raised
-                    label="Cancelar" 
-                    secondary
-                    className="md-btn--dialog"
-                    onClick={ () => this.cancel() } />                    
-
+                <Link to="/" className="md-btn--dialog">
+                    <Button 
+                        raised
+                        label="Cancelar" 
+                        secondary
+                        className="md-btn--dialog"/>                    
+                </Link>
                 <Button 
                     raised 
                     label={"Pagar ".concat("$".concat(this.props.purchase.cost.toString()))} 
