@@ -5,6 +5,7 @@ import TabsContainer from 'react-md/lib/Tabs/TabsContainer';
 import Slider from 'react-md/lib/Sliders';
 import FilteredPublicationList from "./FilteredPublicationList"
 import ProfileInformation from "./ProfileInformation"
+import ProfileCategories from "./ProfileCategories.jsx"
 import rootRef from "../../libs/db"
 import _ from "lodash"
 import { userSelector } from "../../redux/getters"
@@ -51,6 +52,8 @@ export default class ProfileMenu extends PureComponent {
       .child(user)
       .on("value", snap => this.setState({ currentUser: snap.val() }))
   }
+
+
 
   _handleTabChange(activeTabIndex) {
     if (activeTabIndex === 1 && !this.state.tabTwoChildren) {
@@ -136,6 +139,11 @@ export default class ProfileMenu extends PureComponent {
           {(this.props.user === this.props.currentUser.uid && this.state.currentUser.admin) &&
           <Tab label="Publicaciones Reportadas">
             <FilteredPublicationList filter={this.filterReportedPublications(this.state.reports)}/> 
+          </Tab>
+          }
+          {(this.props.user === this.props.currentUser.uid && this.state.currentUser.admin) &&
+          <Tab label="Categorias">
+            <ProfileCategories test="asd"/> 
           </Tab>
           }
 

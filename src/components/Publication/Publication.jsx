@@ -44,9 +44,7 @@ class Publication extends PureComponent {
       qualifyVisible: false,
       gauchoDescription: "",
       qualifyError: false,
-      showDeleteConfirmation: false,
-      showGauchoConfirmation: false,
-      gaucho: { name: "", lastname: "", photo: "" }
+      showDeleteConfirmation: false
     };
   }
 
@@ -176,33 +174,9 @@ class Publication extends PureComponent {
       .child("publications")
       .child(this.state.publicationId)
       .update({ gaucho: user.user });
-      
-    this.hideGauchoConfirmation()
-  };
 
-  gauchoConfirmationDialog = () => 
-      <Dialog
-        id="gauchoDialog"
-        visible={this.state.showGauchoConfirmation}
-        className="googleDialog"
-        onHide={this.hideGauchoConfirmation}
-        aria-label="gauchoConfirmationDialog"
-      >
-        <section className="dialog md-grid">
-          {"¿Esta seguro que desea designar a " + this.state.gaucho.name + " " + this.state.gaucho.lastname + " como gaucho para su favor?"}
-        </section>
-        <section className="footer md-cell md-cell--12 md-text-right">
-          <Button flat label="Cancelar" onClick={this.hideGauchoConfirmation}/>
-          <Button raised primary label="Aceptar" onClick={this.grant(this.state.gaucho)}/>
-        </section>
-      </Dialog>    
-
-  showGauchoConfirmation = gaucho => () => 
-  {
     this.closeDialog();
-    this.setState({showGauchoConfirmation: true, gaucho: gaucho})}
-
-  hideGauchoConfirmation = () => this.setState({showGauchoConfirmation: false})
+  };
 
   handleChange = property => value => this.setState({ [property]: value })
 
@@ -299,7 +273,6 @@ class Publication extends PureComponent {
         visible={this.state.visible}
         title={"Postulados"}
         onHide={this.closeDialog}
-        aria-label="postulados"
       >
         <List>
           {this.state.postulados
@@ -316,7 +289,7 @@ class Publication extends PureComponent {
                   key={key}
                   primaryText={x.name + " " + x.lastname}
                   leftAvatar={<UserAvatar url={x.photoURL} />}
-                  onClick={this.showGauchoConfirmation(x)}
+                  onClick={this.grant(x)}
                 />
               );
             })}
@@ -374,8 +347,6 @@ class Publication extends PureComponent {
         id="publishDialog"
         visible={this.state.editVisible}
         className="googleDialog"
-        onHide={this.closeEdit}
-        aria-label="edit"
       >
         <Edit
           publication={this.state.publication}
@@ -410,8 +381,6 @@ class Publication extends PureComponent {
         id="publishDialog"
         visible={this.state.showDeleteConfirmation}
         className="googleDialog"
-        onHide={this.hideDeleteConfirmation}
-        aria-label="delete"
       >
         <section className="dialog md-grid">
           {this.getConfirmationMessage()}
@@ -458,7 +427,9 @@ class Publication extends PureComponent {
 
   deletePublication = () => {
     rootRef
-      .child("publications/" + this.state.publicationId).remove()
+      .child("publications/" + this.state.publicationId)
+      .child("canceled")
+      .set(true)
   }
 
   reportPublication = () => {
@@ -575,7 +546,6 @@ class Publication extends PureComponent {
                       this.openDialog();
                     }}
                   />}
-              {this.gauchoConfirmationDialog()}
               {this.state.publication.gaucho && this.getQualifyDialog()}
               {this.getPostuladosDialog()}
               {this.props.user.uid === this.state.publication.user
@@ -619,6 +589,9 @@ class Publication extends PureComponent {
                     }
                   </div>
                 : <div className="md-cell--right">
+                    <Button tooltipLabel="Preguntar" tooltipPosition="top" icon>
+                      comment
+                    </Button>
                     {this.state.submissions.find(
                       submission => submission.user === this.props.user.uid
                     )
@@ -680,6 +653,24 @@ class Publication extends PureComponent {
                 })}
               </ul>
             </CardText>
+            <Dialog
+                    visible={this.state.publication.canceled}
+                    title="Favor Cancelado"
+                    onHide={()=> 1+1}
+                    modal
+                    actions={[]}
+                  >
+                    <p id="" className="md-color--secondary-text">
+                      Este favor a sido cancelado.
+                    </p>
+                    <Link to="/">
+                      <Button
+                        onClick={() => 1+1}
+                        primary
+                        label='Aceptar'
+                      />
+                    </Link>
+            </Dialog>
             <Divider />
             {this.props.user.uid !== this.state.publication.user &&
               <MakeComment

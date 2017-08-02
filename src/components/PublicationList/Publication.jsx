@@ -57,7 +57,7 @@ class Publication extends React.Component {
     >
       <CardTitle
         avatar={
-          <Link to={"/profile/"+this.props.publication.user}>
+          <Link to={this.state.user.deleted||"/profile/"+this.props.publication.user}>
             <UserAvatar url={this.state.user.photoURL}/> 
           </Link>}
         title={this.state.user.name}
