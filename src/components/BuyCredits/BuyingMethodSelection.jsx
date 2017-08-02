@@ -6,6 +6,7 @@ import CardActions from "react-md/lib/Cards/CardActions"
 import Button from "react-md/lib/Buttons"
 import rootRef from "../../libs/db"
 import Snackbar from 'react-md/lib/Snackbars'
+import firebase from "firebase"
 
 import "./card.scss"
 import "./BuyCredits.scss"
@@ -74,9 +75,9 @@ export default class BuyingMethodSelector extends PureComponent {
     let CreditsData = {
         price: this.props.purchase.cost,
         type : "Buy",    
-        value: this.props.purchase.creditsAmount
+        value: this.props.purchase.creditsAmount,
+        date: firebase.database.ServerValue.TIMESTAMP
     };
-
     rootRef
       .child("credits/" + this.getUserId().toString())
       .push(CreditsData)

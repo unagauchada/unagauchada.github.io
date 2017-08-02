@@ -45,6 +45,12 @@ class Login extends React.Component {
     }
   }
 
+  keyPress = (e) => {
+    if(e.keyCode == 13){
+        this.loginUser()
+    }
+  }
+
   render = () => (
     <login>
       <Paper zDepth={2}>
@@ -58,6 +64,7 @@ class Login extends React.Component {
             onChange={this.handleChange("email")}
             error={ (this.state.error) && ( ['auth/user-not-found', 'auth/user-disabled', 'auth/invalid-email'].indexOf(this.state.error.code) > -1) }
             errorText={this.getUserError()}
+            onKeyDown={this.keyPress}
           />
           <TextField
             id="password"
@@ -68,6 +75,7 @@ class Login extends React.Component {
             onChange={this.handleChange("password")}
             error={(this.state.error) && (this.state.error.code ==='auth/wrong-password')}
             errorText={"Contraseña incorrecta"}
+            onKeyDown={this.keyPress}
           />
         </section>
         <footer>
