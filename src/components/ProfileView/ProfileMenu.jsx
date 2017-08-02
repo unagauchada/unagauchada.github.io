@@ -20,6 +20,7 @@ export default class ProfileMenu extends PureComponent {
     this.state = { 
         activeTabIndex: 0, 
         tabTwoChildren: null,
+        reports: [],
         submissions: null,
         currentUser: {admin: false},
     };
@@ -34,6 +35,7 @@ export default class ProfileMenu extends PureComponent {
 
   componentDidMount = () => {
     this.getCurrentUser(this.props.currentUser.uid)
+    this.getReports()
     this.getSubmissions()
   }
 
@@ -79,6 +81,26 @@ export default class ProfileMenu extends PureComponent {
     return publication.user === user
   }
 
+  filterReportedPublications = reports => publication => {
+    return reports.some(rep => rep.id == publication.id) 
+  }
+
+  getReports = () =>
+    rootRef.child("reports").on("value", snap => {
+      this.setState({
+        reports: _.map(
+          snap.val(),
+          (report, id) =>
+            report
+              ? {
+                  ...report,
+                  id
+                }
+              : null
+        )
+      })
+    })
+
   filterSubmissions = user => publication => {
     if (typeof this.state.submissions[publication.id] === 'undefined') {
       return false
@@ -111,6 +133,12 @@ export default class ProfileMenu extends PureComponent {
             {this.state.submissions && <FilteredPublicationList filter={this.filterSubmissions(this.props.user)}/>}
           </Tab>
           }
+          {(this.props.user === this.props.currentUser.uid && this.state.currentUser.admin) &&
+          <Tab label="Publicaciones Reportadas">
+            <FilteredPublicationList filter={this.filterReportedPublications(this.state.reports)}/> 
+          </Tab>
+          }
+
         </Tabs>
       </TabsContainer>
     );
