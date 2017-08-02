@@ -123,7 +123,7 @@ export default class ProfileMenu extends PureComponent {
     return (
       <TabsContainer onTabChange={this._handleTabChange} activeTabIndex={activeTabIndex} panelClassName="md-grid" colored>
         <Tabs tabId="tab">
-          <Tab label="Informacion">
+          <Tab label="Informacion" >
             <ProfileInformation user={this.props.user}/>
           </Tab>
           {(this.props.user === this.props.currentUser.uid || this.state.currentUser.admin) &&

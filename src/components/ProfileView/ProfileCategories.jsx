@@ -22,6 +22,7 @@ class ProfileCategories extends React.Component {
       userCat: [],
       userAdd: false,
       userNam: "",
+      userLt: "",
       userMod: false,
       userDel: false,
       favAdd: false,
@@ -70,7 +71,7 @@ class ProfileCategories extends React.Component {
     })
 
     getUserCat = () => {
-    rootRef.child("⁠⁠⁠achievements").on("value", snap =>
+    rootRef.child("scores").on("value", snap =>
       this.setState({
         userCat: _.map(
           snap.val(),
@@ -79,7 +80,7 @@ class ProfileCategories extends React.Component {
                   ...achievement,
                   name
                 })
-        )
+        ).sort((x,y) => x.lt-y.lt)
       })
     )      
   }
@@ -117,14 +118,45 @@ class ProfileCategories extends React.Component {
   	this.closeFavDel()
   }
 
-  openUserAdd = () => this.setState({userAdd:true})
+  openUserAdd = cat => this.setState({userAdd:true})
   closeUserAdd= () => this.setState({userAdd:false})
 
-  openUserMod = () => this.setState({userMod:true})
+  userAdd = () =>{
+    console.log("Adding User category:" + this.state.userNam )
+    rootRef
+      .child("scores")
+      .child(this.state.userNam)
+      .child("lt")
+      .set(parseInt(this.state.userLt))
+    this.closeUserAdd()
+  }
+
+  openUserMod = cat => this.setState({userMod:true, userNam: cat.name, userLt: cat.lt, modding:cat })
   closeUserMod= () => this.setState({userMod:false})
 
-  openUserDel = () => this.setState({userDel:true})
+  userMod = () =>{
+    console.log("Modifying User category:" + this.state.userNam )
+    rootRef
+      .child("scores")
+      .child(this.state.userNam).remove()
+    rootRef
+      .child("scores")
+      .child(this.state.userNam)
+      .child("lt")
+      .set(parseInt(this.state.userLt))
+    this.closeUserMod()
+  }
+
+  openUserDel = cat => this.setState({userDel:true, userNam: cat.name, userLt: cat.lt })
   closeUserDel= () => this.setState({userDel:false})
+
+  userDel = () =>{
+    console.log("Modifying User category:" + this.state.userNam )
+    rootRef
+      .child("scores")
+      .child(this.state.userNam).remove()
+    this.closeUserDel()
+  }
 
 
   render = () => {
@@ -156,49 +188,113 @@ class ProfileCategories extends React.Component {
     	 	</CardText>
     	</Card>
     	<Card className="md-cell--right" style={{ width: "45%" }}>
-    		<CardTitle>Categorias de Usuario</CardTitle>
+    		<CardTitle>Categorias de Usuario </CardTitle>
     		<CardText>
     		  	<List>
-    		  	  {this.state.userCat.map(favCat =>
-    		  	  	<ListItem primaryText={favCat.name}
-    		  	  		leftIcon={<Button  onClick={this.openUserDel}> delete </Button>}
-    		  	  		rightIcon={<Button onClick={this.openUserMod}> create </Button>}
+    		  	  {this.state.userCat.map((userCat, i) =>
+    		  	  	<ListItem primaryText={userCat.name}
+                  secondaryText ={( 0 == (this.state.userCat.length -1 )) ?"Desde " + 0  + " puntos":
+                  (i == this.state.userCat.length -1)?"Dese " + (this.state.userCat[i-1].lt +1 )  + " puntos":
+                    "Hasta " + userCat.lt + " puntos"
+                    }
+    		  	  		leftIcon={<Button
+                    disabled={this.state.userCat.length == 1} 
+                    tooltipLabel={this.state.userCat.length == 1 &&"No se permite eliminar a la unica categoria"}
+                    onClick={() => this.openUserDel(userCat)}> 
+                    delete </Button>
+                  }
+    		  	  		rightIcon={<Button onClick={() =>this.openUserMod(userCat)}> create </Button>}
     		  	  	/>
     		  	  )}
     		  	</List>
     		  	<Button 
     		  		flat
     		  		label="Agregar"
-    		  		onClick={this.openUserAdd} 
+    		  		onClick={() => this.openUserAdd()} 
     		  		primary
     		  	/> 
     		</CardText>
     	</Card>
     	<Dialog
           visible={this.state.userAdd}
-          title="Editar Categoria de Usuario"
+          title="Agregar Categoria de Usuario"
           onHide={this.closeDialog}
           modal
           actions={[{
+            onClick: this.userAdd,
+            primary: true,
+            disabled: !this.state.userNam 
+              || this.state.userCat.map(cat => cat.name).some(name => name === this.state.userNam)
+              ||!this.state.userLt
+              ||!(typeof this.state.userLt) == 'number'
+              ||(this.state.userLt%1),
+            label: 'Aceptar',
+          },{
             onClick: this.closeUserAdd,
             primary: true,
-            label: 'Aceptar',
+            label: 'Cancelar',
           }]}
         >
-    		agregar categoria de usuario
+        <TextField
+            label="Nombre de la Categoria"
+            required
+            onChange={text => this.setState({userNam: text})}
+            error={this.state.userCat.map(cat => cat.name).some(name => name === this.state.userNam)}
+            errorText={this.state.userNam==""?"Este campo es obligatorio.":"Este nombre ya esta utilizado."}
+          />
+        <TextField
+            label="Hasta que puntaje?"
+            required
+            type='number'
+            floating={true}
+            onChange={text => this.setState({userLt: text})}
+            error={(this.state.userLt%1) || this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)}
+            errorText={
+              (this.state.userLt == "") ? "Ingrese un entero":
+              this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)?"Otra categoria tiene este puntaje minimo.":
+              ""
+            }
+          />
     	</Dialog>
     	<Dialog
           visible={this.state.userMod}
-          title="Cuenta Eliminada"
+          title="Editar categoria de usuario"
           onHide={this.closeDialog}
           modal
           actions={[{
-            onClick: this.closeUserMod,
+            onClick: this.userMod,
             primary: true,
             label: 'Aceptar',
+          },{
+            onClick: this.closeUserMod,
+            primary: true,
+            label: 'Cancelar',
           }]}
         >
-    		editar categoria de usuario
+    		<TextField
+            label="Nombre de la Categoria"
+            required
+            value={this.state.userNam}
+            onChange={text => this.setState({userNam: text})}
+            error={this.state.userCat.map(cat => cat.name).some(name => name === this.state.userNam)
+              && this.state.userNam != this.state.modding.name }
+            errorText={this.state.userNam==""?"Este campo es obligatorio.":"Este nombre ya esta utilizado."}
+          />
+        <TextField
+            label="Hasta que puntaje?"
+            required
+            value={this.state.userLt}
+            type='number'
+            floating={true}
+            onChange={text => this.setState({userLt: text})}
+            error={(this.state.userLt%1) || this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)}
+            errorText={
+              (this.state.userLt == "") ? "Ingrese un entero":
+              this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)
+              && this.state.userLt != this.state.modding.lt ?"Otra categoria tiene este puntaje minimo.":
+              ""
+            }
+          />
     	</Dialog>
     	<Dialog
           visible={this.state.userDel}
@@ -206,12 +302,16 @@ class ProfileCategories extends React.Component {
           onHide={this.closeDialog}
           modal
           actions={[{
-            onClick: this.closeDeleted,
+            onClick: this.userDel,
             primary: true,
             label: 'Aceptar',
+          },{
+            onClick: this.closeUserDel,
+            primary: true,
+            label: 'Cancelar',
           }]}
         >
-    		eliminar categoria de usuario
+    		Estas seguro que deseas eliminar esta categoria?
     	</Dialog>
     	<Dialog
           visible={this.state.favAdd}

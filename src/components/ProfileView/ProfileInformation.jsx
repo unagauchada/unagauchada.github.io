@@ -43,8 +43,14 @@ export default class ProfileInformation extends PureComponent {
       .on("value", snap => this.setState({ currentUser: snap.val() }))
   }
 
+  getScore = () =>{
+    let score = this.state.archievements
+      .find(archievement => ((this.state.user.qualification <= archievement.lt)))
+    return score? score.name : this.state.archievements.slice(-1)[0].name
+  }
+
   getArchievements = () => {
-    rootRef.child("⁠⁠⁠achievements").on("value", snap =>
+    rootRef.child("scores").on("value", snap =>
       this.setState({
         archievements: _.map(
           snap.val(),
@@ -53,7 +59,7 @@ export default class ProfileInformation extends PureComponent {
                   ...archievement,
                   name
                 })
-        )
+        ).sort((x,y) => x.lt-y.lt)
       })
     )      
   }
@@ -115,6 +121,7 @@ export default class ProfileInformation extends PureComponent {
   }
 
   renderCredits = () => {
+
     if (this.state.user.credits === 1){ 
         return <h2 className="md-display-3 display-override md-text-center">{this.state.user.credits + " Credito"}</h2>
     }else{
@@ -178,7 +185,9 @@ export default class ProfileInformation extends PureComponent {
                     }
                     <CardText>
                         {  this.state.archievements && 
-                            <h2 className="md-display-3 display-override md-text-center">{this.state.archievements.find(archievement => (archievement.gt <= this.state.user.qualification && (this.state.user.qualification <= archievement.lt))).name}</h2>
+                            <h2 className="md-display-3 display-override md-text-center">
+                            {this.getScore()}
+                            </h2>
                         }
                         {  this.state.user.qualification &&
                             <h4 className="md-display-1 display-override md-text-center">{this.state.user.qualification + ' puntos'}</h4>
@@ -204,6 +213,8 @@ export default class ProfileInformation extends PureComponent {
                     </section>
                     }
             </Card>
+
+        <Button label="achievements" primary onClick={() => console.log(this.state.archievements.map(x=>x.name))}/>
        </div>
     )
   }

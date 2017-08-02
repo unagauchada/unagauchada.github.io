@@ -223,7 +223,7 @@ class ProfileView extends PureComponent {
     return (
       <MainPage>
         <Card
-            style={{ width: "100%", maxWidth: 800 }}
+            style={{ width: "100%", maxWidth: 900 }}
             className="md-block-centered profile-view"
           >
             <CardActions>
