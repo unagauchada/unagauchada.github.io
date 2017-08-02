@@ -23,8 +23,10 @@ class ProfileView extends PureComponent {
     this.state = {
       visible: false,
       adminblockVisible:false,
+      adminDeleteVisible:false,
       adminEditVisible: false,
-
+      submissions:[],
+      publications:[],
       currentUser: { name: "", lastname: "", photo: "" },
       user: { name: "", lastname: "", photo: "" },
     }
@@ -33,12 +35,38 @@ class ProfileView extends PureComponent {
   componentDidMount = () => {
     this.getUser(this.props.location.pathname.substring(9))
     this.getCurrentUser(this.props.user.uid)
+    this.getPublications()
+    this.getSubmissions()
   }
 
   componentWillReceiveProps = nextProps => {
     this.getUser(nextProps.location.pathname.substring(9))
     this.getCurrentUser(nextProps.user.uid)
+    this.getPublications()
+    this.getSubmissions()
   }
+
+  getSubmissions = () =>{
+    rootRef
+      .child("submissions")
+      .on("value",
+        (snap => this.setState ({
+          submissions: _.map(snap.val(), (submission,id) => ({...submission,id}) )
+        }))
+      )
+  }
+
+  getPublications = () =>{
+    rootRef
+      .child("publications")
+      .on("value",
+        (snap => this.setState ({
+          publications: _.map(snap.val(), (publication,id) => ({...publication,id}) )
+            .filter(pub => pub.user == this.props.location.pathname.substring(9))
+        }))
+      )
+  }
+
 
   getCurrentUser = user => {
     rootRef
@@ -62,6 +90,70 @@ class ProfileView extends PureComponent {
       .set(true)
     this.closeBlockDialog()
   }
+
+
+  despostularse = publication => {
+    rootRef
+      .child(
+        "submissions/" + publication + "/" + this.props.location.pathname.substring(9)
+      )
+      .remove();
+    rootRef
+      .child("publications/" + publication)
+      .transaction(pub => {
+        pub.submissions--;
+        return pub;
+      });
+  };
+
+  deleteUser = () =>{
+    this.deleteSubmissions()
+    rootRef
+      .child("users")
+      .child(this.props.location.pathname.substring(9))
+      .child("blocked")
+      .set(false)
+    rootRef
+      .child("users")
+      .child(this.props.location.pathname.substring(9))
+      .child("deleted")
+      .set(true)
+    this.state.publications.map(this.cancelPublication)
+    this.closeAdminDeleteDialog()
+
+  }
+
+   cancelPublication = pub => {
+   console.log(pub.title + " canceled")
+    if(pub.gaucho){
+      this.notifyGaucho(pub.gaucho, "El favor " + pub.title + " al que habias sido asignado como gaucho ha sido removido, ya que su creador fue eliminado.")
+    }    
+    rootRef
+      .child("publications/" + pub.id)
+      .child("canceled")
+      .set(true)
+    rootRef
+      .child("submissions/" + pub.uid).remove()
+  }
+
+  notifyGaucho = (gaucho, message) => { 
+    rootRef
+      .child('users')
+      .child(gaucho).child("message")
+      .set(message)     
+  }
+
+  deleteSubmissions = () => {
+    let subs =(this.state.submissions.filter(sub => sub[this.props.location.pathname.substring(9)]).map(x=> x.id) )
+    console.log(subs)
+    subs.map(this.despostularse)
+
+  }
+
+  openAdminDeleteDialog = () => this.setState({ adminDeleteVisible: true })
+   
+
+  closeAdminDeleteDialog = () => this.setState({ adminDeleteVisible: false })
 
   unlockUser = () => {
     rootRef
@@ -116,29 +208,6 @@ class ProfileView extends PureComponent {
 
   closeBlockDialog = () => this.setState({ adminBlockVisible: false })
 
-  blockDialog = () =>{
-    return(
-      <Dialog
-          visible={this.state.adminBlockVisible}
-          title="Bloquear Usuario"
-          onHide={this.closeDialog}
-          modal
-          actions={[{
-            onClick: this.blockUser,
-            primary: true,
-            label: 'Aceptar',
-          },{
-            onClick: this.closeBlockDialog,
-            primary: false,
-            label: 'Cancelar',
-          }]}
-        >
-          <p id="" className="md-color--secondary-text">
-            Estas seguro que deseas bloquear a {this.state.user.name + " " + this.state.user.lastname}?
-          </p>
-      </Dialog>
-    )
-  }
 
   renderImage = () => {
     if (this.state.user.photoURL && this.state.user.photoURL !== ""){ 
@@ -188,6 +257,7 @@ class ProfileView extends PureComponent {
                       icon
                       tooltipLabel="Eliminar"
                       tooltipPosition="top"
+                      onClick={this.openAdminDeleteDialog}
                   >
                       delete
                   </Button>
@@ -228,12 +298,31 @@ class ProfileView extends PureComponent {
                       Estas seguro que deseas bloquear a {this.state.user.name + " " + this.state.user.lastname}?
                     </p>
                 </Dialog>
+                <Dialog
+                    visible={this.state.adminDeleteVisible}
+                    title="Eliminar Usuario"
+                    onHide={this.closeDialog}
+                    modal
+                    actions={[{
+                      onClick: this.deleteUser,
+                      primary: true,
+                      label: 'Aceptar',
+                    },{
+                      onClick: this.closeAdminDeleteDialog,
+                      primary: false,
+                      label: 'Cancelar',
+                    }]}
+                  >
+                    <p id="" className="md-color--secondary-text">
+                      Estas seguro que deseas eliminar a {this.state.user.name + " " + this.state.user.lastname}?
+                    </p>
+                    <p> Eliminar a un usuario es <i> irreversible. </i> </p>
+                </Dialog>
             </CardActions>
             <CardText>
                 <ProfileMenu user={this.props.location.pathname.substring(9)}/>
             </CardText>
         </Card>
-        {this.blockDialog}
       </MainPage>
     )
   }

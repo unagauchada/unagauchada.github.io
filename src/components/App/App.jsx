@@ -21,8 +21,8 @@ import FavorView from "../Publication"
 import ProfileView from "../ProfileView"
 import actionCreator from "../ToolbarActions"
 import MainPage from "../MainPage"
-import rootRef from "../../libs/db"
-import Statistics from "../Statistics"
+import rootRef from "../../libs/db" 
+import Statistics from "../Statistics" 
 import "./App.scss"
 
 const nav = <Button key="nav" icon>menu</Button>
@@ -55,10 +55,10 @@ class App extends React.Component {
         super();
         this.state = {
             searchText: "",
-
             user: { admin: false },
             searchLoc: "",
             blocked: false,
+            deleted:false,
             searchCat: "",
             text: "",
             showButtons: false,
@@ -79,18 +79,21 @@ class App extends React.Component {
   componentDidMount = () => {
     this.getBlocked(firebase)
     firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
-  }
+    this.getDeleted(firebase)
 
+  }
+  
   getUser = user => {
     rootRef
       .child("users")
       .child(user.uid)
       .on("value", snap => this.setState({ user: snap.val() }))
-  }
+   }
 
 
   componentWillReceiveProps = nextProps => {
     this.getBlocked(firebase)
+    this.getDeleted(firebase)
   }
 
   getStates = () => {
@@ -151,6 +154,54 @@ class App extends React.Component {
 
   }
 
+  getDeleted = (fb) =>{
+    console.log("getDeleted")
+    if(fb.auth().currentUser){
+      console.log("uid: "+ fb.auth().currentUser.uid)
+      rootRef
+      .child("users")
+      .child(fb.auth().currentUser.uid)
+      .child("deleted")
+      .on('value',  snap => {
+        console.log('snapback: ' + snap.val())
+        if( snap.val() == true){
+          this.openDeleted()
+          fb.auth().signOut()
+          }
+        } 
+      )
+  }
+  }
+
+  openDeleted = () => {
+    this.setState({ deleted: true });
+  };
+
+  closeDeleted = () => {
+    this.setState({ deleted: false });
+  };
+
+  getDeletedDialog = () => {
+    return(
+      <Dialog
+          visible={this.state.deleted}
+          title="Cuenta Eliminada"
+          onHide={this.closeDialog}
+          modal
+          actions={[{
+            onClick: this.closeDeleted,
+            primary: true,
+            label: 'Aceptar',
+          }]}
+        >
+          <p id="speedBoostDescription" className="md-color--secondary-text">
+            Tu cuenta a sido cerrada definitivamente por la administracion de UnaGauchada.
+          </p>
+        </Dialog>
+    )
+
+  }
+
 
   getCategories = () => {
     rootRef.child("categories").on("value", snap =>
@@ -161,6 +212,10 @@ class App extends React.Component {
       })
     )
   }  
+
+   handleClear() {
+    
+  }
 
   handleChange= value =>{
     if (value) {
@@ -201,13 +256,13 @@ class App extends React.Component {
     this.setState({ searchCat: value })
   }
 
-  home = () => <Home searchText={this.state.searchText} searchLoc={this.state.searchLoc} searchCat={this.state.searchCat} />
 
   render = () => (
     <form  onSubmit={(e) => {e.preventDefault(); this.handleSearch(); }}>
     <Router>
       <app>
         {this.getBlockedDialog()}
+        {this.getDeletedDialog()}
         <Toolbar
           zDepth={1}
           colored
@@ -281,7 +336,7 @@ class App extends React.Component {
           </div>
         </Toolbar>
         <Switch>
-          <Route exact path="/" component={this.home} />
+          <Route exact path="/" component={() => <Home searchText={this.state.searchText} searchLoc={this.state.searchLoc} searchCat={this.state.searchCat} />} />
           <Route path="/signup" component={Signup} />
           <Route path="/signin" component={Login} />
           <Route path="/buy" component={this.props.user ? BuyCredits : Login} />

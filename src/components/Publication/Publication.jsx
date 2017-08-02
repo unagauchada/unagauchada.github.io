@@ -43,10 +43,11 @@ class Publication extends PureComponent {
       editVisible: false,
       qualifyVisible: false,
       gauchoDescription: "",
-      qualifyError: false,
+      qualifyError: false, 
       showDeleteConfirmation: false,
       showGauchoConfirmation: false,
       gaucho: { name: "", lastname: "", photo: "" }
+      showDeleteConfirmation: false
     };
   }
 
@@ -176,7 +177,7 @@ class Publication extends PureComponent {
       .child("publications")
       .child(this.state.publicationId)
       .update({ gaucho: user.user });
-      
+       
     this.hideGauchoConfirmation()
   };
 
@@ -196,11 +197,12 @@ class Publication extends PureComponent {
           <Button raised primary label="Aceptar" onClick={this.grant(this.state.gaucho)}/>
         </section>
       </Dialog>    
-
+ 
   showGauchoConfirmation = gaucho => () => 
   {
-    this.closeDialog();
-    this.setState({showGauchoConfirmation: true, gaucho: gaucho})}
+     this.closeDialog();
+    this.setState({showGauchoConfirmation: true, gaucho: gaucho})
+  }
 
   hideGauchoConfirmation = () => this.setState({showGauchoConfirmation: false})
 
@@ -458,7 +460,9 @@ class Publication extends PureComponent {
 
   deletePublication = () => {
     rootRef
-      .child("publications/" + this.state.publicationId).remove()
+      .child("publications/" + this.state.publicationId)
+      .child("canceled")
+      .set(true)
   }
 
   reportPublication = () => {
@@ -619,6 +623,9 @@ class Publication extends PureComponent {
                     }
                   </div>
                 : <div className="md-cell--right">
+                    <Button tooltipLabel="Preguntar" tooltipPosition="top" icon>
+                      comment
+                    </Button>
                     {this.state.submissions.find(
                       submission => submission.user === this.props.user.uid
                     )
@@ -680,6 +687,24 @@ class Publication extends PureComponent {
                 })}
               </ul>
             </CardText>
+            <Dialog
+                    visible={this.state.publication.canceled}
+                    title="Favor Cancelado"
+                    onHide={()=> 1+1}
+                    modal
+                    actions={[]}
+                  >
+                    <p id="" className="md-color--secondary-text">
+                      Este favor a sido cancelado.
+                    </p>
+                    <Link to="/">
+                      <Button
+                        onClick={() => 1+1}
+                        primary
+                        label='Aceptar'
+                      />
+                    </Link>
+            </Dialog>
             <Divider />
             {this.props.user.uid !== this.state.publication.user &&
               <MakeComment
