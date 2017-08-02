@@ -73,7 +73,11 @@ class App extends React.Component {
     this.getStates()
     this.getCategories()
   }
- 
+
+  componentDidMount() {
+    firebase.auth(fbApp).onAuthStateChanged(user => this.props.updateUser(user))
+  }
+
   getUser = user => {
     rootRef
       .child("users")
