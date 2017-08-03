@@ -293,7 +293,7 @@ class App extends React.Component {
               id="iconLeftPhone"
               block
               data={[]}
-              placeholder="Buscar"
+              placeholder="Buscar por contenido"
               leftIcon={<Button icon onClick={this.handleSearch}>search</Button>}
               onChange={this.handleChange}
               onFocus={this.showButtons}              size={10}
