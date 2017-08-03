@@ -15,6 +15,7 @@ import rootRef from "../../libs/db"
 import "./ProfileView.scss"
 import Avatar from "react-md/lib/Avatars"
 import Dialog from "react-md/lib/Dialogs"
+import { Redirect } from "react-router-dom"
 
 @connect(state => ({ user: userSelector(state) }))
 class ProfileView extends PureComponent {
@@ -22,6 +23,7 @@ class ProfileView extends PureComponent {
     super(props)
     this.state = {
       visible: false,
+      deleted: false,
       adminblockVisible:false,
       adminDeleteVisible:false,
       adminEditVisible: false,
@@ -79,7 +81,7 @@ class ProfileView extends PureComponent {
     rootRef
       .child("users")
       .child(user)
-      .on("value", snap => this.setState({ user: snap.val() }))
+      .on("value", snap => this.setState({ user: snap.val(), deleted: snap.val().deleted }))
   }
   
     blockUser = () => {
@@ -120,6 +122,7 @@ class ProfileView extends PureComponent {
       .set(true)
     this.state.publications.map(this.cancelPublication)
     this.closeAdminDeleteDialog()
+    this.setState({deleted: true})
 
   }
 
@@ -222,6 +225,7 @@ class ProfileView extends PureComponent {
   render = () => {
     return (
       <MainPage>
+        { this.state.deleted && <Redirect to="/" />}
         <Card
             style={{ width: "100%", maxWidth: 900 }}
             className="md-block-centered profile-view"
