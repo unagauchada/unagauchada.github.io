@@ -94,9 +94,10 @@ class Publication extends React.Component {
       <CardTitle
         avatar={
           <Link
-            to={
+            to={ 
               this.state.user.deleted ||
-              "/profile/" + this.props.publication.user
+              (firebase.auth().currentUser &&
+              "/profile/" + this.props.publication.user)
             }
           >
             <UserAvatar url={this.state.user.photoURL} />
