@@ -139,6 +139,7 @@ class App extends React.Component {
   getBlockedDialog = () => {
     return (
       <Dialog
+        id="blockDialog"
         visible={this.state.blocked}
         title="Cuenta bloqueada"
         onHide={this.closeDialog}
