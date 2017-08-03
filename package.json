@@ -25,6 +25,7 @@
     "custom-react-scripts": "0.0.23",
     "gh-pages": "^1.0.0"
   },
+  "homepage": "https://unagauchada.github.io/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
