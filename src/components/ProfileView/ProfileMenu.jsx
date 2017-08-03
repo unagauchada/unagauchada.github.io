@@ -81,7 +81,7 @@ export default class ProfileMenu extends PureComponent {
   }
 
   filterPublications = user => publication => {
-    return publication.user === user
+    return (publication.user === user && !publication.blocked && !publication.canceled)
   }
 
   filterReportedPublications = reports => publication => {
@@ -105,7 +105,7 @@ export default class ProfileMenu extends PureComponent {
     })
 
   filterSubmissions = user => publication => {
-    if (typeof this.state.submissions[publication.id] === 'undefined') {
+    if ((typeof this.state.submissions[publication.id] === 'undefined') || (publication.end < new Date()) || publication.canceled || publication.blocked) {
       return false
     }else{
       return typeof this.state.submissions[publication.id][user] !== 'undefined'

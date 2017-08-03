@@ -1,17 +1,11 @@
 import React from "react"
 import _ from "lodash"
 import { connect } from "react-redux"
-import Button from "react-md/lib/Buttons/Button"
-import Dialog from "react-md/lib/Dialogs"
-import Snackbar from "react-md/lib/Snackbars";
-import Divider from 'react-md/lib/Dividers';
 import rootRef from "../../libs/db"
 import { userSelector } from "../../redux/getters"
-import MetricsGraphics from 'react-metrics-graphics';
 import Card from "react-md/lib/Cards/Card"
 import CardTitle from "react-md/lib/Cards/CardTitle"
 import CardText from "react-md/lib/Cards/CardText"
-import CardActions from "react-md/lib/Cards/CardActions"
 import MainPage from '../MainPage'
 import Plot from './Plot'
 import Switch from 'react-md/lib/SelectionControls/Switch';
