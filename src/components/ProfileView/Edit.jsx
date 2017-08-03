@@ -1,20 +1,21 @@
 import React from "react"
 import _ from "lodash"
+import { Link } from "react-router-dom"
 import Button from "react-md/lib/Buttons/Button"
 import TextField from "react-md/lib/TextFields"
-import SelectField from 'react-md/lib/SelectFields';
-import Snackbar from 'react-md/lib/Snackbars';
+import SelectField from "react-md/lib/SelectFields"
+import Snackbar from "react-md/lib/Snackbars"
 import rootRef, { storageRef } from "../../libs/db"
 import UserAvatar from "../UserAvatar"
 import PhotoEdit from "./PhotoEdit"
 import FontIcon from "react-md/lib/FontIcons"
 import Avatar from "react-md/lib/Avatars"
-import PropTypes from 'prop-types';
-import DatePicker from 'react-md/lib/Pickers/DatePickerContainer';
+import PropTypes from "prop-types"
+import DatePicker from "react-md/lib/Pickers/DatePickerContainer"
 import "./ProfileView.scss"
 
 const duration = 15
-const today = new Date();
+const today = new Date()
 
 import { connect } from "react-redux"
 import { userSelector } from "../../redux/getters"
@@ -43,12 +44,9 @@ class Edit extends React.Component {
   }
 
   initializeUserData = user => {
-    user.birthdate && 
-      this.setState({birthdate: this.props.user.birthdate})
-    user.city && 
-      this.setState({state: this.props.user.city})
-    user.phone && 
-      this.setState({phone: this.props.user.phone})
+    user.birthdate && this.setState({ birthdate: this.props.user.birthdate })
+    user.city && this.setState({ state: this.props.user.city })
+    user.phone && this.setState({ phone: this.props.user.phone })
   }
 
   setStates = () => {
@@ -65,25 +63,19 @@ class Edit extends React.Component {
     let { state, birthdate, phone } = this.state
     let imageURL = ""
     let user = this.props.currentUser.uid
-    if(this.state.birthdateChanged){
+    if (this.state.birthdateChanged) {
       console.log("birthdate changed")
-      rootRef
-        .child("users/".concat(user).concat("/birthdate"))
-        .set(birthdate)      
+      rootRef.child("users/".concat(user).concat("/birthdate")).set(birthdate)
     }
-    if(this.state.stateChanged){
+    if (this.state.stateChanged) {
       console.log("state changed")
-      rootRef
-        .child("users/".concat(user).concat("/city"))
-        .set(state)      
+      rootRef.child("users/".concat(user).concat("/city")).set(state)
     }
-    if(this.state.phoneChanged){
+    if (this.state.phoneChanged) {
       console.log("phone changed")
-      rootRef
-        .child("users/".concat(user).concat("/phone"))
-        .set(phone)      
+      rootRef.child("users/".concat(user).concat("/phone")).set(phone)
     }
-    if(this.state.imageChanged){
+    if (this.state.imageChanged) {
       console.log("photo changed")
       let uploadTask = storageRef
         .child("users/" + user)
@@ -96,20 +88,28 @@ class Edit extends React.Component {
           console.error(error)
         },
         () => {
-          let image = { ...this.state.image, url: uploadTask.snapshot.downloadURL}
+          let image = {
+            ...this.state.image,
+            url: uploadTask.snapshot.downloadURL
+          }
           this.setState({ image })
 
           rootRef
             .child("users/".concat(user).concat("/photoURL"))
             .set(image.url)
 
-          this.props.currentUser.updateProfile({
-            photoURL: image.url
-          }).then(function() {
-            // Update successful.
-          }, function(error) {
-            // An error happened.
-          });
+          this.props.currentUser
+            .updateProfile({
+              photoURL: image.url
+            })
+            .then(
+              function() {
+                // Update successful.
+              },
+              function(error) {
+                // An error happened.
+              }
+            )
         }
       )
     }
@@ -119,28 +119,29 @@ class Edit extends React.Component {
   cancel = () => this.clean()
 
   clean = () => {
-    this.setState({  category: 1, state: 1, text: "" })
+    this.setState({ category: 1, state: 1, text: "" })
     this.props.handleClose()
   }
 
-  _handleStateChange = (value, index, event) => { // eslint-disable-line no-unused-vars
-    this.setState({ state: value, error: false });
-    this.setState({ stateChanged: true})
-  };
-  
   _handleStateChange = (value, index, event) => {
-    this.setState({ state: value })
-    this.setState({ stateChanged: true})
+    // eslint-disable-line no-unused-vars
+    this.setState({ state: value, error: false })
+    this.setState({ stateChanged: true })
   }
 
-  handlePhoneChange =  (value) => {
-    this.setState({ phone: value })
-    this.setState({ phoneChanged: true})
+  _handleStateChange = (value, index, event) => {
+    this.setState({ state: value })
+    this.setState({ stateChanged: true })
   }
-  
-  handleBirthdateChange =  (value) => {
+
+  handlePhoneChange = value => {
+    this.setState({ phone: value })
+    this.setState({ phoneChanged: true })
+  }
+
+  handleBirthdateChange = value => {
     this.setState({ birthdate: value })
-    this.setState({ birthdateChanged: true})
+    this.setState({ birthdateChanged: true })
   }
 
   setImage = image => {
@@ -151,56 +152,68 @@ class Edit extends React.Component {
   }
 
   render = () => {
-    return(
-    <section className="dialog md-grid">
-      <section className="header md-cell md-cell--12 md-cell--middle md-text-center ">
-        <PhotoEdit setImage={this.setImage} photoURL={this.props.user.photoURL}/>
-      </section>
-      <section className="md-cell md-cell--12">
-        <TextField
-          id="phone"
-          type="tel"
-          label="Telefono"
-          leftIcon={<FontIcon>phone</FontIcon>}
-          className="md-cell"
-          value={this.state.phone}
-          onChange={this.handlePhoneChange}
-        />
-        <SelectField
-          primary
-          id="state"
-          label="Localidad"
-          itemLabel="name"
-          itemValue="value"
-          value={this.state.state}
-          menuItems={this.state.states}
-          onChange={this._handleStateChange}
-          className="md-cell"
-          leftIcon={<FontIcon>place</FontIcon>}
-        />
-        <div className="md-grid" style={{ padding: 0 }}>
-          <DatePicker
-            id="datePicker"
-            label="Fecha de nacimiento"
-            value={this.state.birthdate}
-            onChange={this.handleBirthdateChange}
-            maxDate={new Date()}
-            defaultCalendarMode="year"
-            fullWidth={false}
-            inline
-            className="md-cell datePicker"
+    return (
+      <section className="dialog md-grid">
+        <section className="header md-cell md-cell--12 md-cell--middle md-text-center ">
+          <PhotoEdit
+            setImage={this.setImage}
+            photoURL={this.props.user.photoURL}
           />
-        </div>
+        </section>
+        <section className="md-cell md-cell--6">
+          <TextField
+            id="phone"
+            type="tel"
+            label="Telefono"
+            leftIcon={<FontIcon>phone</FontIcon>}
+            fullWidth={true}
+            value={this.state.phone}
+            onChange={this.handlePhoneChange}
+          />
+        </section>
+        <section className="md-cell md-cell--6">
+          <SelectField
+            primary
+            id="state"
+            label="Localidad"
+            fullWidth={true}
+            itemLabel="name"
+            itemValue="value"
+            value={this.state.state}
+            menuItems={this.state.states}
+            onChange={this._handleStateChange}
+            leftIcon={<FontIcon>place</FontIcon>}
+          />
+        </section>
+        <section className="md-cell md-cell--12">
+          <div className="md-grid" style={{ padding: 0 }}>
+            <DatePicker
+              id="datePicker"
+              label="Fecha de nacimiento"
+              fullWidth={true}
+              value={this.state.birthdate}
+              onChange={this.handleBirthdateChange}
+              maxDate={new Date()}
+              defaultCalendarMode="year"
+              fullWidth={false}
+              inline
+              className="datePicker"
+            />
+          </div>
+        </section>
+        <section className="md-cell md-cell--6">
+          <Link to="/changePassword">
+            <Button raised primary label="Cambiar contraseña" />
+          </Link>
+        </section>
+        <section className="footer md-cell md-cell--12 md-text-right">
+          <Button flat label="Cancelar" onClick={this.cancel} />
+          <Button raised primary label="Aceptar" onClick={this.submit} />
+        </section>
+        <Snackbar {...this.state} onDismiss={this.removeToast} />
       </section>
-      <section className="footer md-cell md-cell--12 md-text-right">
-        <Button flat label="Cancelar" onClick={this.cancel} />
-        <Button raised primary label="Aceptar" onClick={this.submit} />
-      </section>
-      <Snackbar {...this.state} onDismiss={this.removeToast} />
-      </section>
-  )}
-    
+    )
   }
-
+}
 
 export default Edit
