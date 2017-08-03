@@ -269,6 +269,7 @@ class ProfileView extends PureComponent {
                 }
                 <Dialog
                   id="adminEditionDialog"
+                  aria-label="admin edition dialog"
                   visible={this.state.adminEditVisible}
                   onHide={this.closeAdminEditDialog}
                   className="googleDialog"
@@ -277,6 +278,7 @@ class ProfileView extends PureComponent {
                 </Dialog>
                 <Dialog
                   id="editionDialog"
+                  aria-label="edition dialgo"
                   visible={this.state.visible}
                   onHide={this.closeDialog}
                   className="googleDialog"
