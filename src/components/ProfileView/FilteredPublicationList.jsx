@@ -40,6 +40,7 @@ class PublicationList extends React.Component {
       <publications>
         {this.state.publications
           .filter(this.props.filter)
+          .filter(pub => !pub.canceled)
           .sort(function(a, b) {
             return b.submissions - a.submissions
           })
