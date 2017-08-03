@@ -227,7 +227,7 @@ class ProfileView extends PureComponent {
       <MainPage>
         { this.state.deleted && <Redirect to="/" />}
         <Card
-            style={{ width: "100%", maxWidth: 900 }}
+            style={{ width: "100%", maxWidth: 1024 }}
             className="md-block-centered profile-view"
           >
             <CardActions>
