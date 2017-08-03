@@ -138,7 +138,7 @@ class ProfileCategories extends React.Component {
     console.log("Modifying User category:" + this.state.userNam )
     rootRef
       .child("scores")
-      .child(this.state.userNam).remove()
+      .child(this.state.modding.name).remove()
     rootRef
       .child("scores")
       .child(this.state.userNam)
