@@ -81,7 +81,7 @@ export default class ProfileMenu extends PureComponent {
   }
 
   filterPublications = user => publication => {
-    return (publication.user === user /*|| publication.canceled ||*/ && !publication.blocked && !publication.canceled)
+    return (publication.user === user && !publication.blocked && !publication.canceled)
   }
 
   filterReportedPublications = reports => publication => {
