@@ -150,7 +150,7 @@ export default class ProfileInformation extends PureComponent {
                     <CardTitle
                         title="Creditos"/>
                     <CardText>
-                        {this.state.user.credits && this.renderCredits()}
+                        {this.renderCredits()}
                     </CardText>    
             </Card>
             }
