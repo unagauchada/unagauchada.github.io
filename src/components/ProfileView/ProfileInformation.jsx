@@ -213,8 +213,6 @@ export default class ProfileInformation extends PureComponent {
                     </section>
                     }
             </Card>
-
-        <Button label="achievements" primary onClick={() => console.log(this.state.archievements.map(x=>x.name))}/>
        </div>
     )
   }
