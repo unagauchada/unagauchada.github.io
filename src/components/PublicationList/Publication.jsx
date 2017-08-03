@@ -1,4 +1,5 @@
 import React from "react"
+import _ from "lodash"
 import firebase from "firebase"
 import { Link } from "react-router-dom"
 import Card from "react-md/lib/Cards/Card"
@@ -21,9 +22,13 @@ class Publication extends React.Component {
     }
   }
 
-  componentDidMount = () => this.fetchAll(this.props.publication)
+  componentDidMount() {
+    this.fetchAll(this.props.publication)
+  }
 
-  componentWillReceiveProps = nextProps => this.fetchAll(nextProps.publication)
+  componentWillReceiveProps(nextProps) {
+    this.fetchAll(nextProps.publication)
+  }
 
   fetchAll = publication => {
     this.getState(publication)
@@ -49,7 +54,38 @@ class Publication extends React.Component {
       .child(publication.user)
       .on("value", snap => this.setState({ user: snap.val() }))
 
-  render = () => (
+  block = () => {
+    let { id, user, title, gaucho } = this.props.publication
+    rootRef.child("publications").child(id).child("blocked").set(true)
+    rootRef
+      .child("users")
+      .child(user)
+      .update({
+        message: `Se ha bloqueado su publicación ${title} luego de haber sido reportada`
+      })
+      .catch(e => console.error(e))
+    if (gaucho && gaucho !== "") {
+      rootRef.child("users").child(gaucho).update({
+        message: `Se ha bloqueado la publicación ${title}, de la que usted era gaucho`
+      })
+    }
+    rootRef
+      .child("submissions")
+      .child(id)
+      .once("value")
+      .then(snap => snap.val())
+      .then(submissions => {
+        _.forEach(submissions, (submittion, submitter) => {
+          if (submitter && submitter !== gaucho) {
+            rootRef.child("users").child(submitter).update({
+              message: `Se ha bloqueado la publicación ${title}, de la que usted estaba postulado`
+            })
+          }
+        })
+      })
+  }
+
+  render = () =>
     <Card
       style={{ maxWidth: 400 }}
       className="md-block-centered md-cell--top "
@@ -57,9 +93,15 @@ class Publication extends React.Component {
     >
       <CardTitle
         avatar={
-          <Link to={this.state.user.deleted||"/profile/"+this.props.publication.user}>
-            <UserAvatar url={this.state.user.photoURL}/> 
-          </Link>}
+          <Link
+            to={
+              this.state.user.deleted ||
+              "/profile/" + this.props.publication.user
+            }
+          >
+            <UserAvatar url={this.state.user.photoURL} />
+          </Link>
+        }
         title={this.state.user.name}
         subtitle={this.state.state.name}
       />
@@ -67,7 +109,7 @@ class Publication extends React.Component {
         <img
           src={
             this.props.publication.imageURL &&
-              this.props.publication.imageURL !== ""
+            this.props.publication.imageURL !== ""
               ? this.props.publication.imageURL
               : CompanyLogo
           }
@@ -87,10 +129,17 @@ class Publication extends React.Component {
               ? <Button raised secondary label="Ver" />
               : <Button flat secondary label="Ver" />}
           </Link>
+          {this.props.canReport &&
+            <Button
+              raised
+              primary
+              label="Bloquear"
+              disabled={this.props.publication.blocked}
+              onClick={this.block}
+            />}
         </CardActions>
       ]}
     </Card>
-  )
 }
 
 export default Publication

@@ -11,7 +11,7 @@ class PublicationList extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      publications: [],
+      publications: []
     }
   }
 
@@ -46,7 +46,11 @@ class PublicationList extends React.Component {
           .map(
             publication =>
               publication &&
-              <Publication key={publication.id} publication={publication} />
+              <Publication
+                canReport={this.props.canReport}
+                key={publication.id}
+                publication={publication}
+              />
           )}
       </publications>
     )
