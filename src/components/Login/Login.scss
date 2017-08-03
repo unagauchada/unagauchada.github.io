@@ -21,4 +21,14 @@ login{
         text-align: right;
     }
 
+    .resetPass {
+        padding: 15px;
+        display: block;
+        text-align: center;
+
+        a:hover{
+            color: $md-primary-color ;
+        }
+    }
+
 }
