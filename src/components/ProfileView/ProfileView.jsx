@@ -121,7 +121,7 @@ class ProfileView extends PureComponent {
       .child("deleted")
       .set(true)
     this.state.publications.map(this.cancelPublication)
-    this.closeAdminDeleteDialog()
+    this.closeAdminDeleteDialog
     this.setState({deleted: true})
 
   }
