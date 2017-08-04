@@ -115,7 +115,7 @@ export default class ProfileMenu extends PureComponent {
       publication.end < new Date() ||
       publication.canceled ||
       publication.blocked ||
-      publication.gaucho !== this.props.currentUser.uid
+      publication.gaucho !== this.props.user
     ) {
       return false
     } else {
