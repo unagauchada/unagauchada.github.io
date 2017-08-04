@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 const createConfigs = () => {
     const configs = {
-        baseURL: 'http://unagauchada.ddns.net:8000',
+        baseURL: 'https://dry-sierra-78195.herokuapp.com',
         crossDomain: true,
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded' 
