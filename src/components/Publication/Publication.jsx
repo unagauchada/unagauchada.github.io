@@ -23,7 +23,7 @@ import ListItem from "react-md/lib/Lists/ListItem";
 import Divider from "react-md/lib/Dividers";
 import Edit from "./Edit.jsx";
 import { Link } from "react-router-dom"
-import { Redirect} from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 
 @connect(state => ({ user: userSelector(state) }))
 class Publication extends PureComponent {
