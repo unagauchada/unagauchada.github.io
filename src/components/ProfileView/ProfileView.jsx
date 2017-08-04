@@ -16,6 +16,7 @@ import "./ProfileView.scss"
 import Avatar from "react-md/lib/Avatars"
 import Dialog from "react-md/lib/Dialogs"
 import { Redirect } from "react-router-dom"
+import { postResource } from "../../libs/mail"
 
 @connect(state => ({ user: userSelector(state) }))
 class ProfileView extends PureComponent {
@@ -129,8 +130,12 @@ class ProfileView extends PureComponent {
    cancelPublication = pub => {
    console.log(pub.title + " canceled")
     if(pub.gaucho){
-      this.notifyGaucho(pub.gaucho, "El favor " + pub.title + " al que habias sido asignado como gaucho ha sido removido, ya que su creador fue eliminado.")
-    }    
+       postResource('/send', {
+        to: pub.gaucho.mail,
+        subject: 'Fuiste designado gaucho para ' + pub.title,
+        body: "El favor " + pub.title + " al que habias sido asignado como gaucho ha sido removido, ya que su creador fue eliminado."
+}).catch(e => console.log(e))
+      }    
     rootRef
       .child("publications/" + pub.id)
       .child("canceled")
