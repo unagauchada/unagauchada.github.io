@@ -25,7 +25,7 @@ import Edit from "./Edit.jsx";
 
 import { postResource } from "../../libs/mail"
 import { Link } from "react-router-dom"
-import { Redirect} from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 
 @connect(state => ({ user: userSelector(state) }))
 class Publication extends PureComponent {

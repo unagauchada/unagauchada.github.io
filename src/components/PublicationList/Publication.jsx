@@ -10,6 +10,7 @@ import Media, { MediaOverlay } from "react-md/lib/Media"
 import Button from "react-md/lib/Buttons"
 import CompanyLogo from "../../assets/logo.png"
 import rootRef from "../../libs/db"
+import { postResource } from "../../libs/mail"
 import UserAvatar from "../UserAvatar"
 import Dialog from "react-md/lib/Dialogs"
 
@@ -58,6 +59,11 @@ class Publication extends React.Component {
   block = () => {
     let { id, user, title, gaucho } = this.props.publication
     rootRef.child("publications").child(id).child("blocked").set(true)
+    postResource("/send", {
+      to: user.mail || user.email,
+      subject: "Publicación bloqueada",
+      body: `Se ha bloqueado su publicación **${title}** luego de haber sido reportada`
+    }).catch(e => console.error(e))
     rootRef
       .child("users")
       .child(user)
@@ -69,6 +75,19 @@ class Publication extends React.Component {
       rootRef.child("users").child(gaucho).update({
         message: `Se ha bloqueado la publicación ${title}, de la que usted era gaucho`
       })
+      rootRef
+        .child("users")
+        .child(gaucho)
+        .once("value")
+        .then(snap => snap.val())
+        .then(user =>
+          postResource("/send", {
+            to: user.mail || user.email,
+            subject: "Publicación bloqueada",
+            body: `Se ha bloqueado la publicación **${title}**, de la que usted era gaucho`
+          })
+        )
+        .catch(e => console.error(e))
     }
     rootRef
       .child("submissions")
@@ -81,15 +100,28 @@ class Publication extends React.Component {
             rootRef.child("users").child(submitter).update({
               message: `Se ha bloqueado la publicación ${title}, de la que usted estaba postulado`
             })
+            rootRef
+              .child("users")
+              .child(submitter)
+              .once("value")
+              .then(snap => snap.val())
+              .then(user =>
+                postResource("/send", {
+                  to: user.mail || user.email,
+                  subject: "Publicación bloqueada",
+                  body: `Se ha bloqueado la publicación **${title}**, de la que usted estaba postulado`
+                })
+              )
+              .catch(e => console.error(e))
           }
         })
       })
     this.closeDialog
   }
 
-  openDialog = () => this.setState({blockDialogVisible: true})
+  openDialog = () => this.setState({ blockDialogVisible: true })
 
-  closeDialog = () => this.setState({blockDialogVisible: false})
+  closeDialog = () => this.setState({ blockDialogVisible: false })
 
   render = () =>
     <Card
@@ -100,10 +132,10 @@ class Publication extends React.Component {
       <CardTitle
         avatar={
           <Link
-            to={ 
+            to={
               this.state.user.deleted ||
               (firebase.auth().currentUser &&
-              "/profile/" + this.props.publication.user)
+                "/profile/" + this.props.publication.user)
             }
           >
             <UserAvatar url={this.state.user.photoURL} />
@@ -147,24 +179,30 @@ class Publication extends React.Component {
         </CardActions>
       ]}
       <Dialog
-          visible={this.state.blockDialogVisible}
-          title="Bloquear publicacion"
-          onHide={this.closeDialog}
-          modal
-          actions={[{
+        visible={this.state.blockDialogVisible}
+        title="Bloquear publicacion"
+        onHide={this.closeDialog}
+        modal
+        actions={[
+          {
             onClick: this.block,
             primary: true,
-            label: 'Aceptar',
-          },{
+            label: "Aceptar"
+          },
+          {
             onClick: this.closeDialog,
             primary: false,
-            label: 'Cancelar',
-          }]}
-        >
-          <p id="" className="md-color--secondary-text">
-            Estas seguro que deseas bloquear el favor {this.props.publication.title}?
-          </p>
-          <p> El bloqueo es <i> irreversible. </i> </p>
+            label: "Cancelar"
+          }
+        ]}
+      >
+        <p id="" className="md-color--secondary-text">
+          Estas seguro que deseas bloquear el favor{" "}
+          {this.props.publication.title}?
+        </p>
+        <p>
+          {" "}El bloqueo es <i> irreversible. </i>{" "}
+        </p>
       </Dialog>
     </Card>
 }
