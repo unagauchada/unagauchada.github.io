@@ -11,6 +11,7 @@ import Button from "react-md/lib/Buttons"
 import CompanyLogo from "../../assets/logo.png"
 import rootRef from "../../libs/db"
 import UserAvatar from "../UserAvatar"
+import Dialog from "react-md/lib/Dialogs"
 
 class Publication extends React.Component {
   constructor(props) {
@@ -83,7 +84,12 @@ class Publication extends React.Component {
           }
         })
       })
+    this.closeDialog
   }
+
+  openDialog = () => this.setState({blockDialogVisible: true})
+
+  closeDialog = () => this.setState({blockDialogVisible: false})
 
   render = () =>
     <Card
@@ -136,10 +142,30 @@ class Publication extends React.Component {
               primary
               label="Bloquear"
               disabled={this.props.publication.blocked}
-              onClick={this.block}
+              onClick={this.openDialog}
             />}
         </CardActions>
       ]}
+      <Dialog
+          visible={this.state.blockDialogVisible}
+          title="Bloquear publicacion"
+          onHide={this.closeDialog}
+          modal
+          actions={[{
+            onClick: this.block,
+            primary: true,
+            label: 'Aceptar',
+          },{
+            onClick: this.closeDialog,
+            primary: false,
+            label: 'Cancelar',
+          }]}
+        >
+          <p id="" className="md-color--secondary-text">
+            Estas seguro que deseas bloquear el favor {this.props.publication.title}?
+          </p>
+          <p> El bloqueo es <i> irreversible. </i> </p>
+      </Dialog>
     </Card>
 }
 
