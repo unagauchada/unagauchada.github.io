@@ -22,6 +22,8 @@ import List from "react-md/lib/Lists/List";
 import ListItem from "react-md/lib/Lists/ListItem";
 import Divider from "react-md/lib/Dividers";
 import Edit from "./Edit.jsx";
+
+import { postResource } from "../../libs/mail"
 import { Link } from "react-router-dom"
 import { Redirect } from 'react-router-dom';
 
@@ -47,6 +49,7 @@ class Publication extends PureComponent {
       showDeleteConfirmation: false,
       showGauchoConfirmation: false,
       gaucho: { name: "", lastname: "", photo: "" },
+      gauchoState: '',
       showDeleteConfirmation: false
     };
   }
@@ -95,6 +98,15 @@ class Publication extends PureComponent {
     });
   };
 
+  getGauchoState = ( ) =>{
+      if (this.state.gaucho.state){
+            rootRef
+              .child("states")
+              .child(this.state.gaucho.state)
+              .on("value", snap => this.setState({ gauchoState: snap.val().name }));
+      }
+  }
+
   getUsuariosPostulados = () => {
     rootRef.child("users").on("value", snap =>
       this.setState({
@@ -133,6 +145,7 @@ class Publication extends PureComponent {
   };
 
   componentDidMount = () => {
+    this.getGauchoState();
     this.getUsuariosPostulados();
     this.getPublication(this.props.match.params.favorID);
     this.getPublicationId(this.props.match.params.favorID);
@@ -142,6 +155,7 @@ class Publication extends PureComponent {
   };
 
   componentWillReceiveProps = nextProps => {
+     this.getGauchoState();
     this.getUsuariosPostulados();
     this.getPublication(nextProps.match.params.favorID);
     this.getPublicationId(nextProps.match.params.favorID);
@@ -167,6 +181,7 @@ class Publication extends PureComponent {
   };
 
   grant = user => e => {
+    console.log(this.state.gauchoState)
     rootRef
       .child("submissions")
       .child(this.state.publicationId)
@@ -177,7 +192,25 @@ class Publication extends PureComponent {
       .child("publications")
       .child(this.state.publicationId)
       .update({ gaucho: user.user });
-       
+
+    postResource('/send', {
+        to: this.state.gaucho.mail,
+        subject: 'Fuiste designado gaucho para ' + this.state.publication.title,
+        body: this.state.gaucho.name + " " + this.state.gaucho.lastname + ",\n"+
+              "Aqui estan la informacion de contacto del usuario que te selecciono: \n \n"+
+              "Dueno del favor: " + this.state.user.name + " " + this.state.user.lastname + "\n" +
+              "Direccion de E-Mail: " + this.state.user.mail + "\n"
+    }).catch(e => console.log(e))
+
+    postResource('/send', {
+        to: this.state.user.mail,
+        subject: 'Designaste un gaucho para ' + this.state.publication.title,
+        body: this.state.user.name + " " + this.state.user.lastname + ",\n"+
+              "Aqui estan la informacion de contacto del gaucho que seleccionaste: \n \n"+
+              "Gaucho: " + this.state.gaucho.name + " " + this.state.gaucho.lastname + "\n" +
+              "Direccion de E-Mail: " + this.state.gaucho.mail +"\n" 
+    }).catch(e => console.log(e))
+     
     this.hideGauchoConfirmation()
   };
 
@@ -201,6 +234,7 @@ class Publication extends PureComponent {
   showGauchoConfirmation = gaucho => () => 
   {
      this.closeDialog();
+
     this.setState({showGauchoConfirmation: true, gaucho: gaucho})
   }
 

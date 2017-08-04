@@ -114,7 +114,8 @@ export default class ProfileMenu extends PureComponent {
       typeof this.state.submissions[publication.id] === "undefined" ||
       publication.end < new Date() ||
       publication.canceled ||
-      publication.blocked
+      publication.blocked ||
+      publication.gaucho !== this.props.user
     ) {
       return false
     } else {
