@@ -87,7 +87,7 @@ class Singup extends React.Component {
         rootRef
           .child("users")
           .child(user.uid)
-          .set({ name, lastname, city, birthdate, phone, credits: 1, qualification: 0 })
+          .set({mail:this.state.email, name, lastname, city, birthdate, phone, credits: 1, qualification: 0 })
         return user
       })
       .then(user => user.sendEmailVerification())
