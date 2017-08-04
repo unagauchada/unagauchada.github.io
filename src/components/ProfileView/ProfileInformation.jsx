@@ -120,6 +120,16 @@ export default class ProfileInformation extends PureComponent {
     )
   }
 
+  getQualification = () => {
+    if (this.state.user.qualification === 0){ 
+        return "0 Puntos"
+    }else if (this.state.user.qualification === 1){ 
+        return this.state.user.qualification + " Punto"
+    }else{
+        return this.state.user.qualification + " Puntos"            
+    }
+  }
+
   renderCredits = () => {
 
     if (this.state.user.credits === 1){ 
@@ -189,8 +199,8 @@ export default class ProfileInformation extends PureComponent {
                             {this.getScore()}
                             </h2>
                         }
-                        {  this.state.user.qualification &&
-                            <h4 className="md-display-1 display-override md-text-center">{this.state.user.qualification + ' puntos'}</h4>
+                        {  this.state.user.qualification || this.state.user.qualification === 0 &&
+                            <h4 className="md-display-1 display-override md-text-center">{this.getQualification()}</h4>
                         }
                     </CardText>    
                     {this.state.showQualifications && this.state.qualifications.length>0 &&
