@@ -193,9 +193,14 @@ class ProfileCategories extends React.Component {
     		  	<List>
     		  	  {this.state.userCat.map((userCat, i) =>
     		  	  	<ListItem primaryText={userCat.name}
-                  secondaryText ={( 0 == (this.state.userCat.length -1 )) ?"Desde " + 0  + " puntos":
-                  (i == this.state.userCat.length -1)?"Dese " + (this.state.userCat[i-1].lt +1 )  + " puntos":
-                    "Hasta " + userCat.lt + " puntos"
+                  secondaryText =
+                  {(( 0 == i) && 1 == this.state.userCat.length )?
+                    "Desde negativos hasta infinitos puntos":
+                  ( 0 == i) ?
+                    "Desde negativos hasta " + userCat.lt  + " puntos":
+                  (i == this.state.userCat.length -1)?
+                    "Desde " + (this.state.userCat[i-1].lt +1 ) + " hasta infinitos puntos":                    
+                    "Desde " + (this.state.userCat[i-1].lt +1 ) + " Hasta " + userCat.lt + " puntos"
                     }
     		  	  		leftIcon={<Button
                     disabled={this.state.userCat.length == 1} 
@@ -264,6 +269,14 @@ class ProfileCategories extends React.Component {
           actions={[{
             onClick: this.userMod,
             primary: true,
+            disabled: !this.state.userNam 
+              || (this.state.userCat.map(cat => cat.name).some(name => name === this.state.userNam)
+                    && this.state.userNam != this.state.modding.name)
+              ||!this.state.userLt
+              ||!(typeof this.state.userLt) == 'number'
+              ||(this.state.userLt%1)
+              ||(this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)
+                            && this.state.userLt != this.state.modding.lt),
             label: 'Aceptar',
           },{
             onClick: this.closeUserMod,
@@ -289,7 +302,7 @@ class ProfileCategories extends React.Component {
             onChange={text => this.setState({userLt: text})}
             error={(this.state.userLt%1) || this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)}
             errorText={
-              (this.state.userLt == "") ? "Ingrese un entero":
+              (this.state.userLt == "" && this.state.userLt != 0) ? "Ingrese un entero":
               this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)
               && this.state.userLt != this.state.modding.lt ?"Otra categoria tiene este puntaje minimo.":
               ""
@@ -298,7 +311,7 @@ class ProfileCategories extends React.Component {
     	</Dialog>
     	<Dialog
           visible={this.state.userDel}
-          title="Cuenta Eliminada"
+          title="Eliminar categoria"
           onHide={this.closeDialog}
           modal
           actions={[{
