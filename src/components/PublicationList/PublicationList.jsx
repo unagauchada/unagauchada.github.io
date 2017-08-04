@@ -32,7 +32,8 @@ class PublicationList extends React.Component {
       credits: 0,
       toasts: [],
       autohide: true,
-      message: null
+      message: null,
+      hasMessage: false
     }
   }
 
@@ -52,13 +53,25 @@ class PublicationList extends React.Component {
     this._addToast("No posee suficiente credito")
   }
 
-  toastMessage = () => {
-    this._addToast(this.state.message)
+  showMessage = () => this.setState({hasMessage: true})
+
+  hideMessage = () => {
+    this.setState({hasMessage: false})
     rootRef
       .child('users')
       .child(this.props.user.uid).child("message")
       .remove()     
+  }
 
+  componentWillUpdate(nextProps, nextState) {
+    const { toasts } = nextState;
+    const [toast] = toasts;
+    if (this.state.toasts === toasts || !toast) {
+      return;
+    }
+
+    const autohide = toast.action !== 'ok';
+    this.setState({ autohide });
   }
 
   componentDidMount = () => {
@@ -69,8 +82,6 @@ class PublicationList extends React.Component {
     this.getUsers()
     this.getMessage(this.props)
   }
-
-
 
   getStates = () => {
     rootRef.child("states").on("value", snap =>
@@ -218,6 +229,7 @@ class PublicationList extends React.Component {
       .child("users/" + this.getUserId(props) + "/message")
       .on("value", snap => {
         console.log(snap.val())
+        snap.val() && this.showMessage()
         this.setState({ message: snap.val() })
       })
   }
@@ -263,9 +275,26 @@ class PublicationList extends React.Component {
 
   render = () => {
     let publishButton = this.getButton()
-    this.state.message && this.toastMessage()
     return (
       <div>
+      <Dialog
+        id="messageDialog"
+        visible={this.state.hasMessage}
+        title="Nuevo mensaje"
+        onHide={this.hideMessage}
+        modal
+        actions={[
+          {
+            onClick: this.hideMessage,
+            primary: true,
+            label: "Aceptar"
+          }
+        ]}
+      >
+        <p id="speedBoostDescription" className="md-color--secondary-text">
+          {this.state.message}
+        </p>
+      </Dialog>
       {this.searchHeader()}  
       <publications>
         {this.state.publications
