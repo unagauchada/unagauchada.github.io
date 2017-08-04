@@ -24,6 +24,7 @@ class ProfileCategories extends React.Component {
       userNam: "",
       userLt: "",
       userMod: false,
+      cur: -7,
       userDel: false,
       favAdd: false,
       favNam: "",
@@ -118,11 +119,24 @@ class ProfileCategories extends React.Component {
   	this.closeFavDel()
   }
 
-  openUserAdd = cat => this.setState({userAdd:true})
+  openUserAdd = cat => this.setState({userAdd:true, userNam: "", userLt:0, userGt:0})
   closeUserAdd= () => this.setState({userAdd:false})
 
   userAdd = () =>{
-    console.log("Adding User category:" + this.state.userNam )
+    let toDel = this.getCovered()
+    rootRef
+     .child("scores")
+     .child(this.state.userCat.filter(cat=> cat.lt >= this.state.userGt-1)[0].name)
+     .child("lt")
+     .set(parseInt(this.state.userGt-1))
+
+    toDel
+      .slice(1)
+      .map(cat=> rootRef
+        .child("scores")
+        .child(cat).remove()
+      ) 
+
     rootRef
       .child("scores")
       .child(this.state.userNam)
@@ -131,19 +145,51 @@ class ProfileCategories extends React.Component {
     this.closeUserAdd()
   }
 
-  openUserMod = cat => this.setState({userMod:true, userNam: cat.name, userLt: cat.lt, modding:cat })
+  openUserMod = (cat, ant,i) => this.setState({
+    userMod:true,
+    userNam: cat.name, 
+    userLt: cat.lt, 
+    userGt: (ant.lt +1) ,
+    cur:i,
+    modding: cat, 
+    moddingAnt: ant 
+  })
+
   closeUserMod= () => this.setState({userMod:false})
 
+  getCovered = () => this.state.userCat
+    .filter(cat => cat.lt <= this.state.userLt && cat.lt > this.state.userGt)
+    .map(cat => cat.name)
+
+
   userMod = () =>{
-    console.log("Modifying User category:" + this.state.userNam )
-    rootRef
-      .child("scores")
-      .child(this.state.modding.name).remove()
+    let toDel = this.getCovered()
+
+    if (this.state.moddingAnt&&this.state.moddingAnt.lt< this.state.userGt)
+    {rootRef
+          .child("scores")
+          .child(this.state.moddingAnt.name)
+          .child("lt")
+          .set(parseInt(this.state.userGt - 1))}
+    else if (this.state.moddingAnt){
+        rootRef
+          .child("scores")
+          .child(toDel[0])
+          .child("lt")
+          .set(parseInt(this.state.userGt - 1))
+    }
+    toDel
+      .slice(1)
+      .map(cat=> rootRef
+        .child("scores")
+        .child(cat).remove() )
     rootRef
       .child("scores")
       .child(this.state.userNam)
       .child("lt")
       .set(parseInt(this.state.userLt))
+    
+    
     this.closeUserMod()
   }
 
@@ -208,7 +254,7 @@ class ProfileCategories extends React.Component {
                     onClick={() => this.openUserDel(userCat)}> 
                     delete </Button>
                   }
-    		  	  		rightIcon={<Button onClick={() =>this.openUserMod(userCat)}> create </Button>}
+    		  	  		rightIcon={<Button onClick={() =>this.openUserMod(userCat, i > 0?this.state.userCat[i-1]:false, i)}> create </Button>}
     		  	  	/>
     		  	  )}
     		  	</List>
@@ -217,7 +263,7 @@ class ProfileCategories extends React.Component {
     		  		label="Agregar"
     		  		onClick={() => this.openUserAdd()} 
     		  		primary
-    		  	/> 
+    		  	/>
     		</CardText>
     	</Card>
     	<Dialog
@@ -228,9 +274,12 @@ class ProfileCategories extends React.Component {
           actions={[{
             onClick: this.userAdd,
             primary: true,
-            disabled: !this.state.userNam 
-              || this.state.userCat.map(cat => cat.name).some(name => name === this.state.userNam)
+            disabled: !this.state.userNam
+              ||!this.state.userGt
+              ||!(typeof this.state.userGt) == 'number'
+              ||(this.state.userGt%1) 
               ||!this.state.userLt
+              ||this.state.userLt<this.state.userGt
               ||!(typeof this.state.userLt) == 'number'
               ||(this.state.userLt%1),
             label: 'Aceptar',
@@ -247,19 +296,27 @@ class ProfileCategories extends React.Component {
             error={this.state.userCat.map(cat => cat.name).some(name => name === this.state.userNam)}
             errorText={this.state.userNam==""?"Este campo es obligatorio.":"Este nombre ya esta utilizado."}
           />
-        <TextField
-            label="Hasta que puntaje?"
-            required
-            type='number'
-            floating={true}
-            onChange={text => this.setState({userLt: text})}
-            error={(this.state.userLt%1) || this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)}
-            errorText={
-              (this.state.userLt == "") ? "Ingrese un entero":
-              this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)?"Otra categoria tiene este puntaje minimo.":
-              ""
-            }
-          />
+          {<TextField
+                      label="Desde que puntaje?"
+                      required
+                      value={this.state.userGt}
+                      type='number'
+                      floating={true}
+                      onChange={text => this.setState({userGt: text})}
+                      error={(this.state.userGt%1)}
+                      errorText={ "Ingrese un entero inferior a la cota superior"
+                      }
+                    />}
+        {<TextField
+                    label="Hasta que puntaje?"
+                    required
+                    type='number'
+                    floating={true}
+                    onChange={text => this.setState({userLt: text})}
+                    error={(this.state.userLt%1) }
+                    errorText={
+                      (this.state.userLt == "") ? "Ingrese un entero superior a la cota inferior":""}
+                  />}
     	</Dialog>
     	<Dialog
           visible={this.state.userMod}
@@ -267,16 +324,15 @@ class ProfileCategories extends React.Component {
           onHide={this.closeDialog}
           modal
           actions={[{
-            onClick: this.userMod,
+            onClick: () => this.userMod(),
             primary: true,
             disabled: !this.state.userNam 
               || (this.state.userCat.map(cat => cat.name).some(name => name === this.state.userNam)
                     && this.state.userNam != this.state.modding.name)
               ||!this.state.userLt
+              ||this.state.userLt<this.state.userGt
               ||!(typeof this.state.userLt) == 'number'
-              ||(this.state.userLt%1)
-              ||(this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)
-                            && this.state.userLt != this.state.modding.lt),
+              ||(this.state.userLt%1),
             label: 'Aceptar',
           },{
             onClick: this.closeUserMod,
@@ -293,21 +349,30 @@ class ProfileCategories extends React.Component {
               && this.state.userNam != this.state.modding.name }
             errorText={this.state.userNam==""?"Este campo es obligatorio.":"Este nombre ya esta utilizado."}
           />
-        <TextField
-            label="Hasta que puntaje?"
-            required
-            value={this.state.userLt}
-            type='number'
-            floating={true}
-            onChange={text => this.setState({userLt: text})}
-            error={(this.state.userLt%1) || this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)}
-            errorText={
-              (this.state.userLt == "" && this.state.userLt != 0) ? "Ingrese un entero":
-              this.state.userCat.map(cat => cat.lt).some(lt => lt == this.state.userLt)
-              && this.state.userLt != this.state.modding.lt ?"Otra categoria tiene este puntaje minimo.":
-              ""
-            }
-          />
+          {!this.state.cur==0 && <TextField
+                      label="Desde que puntaje?"
+                      required
+                      value={this.state.userGt}
+                      type='number'
+                      floating={true}
+                      onChange={text => this.setState({userGt: text})}
+                      error={(this.state.userGt%1)||this.state.userLt<this.state.userGt}
+                      errorText={ "Ingrese un entero inferior a la cota superior"
+                      }
+                    />}
+        {<TextField
+                    label="Hasta que puntaje?"
+                    required
+                    value={this.state.userLt}
+                    type='number'
+                    floating={true}
+                    onChange={text => this.setState({userLt: text})}
+                    error={(this.state.userLt%1)||((this.state.userCat.length -1) == this.state.cur &&this.state.userLt< this.state.modding.lt)||this.state.userLt<this.state.userGt}
+                    errorText={
+                      (this.state.userLt == ""||this.state.userLt<this.state.userGt) ? "Ingrese un entero superior a la cota inferior":
+                      "No se puede reducir la cota superior de la categoria mas alta"
+                    }
+                  />}
     	</Dialog>
     	<Dialog
           visible={this.state.userDel}
@@ -328,7 +393,7 @@ class ProfileCategories extends React.Component {
     	</Dialog>
     	<Dialog
           visible={this.state.favAdd}
-          title="Cuenta Eliminada"
+          title="Agregar categoria de favor"
           onHide={this.closeDialog}
           modal
           actions={[{
